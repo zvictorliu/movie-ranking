@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory  # 导入 Flask 和 jsonify [[1]]
+from flask import Flask, jsonify, send_from_directory, request  # 导入 Flask 和 jsonify [[1]]
 from flask_cors import CORS  # 导入 CORS [[2]]
 import os
 import frontmatter
@@ -92,6 +92,29 @@ def get_actor(actor_name):
             "body_html": body_html,
         }
         return jsonify(actor_data)
+    
+
+@app.route('/api/update-order', methods=['POST'])
+def update_order():
+    try:
+        data = request.json
+        new_order = data.get('order')
+
+        for item in new_order:
+            file_path = os.path.join(CONTENT_FOLDER, item['id'])
+            if not os.path.exists(file_path):
+                return jsonify({"error": f"File not found: {item['id']}"}), 404
+
+            with open(file_path, 'r+', encoding='utf-8') as f:
+                post = frontmatter.load(f)
+                post['order'] = item['order']
+                f.seek(0)
+                f.write(frontmatter.dumps(post))
+                f.truncate()
+
+        return jsonify({"message": "Order updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

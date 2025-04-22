@@ -63,6 +63,8 @@
         </button>
       </div>
     </div>
+
+    <button @click="saveOrder" class="save-button">保存顺序</button>
   </div>
 </template>
 
@@ -135,6 +137,18 @@ export default {
       }
       return hash;
     },
+    async saveOrder() {
+      const newOrder = this.movies.map((movie, index) => ({
+        id: movie.id,
+        order: index + 1, // 更新顺序值
+      }));
+      try {
+        await axios.post('http://localhost:5000/api/update-order', { order: newOrder });
+        this.$message.success("排行顺序已更新！");
+      } catch (error) {
+        this.$message.error("更新失败，请稍后再试！");
+      }
+    },
   },
   async created() {
     try {
@@ -201,6 +215,18 @@ export default {
 .icon-button:disabled {
   color: #ccc;
   cursor: not-allowed;
+}
+
+.save-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.save-button:hover {
+  background-color: #33a07c;
 }
 
 
