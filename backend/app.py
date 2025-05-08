@@ -32,6 +32,7 @@ def parse_markdown_files():
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)  # 使用 frontmatter 解析 Markdown 文件 [[3]]
                 body_html = markdown.markdown(post.content)  # 将正文转换为 HTML [[3]]
+                body_html = body_html.replace('src="./imgs/', 'src="http://localhost:5000/imgs/')
                 movie_data = {
                     "id": filename,
                     "title": post.get('title', '未知标题'),
@@ -65,9 +66,9 @@ def get_movies():
     """
     movies = parse_markdown_files()
     
-    print("获取所有影片信息：")
-    for movie in movies:
-        print(movie)
+    print(f"获取所有影片信息：{len(movies)} movies")
+#    for movie in movies:
+#        print(movie)
 
     return jsonify(movies)
 
