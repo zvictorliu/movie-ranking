@@ -116,6 +116,79 @@ def update_order():
         return jsonify({"message": "Order updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/create-movie', methods=['POST'])
+def create_movie():
+    """
+    API 接口：接收前端发送的影片数据并创建 Markdown 文件 [[3]]。
+    """
+    data = request.json
+    title = data.get('title')
+    actors = data.get('actors', '')
+    tags = data.get('tags', '').split(',')  # 将标签字符串转换为列表
+    description = data.get('description', '')
+    order = data.get('order', 1)
+
+    # 确保内容文件夹存在
+    if not os.path.exists(CONTENT_FOLDER):
+        os.makedirs(CONTENT_FOLDER)
+
+    # 生成文件名
+    filename = f"{title.replace(' ', '_')}.md"
+    file_path = os.path.join(CONTENT_FOLDER, filename)
+
+    # 构建 Markdown 文件内容
+    post = frontmatter.Post("")
+    post.metadata = {
+        "title": title,
+        "actors": actors,
+        "tags": [tag.strip() for tag in tags if tag.strip()],
+        "description": description,
+        "order": int(order),  # 默认顺序值为无穷大
+        "cover": f"{title.replace(' ', '_')}.jpg",  # 默认封面图片名
+    }
+
+    # 写入文件
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(frontmatter.dumps(post))
+
+    return jsonify({"success": True, "message": "Movie created successfully"}), 200
+
+@app.route('/api/create-actor', methods=['POST'])
+def create_actor():
+    """
+    API 接口：接收前端发送的演员数据并创建 Markdown 文件 [[1]]。
+    """
+    data = request.json
+    name = data.get('name')
+    birth = data.get('birth')
+    debut = data.get('debut')
+    bio = data.get('bio', '')
+    cover = data.get('cover', '')
+
+    # 确保演员文件夹存在
+    if not os.path.exists(ACTORS_FOLDER):
+        os.makedirs(ACTORS_FOLDER)
+
+    # 生成文件名
+    filename = f"{name.replace(' ', '_')}.md"
+    file_path = os.path.join(ACTORS_FOLDER, filename)
+
+    # 构建 Markdown 文件内容
+    post = frontmatter.Post("")
+    post.metadata = {
+        "name": name,
+        "birth": birth,
+        "debut": debut,
+        "cover": f"{name.replace(' ', '_')}.jpg",  # 默认封面图片名
+    }
+
+    # 写入文件
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(frontmatter.dumps(post))
+
+    return jsonify({"success": True, "message": "Actor created successfully"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

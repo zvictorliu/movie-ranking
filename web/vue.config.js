@@ -1,16 +1,13 @@
 const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
-  transpileDependencies: true,
-  // devServer: {
-  //   proxy: {
-  //     '/imgs': {
-  //       target: 'http://localhost:5000', // 后端服务地址
-  //       changeOrigin: true,
-  //       pathRewrite: {
-  //         '^/imgs': '/imgs', // 重写路径
-  //       },
-  //     },
-  //   },
-  // },
-
-})
+module.exports = {
+  devServer: {
+    port: 8080, // Vue应用运行的端口
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000', // 替换为你的后端服务器地址
+        changeOrigin: true,
+        // pathRewrite: { '^/api': '' }, // 可选：重写路径
+      },
+    },
+  },
+}

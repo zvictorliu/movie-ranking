@@ -6,6 +6,7 @@
         <img src="/home-button.png" alt="Logo" />
       </div>
       <h1 class="title" >影片排行榜</h1>
+      
     </header>
 
     <!-- 路由视图：显示当前路由对应的页面 -->
@@ -28,6 +29,7 @@ export default {
     goToHome() {
       this.$router.push({ name: "HomePage" }); // 返回主页 [[6]]
     },
+    
   },
 };
 </script>
@@ -60,8 +62,10 @@ body {
 .title {
   color: white;
   font-size: 24px;
-  margin-left: 20px;
+  margin: 0 10px;
 }
+
+
 
 .app-main {
   flex: 1;

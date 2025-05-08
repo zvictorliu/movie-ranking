@@ -1,5 +1,73 @@
 <template>
   <div class="home">
+    <!-- 新建按钮 -->
+    <button class="new-button" @click="openDialog">新建影片</button>
+    <!-- 浮动窗口 -->
+    <el-dialog v-model="dialogVisible" title="新增影片" width="30%">
+      <el-form :model="formData" label-width="80px">
+        <el-form-item label="标题">
+          <el-input v-model="formData.title" placeholder="请输入影片标题"></el-input>
+        </el-form-item>
+        <el-form-item label="演员">
+          <el-input v-model="formData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-input v-model="formData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="简介">
+          <el-input
+            v-model="formData.description"
+            type="textarea"
+            placeholder="请输入影片简介"
+          ></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="封面">
+          <el-input v-model="formData.cover" placeholder="请输入封面图片路径"></el-input>
+        </el-form-item> -->
+      <el-form-item label="order">
+        <el-input v-model="formData.order" placeholder="请输入影片顺序"></el-input>
+      </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveMovie">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 新建按钮 -->
+    <button class="new-button" @click="openActorDialog">新建演员</button>
+
+    <!-- 浮动窗口 -->
+    <el-dialog v-model="actorDialogVisible" title="新增演员" width="30%">
+      <el-form :model="actorFormData" label-width="80px">
+        <el-form-item label="姓名">
+          <el-input v-model="actorFormData.name" placeholder="请输入演员姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="出生日期">
+          <el-input
+            v-model="actorFormData.birth"
+            placeholder="请输入出生日期"
+            style="width: 100%;"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="出道日期">
+          <el-input
+            v-model="actorFormData.debut"
+            placeholder="请输入出道日期"
+            style="width: 100%;"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="actorDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveActor">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
     <div v-for="(movie, index) in movies" :key="movie.id" class="movie-item">
       <!-- 封面 -->
       <div class="cover-wrapper" @click="goToDetail(movie.id)">
@@ -86,9 +154,75 @@ export default {
     return {
       movies: [], // 初始为空数组，稍后加载数据
       defaultCover, // 默认图片路径
+      dialogVisible: false, // 控制浮动窗口的显示状态
+      formData: {
+        title: "",
+        actors: "",
+        tags: "",
+        description: "",
+        order: 1, // 新增顺序字段
+      },
+      actorDialogVisible: false, // 控制浮动窗口的显示状态
+      actorFormData: {
+        name: "",
+        birth: "",
+        debut: "",
+      },
     };
   },
   methods: {
+    openDialog() {
+      this.dialogVisible = true; // 打开浮动窗口 [[4]]
+    },
+    async saveMovie() {
+      try {
+        const response = await axios.post('http://localhost:5000/api/create-movie', this.formData);
+        if (response.data.success) {
+          this.$message.success("影片已成功创建！");
+          this.dialogVisible = false; // 关闭浮动窗口
+          this.resetForm(); // 清空表单
+        } else {
+          this.$message.error("创建失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message);
+        this.$message.error("创建失败，请稍后再试！");
+      }
+    },
+    resetForm() {
+      this.formData = {
+        title: "",
+        actors: "",
+        tags: "",
+        description: "",
+        order: 1,
+      };
+    },
+    openActorDialog() {
+      this.actorDialogVisible = true; // 打开浮动窗口 [[1]]
+    },
+    async saveActor() {
+      try {
+        const response = await axios.post('http://localhost:5000/api/create-actor', this.actorFormData);
+        if (response.data.success) {
+          this.$message.success("演员已成功创建！");
+          this.actorDialogVisible = false; // 关闭浮动窗口
+          this.resetActorForm(); // 清空表单
+        } else {
+          this.$message.error("创建失败，请稍后再试！");
+        }
+      } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message);
+        this.$message.error("创建失败，请稍后再试！");
+      }
+    },
+    resetActorForm() {
+      this.actorFormData = {
+        name: "",
+        birth: "",
+        debut: "",
+      };
+    },
     moveUp(index) {
       if (index > 0) {
         const temp = this.movies[index];
@@ -152,7 +286,7 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get("http://localhost:5000/api/movies"); // 调用后端 API [[2]]
+      const response = await axios.get('http://localhost:5000/api/movies'); // 调用后端 API [[2]]
       this.movies = response.data;
     } catch (error) {
       console.error("请求失败:", error);
@@ -229,5 +363,14 @@ export default {
   background-color: #33a07c;
 }
 
+.new-button {
+  margin: 20px 10px;
+  background-color: #409eff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
 </style>
