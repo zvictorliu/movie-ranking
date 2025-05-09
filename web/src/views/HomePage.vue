@@ -1,7 +1,13 @@
 <template>
   <div class="home">
+    
     <!-- 新建按钮 -->
     <button class="new-button" @click="openDialog">新建影片</button>
+    <!-- 新建按钮 -->
+    <button class="new-button" @click="openActorDialog">新建演员</button>
+    <button @click="saveOrder" class="save-button">保存顺序</button>
+
+
     <!-- 浮动窗口 -->
     <el-dialog v-model="dialogVisible" title="新增影片" width="30%">
       <el-form :model="formData" label-width="80px">
@@ -35,9 +41,6 @@
         </span>
       </template>
     </el-dialog>
-
-    <!-- 新建按钮 -->
-    <button class="new-button" @click="openActorDialog">新建演员</button>
 
     <!-- 浮动窗口 -->
     <el-dialog v-model="actorDialogVisible" title="新增演员" width="30%">
@@ -132,7 +135,6 @@
       </div>
     </div>
 
-    <button @click="saveOrder" class="save-button">保存顺序</button>
   </div>
 </template>
 

@@ -1,13 +1,7 @@
 <template>
   <div id="app">
     <!-- 全局头部 -->
-    <header class="app-header">
-      <div class="logo" @click="goToHome">
-        <img src="/home-button.png" alt="Logo" />
-      </div>
-      <h1 class="title" >影片排行榜</h1>
-      
-    </header>
+    <Header />
 
     <!-- 路由视图：显示当前路由对应的页面 -->
     <main class="app-main">
@@ -16,20 +10,19 @@
     </main>
 
     <!-- 全局底部 -->
-    <footer class="app-footer">
-      <p>&copy; 2025 My Movie Ranking App</p>
-    </footer>
+    <Footer />
+    
   </div>
 </template>
 
 <script>
+import Footer from "./components/Footer.vue";
+import Header from "./components/Header.vue";
 export default {
   name: "App",
-  methods: {
-    goToHome() {
-      this.$router.push({ name: "HomePage" }); // 返回主页 [[6]]
-    },
-    
+  components: {
+    Header,
+    Footer,
   },
 };
 </script>
@@ -47,35 +40,9 @@ body {
   min-height: 100vh;
 }
 
-.app-header {
-  background-color: #42b983;
-  padding: 10px 20px;
-  align-items: center;
-  display: flex;
-}
-
-.logo img {
-  width: 50px;
-  cursor: pointer;
-}
-
-.title {
-  color: white;
-  font-size: 24px;
-  margin: 0 10px;
-}
-
-
-
 .app-main {
   flex: 1;
   padding: 20px;
 }
 
-.app-footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 10px;
-}
 </style>
