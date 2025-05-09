@@ -68,7 +68,27 @@
       <!-- 新建按钮 -->
       <button class="new-button material-icons" @click="openDialog" title="添加影片">add</button>
       <button @click="saveOrder" class="save-button material-icons" title="保存顺序">save</button>
-      <div v-for="(movie, index) in movies" :key="movie.id" class="movie-item">
+      <!-- 筛选器 -->
+      <div class="filter-container">
+        <label for="actor-filter">按演员筛选：</label>
+      <el-select
+        v-model="selectedActors"
+        multiple
+        clearable
+        filterable
+        placeholder="请选择演员"
+        style="width: 200px;"
+        @change="filterMovies"
+      >
+        <el-option
+          v-for="actor in actors"
+          :key="actor.name"
+          :label="actor.name"
+          :value="actor.name"
+        ></el-option>
+      </el-select>
+      </div>
+      <div v-for="(movie, index) in filteredMovies" :key="movie.id" class="movie-item">
         <!-- 封面 -->
         <div class="cover-wrapper" @click="goToDetail(movie.id)">
           <img :src="movie.cover" alt="封面" class="cover" @error="setDefaultCover($event)" />
@@ -167,6 +187,8 @@ export default {
   data() {
     return {
       movies: [], // 初始为空数组，稍后加载数据
+      filteredMovies: [], // 筛选后的影片
+      selectedActors: [], // 当前选择的演员
       defaultCover, // 默认图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
       actors: [], // 演员列表
@@ -286,6 +308,18 @@ export default {
       }
       return hash
     },
+    filterMovies() {
+      console.log('筛选演员:', this.selectedActors) // 调试信息
+      if (this.selectedActors.length > 0) {
+        this.filteredMovies = this.movies.filter((movie) =>
+          this.selectedActors.some((actor) =>
+            movie.actors && movie.actors.split(', ').includes(actor)
+          )
+        );
+      } else {
+        this.filteredMovies = [...this.movies]; // 如果未选择演员，则显示所有影片
+      }
+    },
     async saveOrder() {
       const newOrder = this.movies.map((movie, index) => ({
         id: movie.id,
@@ -303,6 +337,7 @@ export default {
     try {
       const response = await axios.get('/api/movies')
       this.movies = response.data
+      this.filteredMovies = response.data // 初始化筛选后的影片
     } catch (error) {
       console.error('Error fetching movies:', error)
     }
@@ -429,4 +464,16 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.filter-container {
+  margin-bottom: 20px;
+}
+.filter-container label {
+  margin-right: 10px;
+}
+.filter-container select {
+  margin-left: 10px;
+}
+
+
 </style>
