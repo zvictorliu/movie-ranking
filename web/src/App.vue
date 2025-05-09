@@ -18,11 +18,17 @@
 <script>
 import Footer from "./components/Footer.vue";
 import Header from "./components/Header.vue";
+import { useViewStore } from './store/view';
+import './assets/material-icons.scss';
 export default {
   name: "App",
   components: {
     Header,
     Footer,
+  },
+  setup() {
+    const viewStore = useViewStore();
+    return { viewStore };
   },
 };
 </script>

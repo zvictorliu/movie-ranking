@@ -1,11 +1,5 @@
 <template>
   <div class="home">
-    <!-- 新建按钮 -->
-    <button class="new-button" @click="openDialog">新建影片</button>
-    <!-- 新建按钮 -->
-    <button class="new-button" @click="openActorDialog">新建演员</button>
-    <button @click="saveOrder" class="save-button">保存顺序</button>
-
     <!-- 浮动窗口 -->
     <el-dialog v-model="dialogVisible" title="新增影片" width="30%">
       <el-form :model="formData" label-width="80px">
@@ -69,13 +63,11 @@
       </template>
     </el-dialog>
 
-    <!-- 切换按钮 -->
-    <button class="toggle-button" @click="toggleView">
-      {{ isMovieView ? '切换到演员视图' : '切换到影片视图' }}
-    </button>
-
     <!-- 影片视图 -->
-    <div v-if="isMovieView" class="movie-view">
+    <div v-if="viewStore.isMovieView" class="movie-view">
+      <!-- 新建按钮 -->
+      <button class="new-button material-icons" @click="openDialog" title="添加影片">add</button>
+      <button @click="saveOrder" class="save-button material-icons" title="保存顺序">save</button>
       <div v-for="(movie, index) in movies" :key="movie.id" class="movie-item">
         <!-- 封面 -->
         <div class="cover-wrapper" @click="goToDetail(movie.id)">
@@ -134,6 +126,8 @@
 
     <!-- 演员视图 -->
     <div v-else class="actor-view">
+      <!-- 新建按钮 -->
+      <button class="new-button material-icons" @click="openActorDialog" title="添加演员">add</button>
       <h1>演员列表</h1>
       <div class="actor-grid">
         <div v-for="(actor, index) in actors" :key="actor.name" class="actor-item">
@@ -158,6 +152,7 @@ import defaultCover from '@/assets/missing.png'
 import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
 
 import axios from 'axios'
+import { useViewStore } from '../store/view'
 
 export default {
   name: 'HomePage',
@@ -165,12 +160,15 @@ export default {
     ArrowUp,
     ArrowDown,
   },
+  setup() {
+    const viewStore = useViewStore()
+    return { viewStore }
+  },
   data() {
     return {
       movies: [], // 初始为空数组，稍后加载数据
       defaultCover, // 默认图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
-      isMovieView: true, // 控制影片视图和演员视图的切换
       actors: [], // 演员列表
       formData: {
         title: '',
@@ -190,9 +188,6 @@ export default {
   methods: {
     openDialog() {
       this.dialogVisible = true // 打开浮动窗口 [[4]]
-    },
-    toggleView() {
-      this.isMovieView = !this.isMovieView // 切换视图 [[3]]
     },
     async saveMovie() {
       try {
@@ -428,16 +423,6 @@ export default {
 .new-button {
   margin: 20px 10px;
   background-color: #409eff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.toggle-button {
-  margin: 20px 10px;
-  background-color: #42b983;
   color: white;
   border: none;
   padding: 10px 20px;
