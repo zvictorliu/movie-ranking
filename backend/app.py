@@ -3,6 +3,7 @@ from flask_cors import CORS  # 导入 CORS [[2]]
 import os
 import frontmatter
 import markdown
+from pypinyin import lazy_pinyin
 
 app = Flask(__name__)
 CORS(app)  # 启用 CORS 支持 [[2]]
@@ -193,6 +194,25 @@ def create_actor():
         f.write(frontmatter.dumps(post))
 
     return jsonify({"success": True, "message": "Actor created successfully"}), 200
+
+@app.route('/api/actors', methods=['GET'])
+def get_actors():
+    """
+    API 接口：获取所有演员的数据，包括封面路径。
+    """
+    actors = []
+    for filename in os.listdir(ACTORS_FOLDER):
+        if filename.endswith('.md'):
+            file_path = os.path.join(ACTORS_FOLDER, filename)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.load(f)
+                actors.append({
+                    "name": post.get('name'),
+                    "cover": f"/imgs/{post.get('cover')}",
+                })
+    # 姓名的拼音排序
+    actors = sorted(actors, key=lambda actor: ''.join(lazy_pinyin(actor['name'])))
+    return jsonify(actors), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
