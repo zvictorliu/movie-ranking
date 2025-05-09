@@ -19,7 +19,10 @@ def serve_image(filename):
     提供对 imgs 文件夹中图片的访问。
     """
     print(f"Serving image: {filename}")
-    return send_from_directory(IMGS_FOLDER, filename)
+    imgs_fd = IMGS_FOLDER
+    if not os.path.exists(os.path.join(imgs_fd, filename)):
+        imgs_fd = f'{ACTORS_FOLDER}/imgs'
+    return send_from_directory(imgs_fd, filename)
 
 def parse_markdown_files():
     """
@@ -85,6 +88,7 @@ def get_actor(actor_name):
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
         body_html = markdown.markdown(post.content)  # 将正文转换为 HTML
+        body_html = body_html.replace('src="./imgs', 'src="/imgs')
         actor_data = {
             "name": post.get('name'),
             "birth": post.get('birth'),
