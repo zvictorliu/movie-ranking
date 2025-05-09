@@ -79,7 +79,7 @@ export default {
   methods: {
     async fetchMovies() {
       try {
-        const response = await axios.get("http://localhost:5000/api/movies"); // 调用后端 API [[2]]
+        const response = await axios.get("/api/movies"); // 调用后端 API [[2]]
         return response.data; // 返回电影列表
       } catch (error) {
         console.error("请求失败:", error);

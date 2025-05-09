@@ -176,7 +176,7 @@ export default {
     },
     async saveMovie() {
       try {
-        const response = await axios.post('http://localhost:5000/api/create-movie', this.formData);
+        const response = await axios.post('/api/create-movie', this.formData);
         if (response.data.success) {
           this.$message.success("影片已成功创建！");
           this.dialogVisible = false; // 关闭浮动窗口
@@ -203,7 +203,7 @@ export default {
     },
     async saveActor() {
       try {
-        const response = await axios.post('http://localhost:5000/api/create-actor', this.actorFormData);
+        const response = await axios.post('/api/create-actor', this.actorFormData);
         if (response.data.success) {
           this.$message.success("演员已成功创建！");
           this.actorDialogVisible = false; // 关闭浮动窗口
@@ -277,7 +277,7 @@ export default {
         order: index + 1, // 更新顺序值
       }));
       try {
-        await axios.post('http://localhost:5000/api/update-order', { order: newOrder });
+        await axios.post('/api/update-order', { order: newOrder });
         this.$message.success("排行顺序已更新！");
       } catch (error) {
         this.$message.error("更新失败，请稍后再试！");
@@ -286,7 +286,7 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get('http://localhost:5000/api/movies'); // 调用后端 API [[2]]
+      const response = await axios.get('/api/movies'); // 调用后端 API [[2]]
       this.movies = response.data;
     } catch (error) {
       console.error("请求失败:", error);

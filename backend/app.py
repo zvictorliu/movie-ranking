@@ -32,14 +32,14 @@ def parse_markdown_files():
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)  # 使用 frontmatter 解析 Markdown 文件 [[3]]
                 body_html = markdown.markdown(post.content)  # 将正文转换为 HTML [[3]]
-                body_html = body_html.replace('src="./imgs/', 'src="http://localhost:5000/imgs/')
+                body_html = body_html.replace('src="./imgs', 'src="/imgs')  # 替换为绝对路径
                 movie_data = {
                     "id": filename,
                     "title": post.get('title', '未知标题'),
                     "actors": post.get('actors', '未知演员'),
                     "tags": post.get('tags', []),
                     "description": post.get('description', '暂无描述'),
-                    "cover": f"http://localhost:5000/imgs/{post.get('cover')}",
+                    "cover": f"/imgs/{post.get('cover')}",
                     "order": post.get('order', float('inf')),
                     "body_html": body_html,  # 添加正文 HTML 字段
                 }
@@ -89,7 +89,7 @@ def get_actor(actor_name):
             "name": post.get('name'),
             "birth": post.get('birth'),
             "debut": post.get('debut'),
-            "cover": f"http://localhost:5000/imgs/{post.get('cover')}",
+            "cover": f"/imgs/{post.get('cover')}",
             "body_html": body_html,
         }
         return jsonify(actor_data)

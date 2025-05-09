@@ -32,7 +32,7 @@ export default {
     const { name } = this.$route.params;
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/actor/${name}`
+        `/api/actor/${name}`
       );
       this.actor = response.data;
       console.log("演员详情:", this.actor); // 调试信息
