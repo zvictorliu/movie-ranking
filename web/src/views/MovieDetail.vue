@@ -1,12 +1,7 @@
 <template>
   <div class="movie-detail">
     <h1>{{ movie.title }}</h1>
-    <img
-      :src="movie.cover"
-      alt="封面"
-      class="cover"
-      @error="setDefaultCover($event)"
-    />
+    <img :src="movie.cover" alt="封面" class="cover" @error="setDefaultCover($event)" />
     <p>
       <strong>主演：</strong>
       <span v-if="movie.actors">
@@ -22,6 +17,15 @@
       </span>
       <span v-else>暂无演员信息</span>
     </p>
+    <!-- 评分 -->
+    <div class="rating">
+      <strong>评分：</strong>
+      <span v-for="i in 5" :key="i" class="star">
+        <span class="material-icons" :class="{ filled: i <= movie.rating }">
+          {{ i <= movie.rating ? 'star' : 'star_border' }}
+        </span>
+      </span>
+    </div>
     <p>
       <strong>标签：</strong>
       <span v-if="movie.tags">
@@ -51,80 +55,77 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios'
 
 export default {
-  name: "MovieDetail",
+  name: 'MovieDetail',
   data() {
     return {
       movie: {},
       prevMovie: null,
       nextMovie: null,
-    };
+    }
   },
   async created() {
-    const { id } = this.$route.params;
-    const allMovies = await this.fetchMovies();
-    const currentIndex = allMovies.findIndex((m) => m.id === id);
+    const { id } = this.$route.params
+    const allMovies = await this.fetchMovies()
+    const currentIndex = allMovies.findIndex((m) => m.id === id)
 
     if (currentIndex !== -1) {
-      this.movie = allMovies[currentIndex];
-      this.prevMovie = currentIndex > 0 ? allMovies[currentIndex - 1] : null;
-      this.nextMovie =
-        currentIndex < allMovies.length - 1
-          ? allMovies[currentIndex + 1]
-          : null;
+      this.movie = allMovies[currentIndex]
+      this.prevMovie = currentIndex > 0 ? allMovies[currentIndex - 1] : null
+      this.nextMovie = currentIndex < allMovies.length - 1 ? allMovies[currentIndex + 1] : null
     }
   },
   methods: {
     async fetchMovies() {
       try {
-        const response = await axios.get("/api/movies"); // 调用后端 API [[2]]
-        return response.data; // 返回电影列表
+        const response = await axios.get('/api/movies') // 调用后端 API [[2]]
+        return response.data // 返回电影列表
       } catch (error) {
-        console.error("请求失败:", error);
+        console.error('请求失败:', error)
       }
     },
     setDefaultCover(event) {
-      event.target.src = "/imgs/default.jpg"; // 默认图片路径
+      event.target.src = '/imgs/default.jpg' // 默认图片路径
     },
     navigate(direction) {
-      const targetMovie = direction === -1 ? this.prevMovie : this.nextMovie;
+      const targetMovie = direction === -1 ? this.prevMovie : this.nextMovie
       if (targetMovie) {
         this.$router.push({
-          name: "MovieDetail",
+          name: 'MovieDetail',
           params: { id: targetMovie.id },
-        });
+        })
       }
     },
     goToHome() {
-      this.$router.push({ name: "HomePage" }); // 返回主页 [[6]]
+      this.$router.push({ name: 'HomePage' }) // 返回主页 [[6]]
     },
     goToActor(name) {
-      console.log("跳转到演员详情页，演员姓名:", name); // 调试信息
-      this.$router.push({ name: "ActorDetail", params: { name } }); // 跳转到演员详情页
+      console.log('跳转到演员详情页，演员姓名:', name) // 调试信息
+      this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
     },
     getActorTagType(actorName) {
       // 根据演员名字生成固定的类型映射 [[6]]
-      const types = ["success", "info", "warning", "danger"];
-      const typeIndex = Math.abs(this.hashCode(actorName)) % types.length;
-      return types[typeIndex];
+      const types = ['success', 'info', 'warning', 'danger']
+      const typeIndex = Math.abs(this.hashCode(actorName)) % types.length
+      return types[typeIndex]
     },
     getTagType(tag) {
       // 根据标签名字生成固定的类型映射 [[6]]
-      const types = ["success", "info", "warning", "danger"];
-      const typeIndex = Math.abs(this.hashCode(tag)) % types.length;
-      return types[typeIndex];
+      const types = ['success', 'info', 'warning', 'danger']
+      const typeIndex = Math.abs(this.hashCode(tag)) % types.length
+      return types[typeIndex]
     },
     hashCode(str) {
-      let hash = 0;
+      let hash = 0
       for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        hash = str.charCodeAt(i) + ((hash << 5) - hash)
       }
-      return hash;
+      return hash
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -173,11 +174,26 @@ button:disabled {
   line-height: 1.6;
 }
 
-.content ::v-deep(img) { /* 深度选择器，确保样式应用于子组件的 img 元素 */
+.content ::v-deep(img) {
+  /* 深度选择器，确保样式应用于子组件的 img 元素 */
   max-width: 100%; /* 确保图片宽度不超过父容器 */
   height: auto; /* 保持图片比例 */
   border-radius: 10px; /* 添加圆角效果 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 [[8]] */
 }
 
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px; /* 星星之间的间距 */
+}
+
+.star {
+  font-size: 20px; /* 星星图标的大小 */
+  color: #ccc; /* 默认颜色为灰色 */
+}
+
+.star .material-icons.filled {
+  color: #ffca28; /* 填充的星星颜色为黄色 */
+}
 </style>

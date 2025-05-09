@@ -6,7 +6,6 @@
     <h1 class="title">影片排行榜</h1>
 
     <button class="toggle-button" @click="toggleView" title="切换视图">
-      <!-- <span class="material-icons folder-icon">folder</span> -->
       <span class="material-icons">{{ viewStore.isMovieView ? "switch_video" : "theater_comedy" }}</span>
     </button>
   </header>

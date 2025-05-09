@@ -45,6 +45,7 @@ def parse_markdown_files():
                     "description": post.get('description', '暂无描述'),
                     "cover": f"/imgs/{post.get('cover')}",
                     "order": post.get('order', float('inf')),
+                    "rating": post.get('rating', 0),
                     "body_html": body_html,  # 添加正文 HTML 字段
                 }
                 movies.append(movie_data)
@@ -100,13 +101,13 @@ def get_actor(actor_name):
         return jsonify(actor_data)
     
 
-@app.route('/api/update-order', methods=['POST'])
+@app.route('/api/update-ranking', methods=['POST'])
 def update_order():
     try:
         data = request.json
-        new_order = data.get('order')
+        new_ranking = data.get('ranking')
 
-        for item in new_order:
+        for item in new_ranking:
             file_path = os.path.join(CONTENT_FOLDER, item['id'])
             if not os.path.exists(file_path):
                 return jsonify({"error": f"File not found: {item['id']}"}), 404
@@ -114,6 +115,7 @@ def update_order():
             with open(file_path, 'r+', encoding='utf-8') as f:
                 post = frontmatter.load(f)
                 post['order'] = item['order']
+                post['rating'] = item['rating']
                 f.seek(0)
                 f.write(frontmatter.dumps(post))
                 f.truncate()

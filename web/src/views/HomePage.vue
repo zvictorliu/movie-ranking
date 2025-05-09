@@ -25,6 +25,9 @@
         <el-form-item label="order">
           <el-input v-model="formData.order" placeholder="请输入影片顺序"></el-input>
         </el-form-item>
+        <el-form-item label="rating">
+          <el-input v-model="formData.rating" placeholder="请输入影片评分"></el-input>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -67,27 +70,44 @@
     <div v-if="viewStore.isMovieView" class="movie-view">
       <!-- 新建按钮 -->
       <button class="new-button material-icons" @click="openDialog" title="添加影片">add</button>
-      <button @click="saveOrder" class="save-button material-icons" title="保存顺序">save</button>
+      <button @click="saveRanking" class="save-button material-icons" title="保存">save</button>
       <!-- 筛选器 -->
       <div class="filter-container">
-        <label for="actor-filter">按演员筛选：</label>
-      <el-select
-        v-model="selectedActors"
-        multiple
-        clearable
-        filterable
-        placeholder="请选择演员"
-        style="width: 200px;"
-        @change="filterMovies"
-      >
-        <el-option
-          v-for="actor in actors"
-          :key="actor.name"
-          :label="actor.name"
-          :value="actor.name"
-        ></el-option>
-      </el-select>
+        <div class="actor-filter">
+          <label for="actor-filter">按演员筛选：</label>
+          <el-select
+            v-model="selectedActors"
+            multiple
+            clearable
+            filterable
+            placeholder="请选择演员"
+            style="width: 150px"
+            @change="filterMovies"
+          >
+            <el-option
+              v-for="actor in actors"
+              :key="actor.name"
+              :label="actor.name"
+              :value="actor.name"
+            ></el-option>
+          </el-select>
+        </div>
+
+        <div class="rating-filter">
+          <label for="rating-filter">按评分筛选：</label>
+          <el-slider
+            v-model="ratingRange"
+            range
+            :min="0"
+            :max="5"
+            :step="1"
+            style="width: 100px"
+            @change="filterMovies"
+          ></el-slider>
+          <span style="margin-left: 20px;">{{ ratingRange[0] }} - {{ ratingRange[1] }}</span>
+        </div>
       </div>
+
       <div v-for="(movie, index) in filteredMovies" :key="movie.id" class="movie-item">
         <!-- 封面 -->
         <div class="cover-wrapper" @click="goToDetail(movie.id)">
@@ -111,6 +131,15 @@
             </span>
             <span v-else>暂无演员信息</span>
           </p>
+          <!-- 评分 -->
+          <div class="rating">
+            <strong>评分：</strong>
+            <span v-for="i in 5" :key="i" class="star" @click="setRating(movie, i)">
+              <span class="material-icons" :class="{ filled: i <= movie.rating }">
+                {{ i <= movie.rating ? 'star' : 'star_border' }}
+              </span>
+            </span>
+          </div>
           <p>
             <strong>标签：</strong>
             <span v-if="movie.tags">
@@ -147,7 +176,9 @@
     <!-- 演员视图 -->
     <div v-else class="actor-view">
       <!-- 新建按钮 -->
-      <button class="new-button material-icons" @click="openActorDialog" title="添加演员">add</button>
+      <button class="new-button material-icons" @click="openActorDialog" title="添加演员">
+        add
+      </button>
       <h1>演员列表</h1>
       <div class="actor-grid">
         <div v-for="(actor, index) in actors" :key="actor.name" class="actor-item">
@@ -189,6 +220,7 @@ export default {
       movies: [], // 初始为空数组，稍后加载数据
       filteredMovies: [], // 筛选后的影片
       selectedActors: [], // 当前选择的演员
+      ratingRange: [0, 5], // 默认评分区间
       defaultCover, // 默认图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
       actors: [], // 演员列表
@@ -198,6 +230,7 @@ export default {
         tags: '',
         description: '',
         order: 1, // 新增顺序字段
+        rating: 0, // 新增评分字段
       },
       actorDialogVisible: false, // 控制浮动窗口的显示状态
       actorFormData: {
@@ -210,6 +243,9 @@ export default {
   methods: {
     openDialog() {
       this.dialogVisible = true // 打开浮动窗口 [[4]]
+    },
+    setRating(movie, rating) {
+      movie.rating = rating // 更新当前影片的评分
     },
     async saveMovie() {
       try {
@@ -309,25 +345,35 @@ export default {
       return hash
     },
     filterMovies() {
-      console.log('筛选演员:', this.selectedActors) // 调试信息
+      let filtered = [...this.movies]
       if (this.selectedActors.length > 0) {
         this.filteredMovies = this.movies.filter((movie) =>
-          this.selectedActors.some((actor) =>
-            movie.actors && movie.actors.split(', ').includes(actor)
-          )
-        );
+          this.selectedActors.some(
+            (actor) => movie.actors && movie.actors.split(', ').includes(actor),
+          ),
+        )
       } else {
-        this.filteredMovies = [...this.movies]; // 如果未选择演员，则显示所有影片
+        this.filteredMovies = [...this.movies] // 如果未选择演员，则显示所有影片
       }
+
+      // 根据评分区间筛选
+      if (this.ratingRange[0] > 0 || this.ratingRange[1] < 5) {
+        filtered = filtered.filter(
+          (movie) => movie.rating >= this.ratingRange[0] && movie.rating <= this.ratingRange[1],
+        )
+      }
+
+      this.filteredMovies = filtered
     },
-    async saveOrder() {
-      const newOrder = this.movies.map((movie, index) => ({
+    async saveRanking() {
+      const newRanking = this.movies.map((movie, index) => ({
         id: movie.id,
         order: index + 1, // 更新顺序值
+        rating: movie.rating || 0, // 如果没有评分，默认为 0
       }))
       try {
-        await axios.post('/api/update-order', { order: newOrder })
-        this.$message.success('排行顺序已更新！')
+        await axios.post('/api/update-ranking', { ranking: newRanking })
+        this.$message.success('排行已更新！')
       } catch (error) {
         this.$message.error('更新失败，请稍后再试！')
       }
@@ -373,7 +419,6 @@ export default {
   padding-right: 5%;
   align-items: center;
 }
-
 
 .actor-cover {
   max-width: 200px;
@@ -423,7 +468,7 @@ export default {
     flex-direction: row; /* 横向排列 */
   }
   .cover {
-    max-width: 200px; /* 设置最大宽度，避免图片过大 */
+    max-width: 350px; /* 设置最大宽度，避免图片过大 */
     object-fit: cover; /* 确保图片填充整个区域，避免拉伸或变形 */
     aspect-ratio: 16 / 9; /* 设置宽高比为 16:9 */
     margin-right: 20px;
@@ -460,6 +505,25 @@ export default {
     align-items: center;
     gap: 10px;
   }
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px; /* 星星之间的间距 */
+}
+
+.star {
+  font-size: 20px; /* 星星图标的大小 */
+  color: #ccc; /* 默认颜色为灰色 */
+}
+
+.star .material-icons.filled {
+  color: #ffca28; /* 填充的星星颜色为黄色 */
+}
+
+.star:hover {
+  cursor: pointer; /* 鼠标悬停时显示为手型 */
 }
 
 .icon-button {
@@ -499,6 +563,9 @@ export default {
 
 .filter-container {
   margin-bottom: 20px;
+  align-items: left;
+  display: flex;
+  flex-direction: column;
 }
 .filter-container label {
   margin-right: 10px;
@@ -507,5 +574,14 @@ export default {
   margin-left: 10px;
 }
 
+.rating-filter {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-left: 0;
+}
 
+.rating-filter span {
+  margin-left: 10px;
+}
 </style>
