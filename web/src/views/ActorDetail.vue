@@ -73,6 +73,14 @@ export default {
   line-height: 1.6;
 }
 
+.content ::v-deep(img) { /* 深度选择器，确保样式应用于子组件的 img 元素 */
+  max-width: 100%; /* 确保图片宽度不超过父容器 */
+  height: auto; /* 保持图片比例 */
+  border-radius: 10px; /* 添加圆角效果 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 [[8]] */
+}
+
+
 button {
   padding: 10px 20px;
   cursor: pointer;

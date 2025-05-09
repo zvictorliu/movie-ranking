@@ -369,24 +369,11 @@ export default {
 
 .home {
   font-family: Arial, sans-serif;
-  padding-left: 20%;
-  padding-right: 20%;
-}
-.movie-item {
-  display: flex;
+  padding-left: 5%;
+  padding-right: 5%;
   align-items: center;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
 }
 
-.cover {
-  max-width: 200px; /* 设置最大宽度，避免图片过大 [[8]] */
-  object-fit: cover; /* 确保图片填充整个区域，避免拉伸或变形 [[5]] */
-  aspect-ratio: 16 / 9; /* 设置宽高比为 16:9 [[2]] */
-  margin-right: 20px;
-}
 
 .actor-cover {
   max-width: 200px;
@@ -421,15 +408,60 @@ export default {
   margin-top: 20px;
 }
 
-.details {
-  flex: 1;
-  text-align: left;
-}
-.controls {
+.movie-item {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
 }
+
+/* 宽屏设备：横向排列 */
+@media (min-width: 768px) {
+  .movie-item {
+    flex-direction: row; /* 横向排列 */
+  }
+  .cover {
+    max-width: 200px; /* 设置最大宽度，避免图片过大 */
+    object-fit: cover; /* 确保图片填充整个区域，避免拉伸或变形 */
+    aspect-ratio: 16 / 9; /* 设置宽高比为 16:9 */
+    margin-right: 20px;
+  }
+  .details {
+    flex: 1;
+    text-align: left;
+  }
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* 窄屏设备：竖向排列 */
+@media (max-width: 768px) {
+  .movie-item {
+    flex-direction: column; /* 竖向排列 */
+    align-items: flex-start; /* 左对齐 */
+  }
+  .cover {
+    max-width: 100%; /* 让封面占满容器宽度 */
+    margin-right: 0; /* 移除右侧间距 */
+    margin-bottom: 10px; /* 添加底部间距 */
+  }
+  .details {
+    width: 100%; /* 占满容器宽度 */
+    text-align: left;
+  }
+  .controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
 .icon-button {
   background: none;
   border: none;
