@@ -136,6 +136,7 @@ def create_movie():
     tags = data.get('tags', '').split(',')  # 将标签字符串转换为列表
     description = data.get('description', '')
     order = data.get('order', 1)
+    rating = data.get('rating', 0)
 
     # 确保内容文件夹存在
     if not os.path.exists(CONTENT_FOLDER):
@@ -153,6 +154,7 @@ def create_movie():
         "tags": [tag.strip() for tag in tags if tag.strip()],
         "description": description,
         "order": int(order),  # 默认顺序值为无穷大
+        "rating": int(rating),  # 默认评分值为 0
         "cover": f"{title.replace(' ', '_')}.jpg",  # 默认封面图片名
     }
 

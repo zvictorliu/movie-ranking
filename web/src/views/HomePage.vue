@@ -269,6 +269,7 @@ export default {
         tags: '',
         description: '',
         order: 1,
+        rating: 0,
       }
     },
     openActorDialog() {
