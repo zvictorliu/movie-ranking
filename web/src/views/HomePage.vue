@@ -356,9 +356,9 @@ export default {
         this.filteredMovies = [...this.movies] // 如果未选择演员，则显示所有影片
       }
 
-      // 根据评分区间筛选
-      if (this.ratingRange[0] > 0 || this.ratingRange[1] < 5) {
-        filtered = filtered.filter(
+      // 再根据评分区间筛选
+      if (this.ratingRange[0] >= 0 || this.ratingRange[1] <= 5) {
+        filtered = this.filteredMovies.filter(
           (movie) => movie.rating >= this.ratingRange[0] && movie.rating <= this.ratingRange[1],
         )
       }

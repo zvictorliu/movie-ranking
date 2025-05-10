@@ -134,8 +134,8 @@ export default {
   cursor: pointer;
 }
 .movie-detail {
-  padding-left: 20%;
-  padding-right: 20%;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
 .actor-tag {
