@@ -415,8 +415,6 @@ export default {
 
 .home {
   font-family: Arial, sans-serif;
-  padding-left: 5%;
-  padding-right: 5%;
   align-items: center;
 }
 
@@ -451,6 +449,18 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 40px;
   margin-top: 20px;
+}
+
+.actor-view {
+  max-width: 1200px;
+  justify-content: center; /* 水平居中 */
+  margin: auto;
+}
+
+.movie-view {
+  max-width: 800px;
+  justify-content: center; /* 水平居中 */
+  margin: auto;
 }
 
 .movie-item {
