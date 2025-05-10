@@ -218,5 +218,38 @@ def get_actors():
     actors = sorted(actors, key=lambda actor: ''.join(lazy_pinyin(actor['name'])))
     return jsonify(actors), 200
 
+@app.route('/api/movie/<movie_name>', methods=['GET'])
+def get_movie_by_name(movie_name):
+    """
+    API 接口：根据电影名称获取影片详细信息 [[3]]。
+    """
+    for filename in os.listdir(CONTENT_FOLDER):
+        if filename.endswith('.md'):
+            file_path = os.path.join(CONTENT_FOLDER, filename)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.load(f)
+                if post.get('title') == movie_name:  # 匹配电影标题 [[3]]
+                    body_html = markdown.markdown(post.content)
+                    return jsonify({
+                        "id": filename,
+                        "title": post.get('title'),
+                        "actors": post.get('actors', ''),
+                        "tags": post.get('tags', []),
+                        "description": post.get('description', ''),
+                        "cover": f"/imgs/{post.get('cover')}",
+                        "rating": post.get('rating', 0),
+                        "body_html": body_html,
+                    })
+    return jsonify({
+        "id": None,
+        "title": movie_name,
+        "actors": '',
+        "tags": [],
+        "description": '待观看',
+        "cover": '/imgs/default_cover.jpg',
+        "rating": 0,
+        "body_html": '',
+    })
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

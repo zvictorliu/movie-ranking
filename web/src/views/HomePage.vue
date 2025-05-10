@@ -221,7 +221,7 @@ export default {
       filteredMovies: [], // 筛选后的影片
       selectedActors: [], // 当前选择的演员
       ratingRange: [0, 5], // 默认评分区间
-      defaultCover, // 默认图片路径
+      defaultCover: '/imgs/defalt_cover.png', // 默认封面图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
       actors: [], // 演员列表
       formData: {

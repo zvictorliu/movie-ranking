@@ -49,6 +49,7 @@
     <!-- 上一页、下一页按钮 -->
     <div class="navigation">
       <button @click="navigate(-1)" :disabled="!prevMovie">上一页</button>
+      <button @click="goBack">返回</button>
       <button @click="navigate(1)" :disabled="!nextMovie">下一页</button>
     </div>
   </div>
@@ -87,7 +88,7 @@ export default {
       }
     },
     setDefaultCover(event) {
-      event.target.src = '/imgs/default.jpg' // 默认图片路径
+      event.target.src = '/imgs/default_cover.jpg' // 默认图片路径
     },
     navigate(direction) {
       const targetMovie = direction === -1 ? this.prevMovie : this.nextMovie
@@ -97,6 +98,9 @@ export default {
           params: { id: targetMovie.id },
         })
       }
+    },
+    goBack() {
+      this.$router.go(-1) // 返回上一页 [[7]]
     },
     goToHome() {
       this.$router.push({ name: 'HomePage' }) // 返回主页 [[6]]
