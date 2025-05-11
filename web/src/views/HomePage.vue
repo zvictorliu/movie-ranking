@@ -197,8 +197,6 @@
 </template>
 
 <script>
-// 导入默认图片
-import defaultCover from '@/assets/missing.png'
 // 导入 Element Plus 图标
 import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
 
@@ -221,7 +219,7 @@ export default {
       filteredMovies: [], // 筛选后的影片
       selectedActors: [], // 当前选择的演员
       ratingRange: [0, 5], // 默认评分区间
-      defaultCover: '/imgs/defalt_cover.png', // 默认封面图片路径
+      defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
       actors: [], // 演员列表
       formData: {
@@ -229,7 +227,7 @@ export default {
         actors: '',
         tags: '',
         description: '',
-        order: 1, // 新增顺序字段
+        order: 10, // 新增顺序字段
         rating: 0, // 新增评分字段
       },
       actorDialogVisible: false, // 控制浮动窗口的显示状态
@@ -247,21 +245,6 @@ export default {
     setRating(movie, rating) {
       movie.rating = rating // 更新当前影片的评分
     },
-    async saveMovie() {
-      try {
-        const response = await axios.post('/api/create-movie', this.formData)
-        if (response.data.success) {
-          this.$message.success('影片已成功创建！')
-          this.dialogVisible = false // 关闭浮动窗口
-          this.resetForm() // 清空表单
-        } else {
-          this.$message.error('创建失败，请稍后再试！')
-        }
-      } catch (error) {
-        console.error('Error details:', error.response ? error.response.data : error.message)
-        this.$message.error('创建失败，请稍后再试！')
-      }
-    },
     resetForm() {
       this.formData = {
         title: '',
@@ -274,21 +257,6 @@ export default {
     },
     openActorDialog() {
       this.actorDialogVisible = true // 打开浮动窗口 [[1]]
-    },
-    async saveActor() {
-      try {
-        const response = await axios.post('/api/create-actor', this.actorFormData)
-        if (response.data.success) {
-          this.$message.success('演员已成功创建！')
-          this.actorDialogVisible = false // 关闭浮动窗口
-          this.resetActorForm() // 清空表单
-        } else {
-          this.$message.error('创建失败，请稍后再试！')
-        }
-      } catch (error) {
-        console.error('Error details:', error.response ? error.response.data : error.message)
-        this.$message.error('创建失败，请稍后再试！')
-      }
     },
     resetActorForm() {
       this.actorFormData = {
@@ -366,6 +334,38 @@ export default {
 
       this.filteredMovies = filtered
     },
+    async saveMovie() {
+      try {
+        const response = await axios.post('/api/create-movie', this.formData)
+        if (response.data.success) {
+          this.$message.success('影片已成功创建！')
+          this.dialogVisible = false // 关闭浮动窗口
+          this.resetForm() // 清空表单
+          this.fetchMovies() // 重新获取影片列表
+        } else {
+          this.$message.error('创建失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message)
+        this.$message.error('创建失败，请稍后再试！')
+      }
+    },
+    async saveActor() {
+      try {
+        const response = await axios.post('/api/create-actor', this.actorFormData)
+        if (response.data.success) {
+          this.$message.success('演员已成功创建！')
+          this.actorDialogVisible = false // 关闭浮动窗口
+          this.resetActorForm() // 清空表单
+          this.fetchActors() // 重新获取演员列表
+        } else {
+          this.$message.error('创建失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message)
+        this.$message.error('创建失败，请稍后再试！')
+      }
+    },
     async saveRanking() {
       const newRanking = this.movies.map((movie, index) => ({
         id: movie.id,
@@ -375,25 +375,36 @@ export default {
       try {
         await axios.post('/api/update-ranking', { ranking: newRanking })
         this.$message.success('排行已更新！')
+        this.fetchMovies() // 重新获取影片列表
       } catch (error) {
         this.$message.error('更新失败，请稍后再试！')
+      }
+    },
+    async fetchMovies() {
+      try {
+        const response = await axios.get('/api/movies') // 调用后端 API [[2]]
+        this.movies = response.data
+        this.filteredMovies = response.data // 初始化筛选后的影片
+      } catch (error) {
+        console.error('请求失败:', error)
+      }
+    },
+
+    async fetchActors() {
+      try {
+        const response = await axios.get('/api/actors') // 调用后端 API [[2]]
+        this.actors = response.data
+      } catch (error) {
+        console.error('请求失败:', error)
       }
     },
   },
   async created() {
     try {
-      const response = await axios.get('/api/movies')
-      this.movies = response.data
-      this.filteredMovies = response.data // 初始化筛选后的影片
+      await this.fetchMovies() // 获取影片列表
+      await this.fetchActors() // 获取演员列表
     } catch (error) {
-      console.error('Error fetching movies:', error)
-    }
-
-    try {
-      const response = await axios.get('/api/actors')
-      this.actors = response.data
-    } catch (error) {
-      console.error('Error fetching actors:', error)
+      console.error('Error:', error)
     }
   },
 }
