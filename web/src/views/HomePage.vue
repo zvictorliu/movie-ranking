@@ -38,37 +38,8 @@
       </template>
     </el-dialog>
 
-    <!-- 浮动窗口 -->
-    <el-dialog v-model="actorDialogVisible" title="新增演员" width="80%">
-      <el-form :model="actorFormData" label-width="80px">
-        <el-form-item label="姓名">
-          <el-input v-model="actorFormData.name" placeholder="请输入演员姓名"></el-input>
-        </el-form-item>
-        <el-form-item label="出生日期">
-          <el-input
-            v-model="actorFormData.birth"
-            placeholder="请输入出生日期"
-            style="width: 100%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="出道日期">
-          <el-input
-            v-model="actorFormData.debut"
-            placeholder="请输入出道日期"
-            style="width: 100%"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="actorDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveActor">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
     <!-- 影片视图 -->
-    <div v-if="viewStore.isMovieView" class="movie-view">
+    <div class="movie-view">
       <!-- 新建按钮 -->
       <button class="new-button material-icons" @click="openDialog" title="添加影片">add</button>
       <button @click="saveRanking" class="save-button material-icons" title="保存">save</button>
@@ -172,28 +143,7 @@
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- 演员视图 -->
-    <div v-else class="actor-view">
-      <!-- 新建按钮 -->
-      <button class="new-button material-icons" @click="openActorDialog" title="添加演员">
-        add
-      </button>
-      <h1>演员列表</h1>
-      <div class="actor-grid">
-        <div v-for="(actor, index) in actors" :key="actor.name" class="actor-item">
-          <img
-            :src="actor.cover"
-            alt="演员封面"
-            class="actor-cover"
-            @click="goToActor(actor.name)"
-            @error="setDefaultCover($event)"
-          />
-          <span class="actor-name">{{ actor.name }}</span>
-        </div>
-      </div>
-    </div>
+    </div>    
   </div>
 </template>
 
@@ -222,7 +172,6 @@ export default {
       ratingRange: [3, 5], // 默认评分区间
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
-      actors: [], // 演员列表
       formData: {
         title: '',
         actors: '',
@@ -230,12 +179,6 @@ export default {
         description: '',
         order: 10, // 新增顺序字段
         rating: 0, // 新增评分字段
-      },
-      actorDialogVisible: false, // 控制浮动窗口的显示状态
-      actorFormData: {
-        name: '',
-        birth: '',
-        debut: '',
       },
     }
   },
@@ -256,9 +199,7 @@ export default {
         rating: 0,
       }
     },
-    openActorDialog() {
-      this.actorDialogVisible = true // 打开浮动窗口 [[1]]
-    },
+    
     resetActorForm() {
       this.actorFormData = {
         name: '',
@@ -288,11 +229,7 @@ export default {
       // 使用 Vue Router 跳转到详情页
       this.$router.push({ name: 'MovieDetail', params: { id } }) // 跳转到详情页
     },
-    goToHome() {
-      this.$router.push({ name: 'HomePage' }) // 返回主页 [[6]]
-    },
     goToActor(name) {
-      console.log('跳转到演员详情页，演员姓名:', name) // 调试信息
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
     },
     getActorTagType(actorName) {
@@ -351,22 +288,6 @@ export default {
         this.$message.error('创建失败，请稍后再试！')
       }
     },
-    async saveActor() {
-      try {
-        const response = await axios.post('/api/create-actor', this.actorFormData)
-        if (response.data.success) {
-          this.$message.success('演员已成功创建！')
-          this.actorDialogVisible = false // 关闭浮动窗口
-          this.resetActorForm() // 清空表单
-          this.fetchActors() // 重新获取演员列表
-        } else {
-          this.$message.error('创建失败，请稍后再试！')
-        }
-      } catch (error) {
-        console.error('Error details:', error.response ? error.response.data : error.message)
-        this.$message.error('创建失败，请稍后再试！')
-      }
-    },
     async saveRanking() {
       const newRanking = this.movies.map((movie, index) => ({
         id: movie.id,
@@ -391,13 +312,12 @@ export default {
         console.error('请求失败:', error)
       }
     },
-
     async fetchActors() {
       try {
-        const response = await axios.get('/api/actors') // 调用后端 API [[2]]
+        const response = await axios.get('/api/actors')
         this.actors = response.data
       } catch (error) {
-        console.error('请求失败:', error)
+        console.error('Error fetching actors:', error)
       }
     },
   },
@@ -430,45 +350,6 @@ export default {
 .home {
   font-family: Arial, sans-serif;
   align-items: center;
-}
-
-.actor-cover {
-  max-width: 200px;
-  object-fit: cover;
-  margin-right: 10px;
-  border-radius: 10%; /* 圆形封面 */
-}
-
-.actor-item {
-  display: flex;
-  flex-direction: column; /* 垂直排列 */
-  align-items: center; /* 居中对齐 */
-  text-align: center;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  /* 不设置固定高度，让内容决定高度 */
-}
-
-.actor-name {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  word-wrap: break-word; /* 长名字自动换行 */
-}
-
-.actor-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 40px;
-  margin-top: 20px;
-}
-
-.actor-view {
-  max-width: 1200px;
-  justify-content: center; /* 水平居中 */
-  margin: auto;
 }
 
 .movie-view {

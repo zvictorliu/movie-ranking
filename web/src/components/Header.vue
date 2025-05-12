@@ -5,9 +5,13 @@
     </div>
     <h1 class="title">影片排行榜</h1>
 
-    <button class="toggle-button" @click="toggleView" title="切换视图">
+    <!-- <button class="toggle-button" @click="toggleView" title="切换视图">
       <span class="material-icons">{{ viewStore.isMovieView ? "switch_video" : "theater_comedy" }}</span>
-    </button>
+    </button> -->
+    <nav>
+      <span @click="goToHome" class="nav-link">影片排行</span>
+      <span @click="goToActors" class="nav-link">演员列表</span> <!-- 演员页面入口 -->
+    </nav>
   </header>
 </template>
 
@@ -22,6 +26,9 @@ export default {
   methods: {
     goToHome() {
       this.$router.push({ name: 'HomePage' }) // 返回主页 [[6]]
+    },
+    goToActors() {
+      this.$router.push({ name: 'ActorsPage' }) // 跳转到演员列表页面
     },
     toggleView() {
       this.viewStore.toggleView();
@@ -74,5 +81,22 @@ export default {
 
 .material-icons {
   font-size: 24px; /* 设置图标的大小 */
+}
+
+nav {
+  display: flex;
+  gap: 20px; /* 设置两个标题之间的间距 */
+  margin-left: auto; /* 将导航栏推到右侧 */
+}
+
+.nav-link {
+  color: black; /* 设置文字颜色为黑色 [[7]] */
+  text-decoration: none; /* 去掉下划线 */
+  font-size: 16px;
+  cursor: pointer; /* 显示手型光标 */
+}
+
+.nav-link:hover {
+  text-decoration: underline; /* 鼠标悬停时添加下划线 */
 }
 </style>
