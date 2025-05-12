@@ -1,7 +1,8 @@
 <template>
   <div class="home">
+    
     <!-- 浮动窗口 -->
-    <el-dialog v-model="dialogVisible" title="新增影片" width="30%">
+    <el-dialog v-model="dialogVisible" title="新增影片" width="80%">
       <el-form :model="formData" label-width="80px">
         <el-form-item label="标题">
           <el-input v-model="formData.title" placeholder="请输入影片标题"></el-input>
@@ -38,7 +39,7 @@
     </el-dialog>
 
     <!-- 浮动窗口 -->
-    <el-dialog v-model="actorDialogVisible" title="新增演员" width="30%">
+    <el-dialog v-model="actorDialogVisible" title="新增演员" width="80%">
       <el-form :model="actorFormData" label-width="80px">
         <el-form-item label="姓名">
           <el-input v-model="actorFormData.name" placeholder="请输入演员姓名"></el-input>
@@ -218,7 +219,7 @@ export default {
       movies: [], // 初始为空数组，稍后加载数据
       filteredMovies: [], // 筛选后的影片
       selectedActors: [], // 当前选择的演员
-      ratingRange: [0, 5], // 默认评分区间
+      ratingRange: [3, 5], // 默认评分区间
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
       dialogVisible: false, // 控制浮动窗口的显示状态
       actors: [], // 演员列表
@@ -385,6 +386,7 @@ export default {
         const response = await axios.get('/api/movies') // 调用后端 API [[2]]
         this.movies = response.data
         this.filteredMovies = response.data // 初始化筛选后的影片
+        this.filterMovies() // 初始化筛选
       } catch (error) {
         console.error('请求失败:', error)
       }
