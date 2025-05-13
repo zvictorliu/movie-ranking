@@ -200,17 +200,25 @@ export default {
       }
     },
     moveUp(index) {
+      if (this.filteredMovies.length !== this.movies.length) {
+        this.$message.warning('请显示全部影片后再排序')
+        return
+      }
       if (index > 0) {
-        const temp = this.movies[index]
-        this.movies.splice(index, 1)
-        this.movies.splice(index - 1, 0, temp)
+        const temp = this.filteredMovies[index]
+        this.filteredMovies.splice(index, 1)
+        this.filteredMovies.splice(index - 1, 0, temp)
       }
     },
     moveDown(index) {
-      if (index < this.movies.length - 1) {
-        const temp = this.movies[index]
-        this.movies.splice(index, 1)
-        this.movies.splice(index + 1, 0, temp)
+      if (this.filteredMovies.length !== this.movies.length) {
+        this.$message.warning('请显示全部影片后再排序')
+        return
+      }
+      if (index < this.filteredMovies.length - 1) {
+        const temp = this.filteredMovies[index]
+        this.filteredMovies.splice(index, 1)
+        this.filteredMovies.splice(index + 1, 0, temp)
       }
     },
     setDefaultCover(event) {
@@ -281,7 +289,7 @@ export default {
       }
     },
     async saveRanking() {
-      const newRanking = this.movies.map((movie, index) => ({
+      const newRanking = this.filteredMovies.map((movie, index) => ({
         id: movie.id,
         order: index + 1, // 更新顺序值
         rating: movie.rating || 0, // 如果没有评分，默认为 0
