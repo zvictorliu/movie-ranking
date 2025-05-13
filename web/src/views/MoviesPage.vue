@@ -166,6 +166,7 @@ export default {
   data() {
     return {
       movies: [], // 初始为空数组，稍后加载数据
+      actors: [], // 演员列表
       filteredMovies: [], // 筛选后的影片
       selectedActors: [], // 当前选择的演员
       ratingRange: [3, 5], // 默认评分区间
@@ -196,14 +197,6 @@ export default {
         description: '',
         order: 1,
         rating: 0,
-      }
-    },
-
-    resetActorForm() {
-      this.actorFormData = {
-        name: '',
-        birth: '',
-        debut: '',
       }
     },
     moveUp(index) {

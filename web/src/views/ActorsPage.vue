@@ -78,6 +78,13 @@ export default {
     setDefaultCover(event) {
       event.target.src = this.defaultCover // 设置默认封面图片
     },
+    resetActorForm() {
+      this.actorFormData = {
+        name: '',
+        birth: '',
+        debut: '',
+      }
+    },
     async fetchActors() {
       try {
         const response = await axios.get('/api/actors')
@@ -96,6 +103,7 @@ export default {
           this.fetchActors() // 重新获取演员列表
         } else {
           this.$message.error('创建失败，请稍后再试！')
+          console.error('Error details:', response.data.message)
         }
       } catch (error) {
         console.error('Error details:', error.response ? error.response.data : error.message)
