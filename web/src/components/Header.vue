@@ -9,8 +9,9 @@
         <h1 class="title">影片排行榜</h1>
       </div>
       <div class="header-nav">
-        <span @click="goToMovies" class="nav-link">影片排行</span>
-        <span @click="goToActors" class="nav-link">演员列表</span>
+        <span @click="goToMovies" class="nav-link" title="影片排行页面">影片排行</span>
+        <span @click="goToActors" class="nav-link" title="演员列表页面">演员列表</span>
+        <span @click="goToTags" class="nav-link" title="标签页页面">标签</span>
       </div>
     </div>
 
@@ -29,6 +30,7 @@
       <div v-if="isMenuOpen" class="dropdown-menu">
         <span @click="goToMovies" class="nav-link" title="影片排行页面">影片排行</span>
         <span @click="goToActors" class="nav-link" title="演员列表页面">演员列表</span>
+        <span @click="goToTags" class="nav-link" title="标签页页面">标签</span>
       </div>
     </div>
   </header>
@@ -59,6 +61,10 @@ export default {
     },
     goToActors() {
       this.$router.push({ name: 'ActorsPage' }) // 跳转到演员列表页面
+      this.isMenuOpen = false // 关闭菜单
+    },
+    goToTags() {
+      this.$router.push('/tags') // 跳转到标签页面
       this.isMenuOpen = false // 关闭菜单
     },
     toggleMenu() {

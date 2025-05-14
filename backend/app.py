@@ -13,19 +13,7 @@ CONTENT_FOLDER = os.path.join(os.getcwd(), '../content')
 IMGS_FOLDER = os.path.join(CONTENT_FOLDER, 'imgs')
 ACTORS_FOLDER = os.path.join(CONTENT_FOLDER, 'actors')
 
-# 静态资源路由：提供 imgs 文件夹中的图片
-@app.route('/imgs/<path:filename>')
-def serve_image(filename):
-    """
-    提供对 imgs 文件夹中图片的访问。
-    """
-    print(f"Serving image: {filename}")
-    imgs_fd = IMGS_FOLDER
-    if not os.path.exists(os.path.join(imgs_fd, filename)):
-        imgs_fd = f'{ACTORS_FOLDER}/imgs'
-    return send_from_directory(imgs_fd, filename)
-
-def parse_markdown_files():
+def parse_movie_files():
     """
     解析 content 文件夹中的所有 Markdown 文件，并返回解析后的数据列表。
     """
@@ -52,30 +40,89 @@ def parse_markdown_files():
     movies.sort(key=lambda x: (x['order'], x['title']))
     return movies
 
-# @app.route('/api/movie/<movie_id>', methods=['GET'])
-# def get_movie(movie_id):
-#     """
-#     API 接口：获取指定影片的详细信息。
-#     """
-#     print(f"获取影片信息：{movie_id}")
-#     movies = parse_markdown_files()
-#     movie = next((m for m in movies if m['id'] == movie_id), None)
-#     if movie:
-#         return jsonify(movie)
-#     return jsonify({"error": "Movie not found"}), 404
+
+def parse_actor_files():
+    """
+    解析 actors 文件夹中的所有 Markdown 文件，并返回解析后的数据列表。
+    """
+    actors = []
+    for filename in os.listdir(ACTORS_FOLDER):
+        if filename.endswith('.md'):
+            file_path = os.path.join(ACTORS_FOLDER, filename)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.load(f)
+                actor_data = {
+                    "name": post.get('name', '未知演员'),
+                    "birth": post.get('birth', '未知出生日期'),
+                    "debut": post.get('debut', '未知出道日期'),
+                    "cover": f"/imgs/{post.get('cover')}",
+                }
+                actors.append(actor_data)
+    return actors
+
+ALL_MOVIES = parse_movie_files()
+ALL_ACTORS = parse_actor_files()
+
+# 静态资源路由：提供 imgs 文件夹中的图片
+@app.route('/imgs/<path:filename>')
+def serve_image(filename):
+    """
+    提供对 imgs 文件夹中图片的访问。
+    """
+    print(f"Serving image: {filename}")
+    imgs_fd = IMGS_FOLDER
+    if not os.path.exists(os.path.join(imgs_fd, filename)):
+        imgs_fd = f'{ACTORS_FOLDER}/imgs'
+    return send_from_directory(imgs_fd, filename)
+
+
 
 @app.route('/api/movies', methods=['GET'])
 def get_movies():
     """
     API 接口：获取所有影片信息。
     """
-    movies = parse_markdown_files()
+    movies = ALL_MOVIES
     
     print(f"获取所有影片信息：{len(movies)} movies")
-#    for movie in movies:
-#        print(movie)
 
     return jsonify(movies)
+
+@app.route('/api/actors', methods=['GET'])
+def get_actors():
+    """
+    API 接口：获取所有演员的数据，包括封面路径。
+    """
+    actors = ALL_ACTORS
+    print(f"获取所有演员信息：{len(actors)} actors")
+    # 姓名的拼音排序
+    actors = sorted(actors, key=lambda actor: ''.join(lazy_pinyin(actor['name'])))
+    return jsonify(actors), 200
+
+@app.route('/api/tags', methods=['GET'])
+def get_tags():
+    """
+    API 接口：获取所有标签。
+    """
+    movies = ALL_MOVIES
+    # 统计标签出现次数
+    tag_counts = {}
+    for movie in movies:
+        tags = movie.get('tags', [])
+        for tag in tags:
+            if tag not in tag_counts:
+                tag_counts[tag] = 0
+            tag_counts[tag] += 1
+
+    # 转换为字典列表格式
+    tags_list = [{"tag": tag, "count": count} for tag, count in tag_counts.items()]
+    
+    # 按标签名称排序
+    tags_list.sort(key=lambda x: x['tag'])
+
+    print(f"获取所有标签信息：{len(tags_list)} tags")
+
+    return jsonify(tags_list), 200
 
 
 @app.route('/api/actor/<actor_name>', methods=['GET'])
@@ -199,24 +246,6 @@ def create_actor():
 
     return jsonify({"success": True, "message": "Actor created successfully"}), 200
 
-@app.route('/api/actors', methods=['GET'])
-def get_actors():
-    """
-    API 接口：获取所有演员的数据，包括封面路径。
-    """
-    actors = []
-    for filename in os.listdir(ACTORS_FOLDER):
-        if filename.endswith('.md'):
-            file_path = os.path.join(ACTORS_FOLDER, filename)
-            with open(file_path, 'r', encoding='utf-8') as f:
-                post = frontmatter.load(f)
-                actors.append({
-                    "name": post.get('name'),
-                    "cover": f"/imgs/{post.get('cover')}",
-                })
-    # 姓名的拼音排序
-    actors = sorted(actors, key=lambda actor: ''.join(lazy_pinyin(actor['name'])))
-    return jsonify(actors), 200
 
 @app.route('/api/movie/<movie_name>', methods=['GET'])
 def get_movie_by_name(movie_name):
