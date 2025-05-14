@@ -11,7 +11,7 @@
       <div class="header-nav">
         <span @click="goToMovies" class="nav-link" title="影片排行页面">影片排行</span>
         <span @click="goToActors" class="nav-link" title="演员列表页面">演员列表</span>
-        <span @click="goToTags" class="nav-link" title="标签页页面">标签</span>
+        <span @click="goToTags" class="nav-link" title="标签页页面">标签列表</span>
       </div>
     </div>
 

@@ -60,8 +60,6 @@ def parse_actor_files():
                 actors.append(actor_data)
     return actors
 
-ALL_MOVIES = parse_movie_files()
-ALL_ACTORS = parse_actor_files()
 
 # 静态资源路由：提供 imgs 文件夹中的图片
 @app.route('/imgs/<path:filename>')
@@ -76,13 +74,12 @@ def serve_image(filename):
     return send_from_directory(imgs_fd, filename)
 
 
-
 @app.route('/api/movies', methods=['GET'])
 def get_movies():
     """
     API 接口：获取所有影片信息。
     """
-    movies = ALL_MOVIES
+    movies = parse_movie_files()
     
     print(f"获取所有影片信息：{len(movies)} movies")
 
@@ -93,7 +90,7 @@ def get_actors():
     """
     API 接口：获取所有演员的数据，包括封面路径。
     """
-    actors = ALL_ACTORS
+    actors = parse_actor_files()
     print(f"获取所有演员信息：{len(actors)} actors")
     # 姓名的拼音排序
     actors = sorted(actors, key=lambda actor: ''.join(lazy_pinyin(actor['name'])))
@@ -104,7 +101,7 @@ def get_tags():
     """
     API 接口：获取所有标签。
     """
-    movies = ALL_MOVIES
+    movies = parse_movie_files()
     # 统计标签出现次数
     tag_counts = {}
     for movie in movies:
@@ -279,6 +276,20 @@ def get_movie_by_name(movie_name):
         "rating": 0,
         "body_html": '',
     })
+
+@app.route('/api/tags/<tag_name>', methods=['GET'])
+def get_movies_by_tag(tag_name):
+    """
+    API 接口：获取包含指定标签的所有影片。
+    """
+    movies = parse_movie_files()
+    
+    # 筛选包含指定标签的影片
+    filtered_movies = [movie for movie in movies if tag_name in movie.get('tags', [])]
+    
+    print(f"获取包含标签 '{tag_name}' 的影片：{len(filtered_movies)} movies")
+
+    return jsonify(filtered_movies), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

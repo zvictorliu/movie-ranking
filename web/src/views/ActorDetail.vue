@@ -28,21 +28,6 @@
               </span>
             </span>
           </div>
-          <!-- <p>
-            <strong>标签：</strong>
-            <span v-if="movie.tags">
-              <el-tag
-                v-for="(tag, index) in movie.tags"
-                :key="index"
-                :type="getTagType(tag.trim())"
-                effect="plain"
-                class="tag-item"
-              >
-                {{ tag }}
-              </el-tag>
-            </span>
-            <span v-else>暂无标签信息</span>
-          </p> -->
           <p><strong>简介：</strong>{{ movie.description }}</p>
         </div>
       </div>

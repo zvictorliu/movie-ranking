@@ -10,7 +10,7 @@
           :key="index"
           :type="getActorTagType(actor.trim())"
           class="actor-tag"
-          @click="goToActor(actor.trim())"
+          @click="goToTagDetail(actor.trim())"
         >
           {{ actor }}
         </el-tag>
@@ -35,6 +35,7 @@
           :type="getTagType(tag.trim())"
           effect="plain"
           class="tag-item"
+          @click="goToTagDetail(tag.trim())"
         >
           {{ tag }}
         </el-tag>
@@ -109,6 +110,9 @@ export default {
       console.log('跳转到演员详情页，演员姓名:', name) // 调试信息
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
     },
+    goToTagDetail(tagName) {
+      this.$router.push(`/tags/${tagName}`) // 跳转到标签详情页面
+    },
     getActorTagType(actorName) {
       // 根据演员名字生成固定的类型映射 [[6]]
       const types = ['success', 'info', 'warning', 'danger']
@@ -149,6 +153,11 @@ export default {
 
 .tag-item {
   margin-right: 5px;
+}
+
+.tag-item:hover {
+  cursor: pointer;
+  background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
 }
 
 .cover {

@@ -120,6 +120,7 @@
                 :type="getTagType(tag.trim())"
                 effect="plain"
                 class="tag-item"
+                @click="goToTagDetail(tag.trim())"
               >
                 {{ tag }}
               </el-tag>
@@ -231,6 +232,9 @@ export default {
     },
     goToActor(name) {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
+    },
+    goToTagDetail(tagName) {
+      this.$router.push(`/tags/${tagName}`) // 跳转到标签详情页面
     },
     getActorTagType(actorName) {
       // 根据演员名字生成固定的类型映射 [[6]]
@@ -424,6 +428,11 @@ export default {
 
 .tag-item {
   margin-right: 5px;
+}
+
+.tag-item:hover {
+  cursor: pointer;
+  background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
 }
 
 .up-down-button {

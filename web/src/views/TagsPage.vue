@@ -2,7 +2,12 @@
   <div class="tags-page">
     <h1>标签列表</h1>
     <div class="tag-list">
-      <div v-for="(tag, index) in tags" :key="index" class="tag-item">
+      <div
+        v-for="(tag, index) in tags"
+        :key="index"
+        class="tag-item"
+        @click="goToTagDetail(tag.tag)"
+      >
         <span class="tag-name">{{ tag.tag }}</span>
         <span class="tag-count">{{ tag.count }}</span>
       </div>
@@ -30,6 +35,9 @@ export default {
       } catch (error) {
         console.error('Error fetching tags:', error)
       }
+    },
+    goToTagDetail(tagName) {
+      this.$router.push(`/tags/${tagName}`) // 跳转到标签详情页面
     },
   },
 }
