@@ -10,7 +10,7 @@
           :key="index"
           :type="getActorTagType(actor.trim())"
           class="actor-tag"
-          @click="goToTagDetail(actor.trim())"
+          @click="goToActor(actor.trim())"
         >
           {{ actor }}
         </el-tag>
