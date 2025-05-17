@@ -60,6 +60,34 @@ def parse_actor_files():
                 actors.append(actor_data)
     return actors
 
+def append_mainwork(actor, movie):
+    """
+    将演员的主要作品添加到演员数据中。
+    """
+    actor_file = os.path.join(ACTORS_FOLDER, f"{actor}.md")
+    if not os.path.exists(actor_file):
+        return
+    with open(actor_file, 'r+', encoding='utf-8') as f:
+        post = frontmatter.load(f)
+        body = post.content
+
+        # 查找“主要作品”部分，如果不存在则创建
+        if "## 主要作品" not in body:
+            body += "\n## 主要作品\n"
+
+        # 检查影片是否已存在于“主要作品”部分
+        mainworks_start = body.find("## 主要作品")
+        mainworks_section = body[mainworks_start:] if mainworks_start != -1 else ""
+        if f"- {movie}" not in mainworks_section:
+            body += f"\n- {movie}\n"
+
+        # 写回更新后的内容
+        f.seek(0)
+        f.write(frontmatter.dumps(post))
+        f.write(body)
+        f.truncate()
+        print(f"Updated {actor}'s main works with {movie}")
+
 
 # 静态资源路由：提供 imgs 文件夹中的图片
 @app.route('/imgs/<path:filename>')
@@ -205,6 +233,11 @@ def create_movie():
     # 写入文件
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(frontmatter.dumps(post))
+
+    for actor in actors.split(','):
+        actor = actor.strip()
+        if actor:
+            append_mainwork(actor, title)
 
     return jsonify({"success": True, "message": "Movie created successfully"}), 200
 
