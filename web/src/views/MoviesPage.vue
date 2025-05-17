@@ -1,46 +1,7 @@
 <template>
   <div class="movies-container">
-    <!-- 浮动窗口 -->
-    <el-dialog v-model="dialogVisible" title="新增影片" width="80%">
-      <el-form :model="formData" label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="formData.title" placeholder="请输入影片标题"></el-input>
-        </el-form-item>
-        <el-form-item label="演员">
-          <el-input v-model="formData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
-        </el-form-item>
-        <el-form-item label="标签">
-          <el-input v-model="formData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
-        </el-form-item>
-        <el-form-item label="简介">
-          <el-input
-            v-model="formData.description"
-            type="textarea"
-            placeholder="请输入影片简介"
-          ></el-input>
-        </el-form-item>
-        <!-- <el-form-item label="封面">
-            <el-input v-model="formData.cover" placeholder="请输入封面图片路径"></el-input>
-          </el-form-item> -->
-        <el-form-item label="order">
-          <el-input v-model="formData.order" placeholder="请输入影片顺序"></el-input>
-        </el-form-item>
-        <el-form-item label="rating">
-          <el-input v-model="formData.rating" placeholder="请输入影片评分"></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveMovie">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
     <!-- 影片视图 -->
     <div class="movie-view">
-      <!-- 新建按钮 -->
-      <button class="add-button material-icons" @click="openDialog" title="添加影片">add</button>
       <button @click="saveRanking" class="save-button material-icons" title="保存">save</button>
       <!-- 筛选器 -->
       <div class="filter-container">
@@ -172,33 +133,11 @@ export default {
       selectedActors: [], // 当前选择的演员
       ratingRange: [3, 5], // 默认评分区间
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
-      dialogVisible: false, // 控制浮动窗口的显示状态
-      formData: {
-        title: '',
-        actors: '',
-        tags: '',
-        description: '',
-        order: 10, // 新增顺序字段
-        rating: 0, // 新增评分字段
-      },
     }
   },
   methods: {
-    openDialog() {
-      this.dialogVisible = true // 打开浮动窗口 [[4]]
-    },
     setRating(movie, rating) {
       movie.rating = rating // 更新当前影片的评分
-    },
-    resetForm() {
-      this.formData = {
-        title: '',
-        actors: '',
-        tags: '',
-        description: '',
-        order: 1,
-        rating: 0,
-      }
     },
     moveUp(index) {
       if (this.filteredMovies.length !== this.movies.length) {
@@ -275,22 +214,6 @@ export default {
       }
 
       this.filteredMovies = filtered
-    },
-    async saveMovie() {
-      try {
-        const response = await axios.post('/api/create-movie', this.formData)
-        if (response.data.success) {
-          this.$message.success('影片已成功创建！')
-          this.dialogVisible = false // 关闭浮动窗口
-          this.resetForm() // 清空表单
-          this.fetchMovies() // 重新获取影片列表
-        } else {
-          this.$message.error('创建失败，请稍后再试！')
-        }
-      } catch (error) {
-        console.error('Error details:', error.response ? error.response.data : error.message)
-        this.$message.error('创建失败，请稍后再试！')
-      }
     },
     async saveRanking() {
       const newRanking = this.filteredMovies.map((movie, index) => ({

@@ -1,40 +1,7 @@
 <template>
   <div class="actors-container">
-    <!-- 浮动窗口 -->
-    <el-dialog v-model="actorDialogVisible" title="新增演员" width="80%">
-      <el-form :model="actorFormData" label-width="80px">
-        <el-form-item label="姓名">
-          <el-input v-model="actorFormData.name" placeholder="请输入演员姓名"></el-input>
-        </el-form-item>
-        <el-form-item label="出生日期">
-          <el-input
-            v-model="actorFormData.birth"
-            placeholder="请输入出生日期"
-            style="width: 100%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="出道日期">
-          <el-input
-            v-model="actorFormData.debut"
-            placeholder="请输入出道日期"
-            style="width: 100%"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="actorDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveActor">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
     <!-- 演员视图 -->
     <div class="actor-view">
-      <!-- 新建按钮 -->
-      <button class="new-button material-icons" @click="openActorDialog" title="添加演员">
-        add
-      </button>
       <h1>演员列表</h1>
       <div class="actor-grid">
         <div v-for="(actor, index) in actors" :key="actor.name" class="actor-item">
@@ -59,31 +26,15 @@ export default {
   data() {
     return {
       actors: [],
-      actorDialogVisible: false, // 控制浮动窗口的显示状态
-      actorFormData: {
-        name: '',
-        birth: '',
-        debut: '',
-      },
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
     }
   },
   methods: {
-    openActorDialog() {
-      this.actorDialogVisible = true
-    },
     goToActor(name) {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
     },
     setDefaultCover(event) {
       event.target.src = this.defaultCover // 设置默认封面图片
-    },
-    resetActorForm() {
-      this.actorFormData = {
-        name: '',
-        birth: '',
-        debut: '',
-      }
     },
     async fetchActors() {
       try {
@@ -93,24 +44,6 @@ export default {
         console.error('Error fetching actors:', error)
       }
     },
-    async saveActor() {
-      try {
-        const response = await axios.post('/api/create-actor', this.actorFormData)
-        if (response.data.success) {
-          this.$message.success('演员已成功创建！')
-          this.actorDialogVisible = false // 关闭浮动窗口
-          this.resetActorForm() // 清空表单
-          this.fetchActors() // 重新获取演员列表
-        } else {
-          this.$message.error('创建失败，请稍后再试！')
-          console.error('Error details:', response.data.message)
-        }
-      } catch (error) {
-        console.error('Error details:', error.response ? error.response.data : error.message)
-        this.$message.error('创建失败，请稍后再试！')
-      }
-    },
-    
   },
   mounted() {
     this.fetchActors()
@@ -179,5 +112,4 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 }
-
 </style>
