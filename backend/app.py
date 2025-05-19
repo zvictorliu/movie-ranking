@@ -324,5 +324,36 @@ def get_movies_by_tag(tag_name):
 
     return jsonify(filtered_movies), 200
 
+@app.route('/api/update-movie/<id>', methods=['PUT'])
+def update_movie(id):
+    """
+    API 接口：接收前端发送的影片信息，并更新对应的 Markdown 文件。
+    """
+    data = request.json
+    title = data.get('title')
+    actors = data.get('actors', '')
+    tags = data.get('tags', '').split(',')  # 将标签字符串转换为列表
+    description = data.get('description', '')
+    rating = data.get('rating', 0)
+    file_path = os.path.join(CONTENT_FOLDER, id)
+
+    if not os.path.exists(file_path):
+        return jsonify({"success": False, "message": "影片文件不存在"}), 404
+
+    with open(file_path, 'r+', encoding='utf-8') as f:
+        post = frontmatter.load(f)
+        post['title'] = title
+        post['actors'] = actors
+        post['tags'] = [tag.strip() for tag in tags if tag.strip()]
+        # post['cover'] = data.get('cover', post.get('cover', ''))
+        post['description'] = description
+        post['rating'] = int(rating)
+
+        f.seek(0)
+        f.write(frontmatter.dumps(post))
+        f.truncate()
+
+    return jsonify({"success": True, "message": "影片信息更新成功"}), 200
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

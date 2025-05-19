@@ -95,6 +95,9 @@
           <button @click="moveUp(index)" :disabled="index === 0" class="up-down-button">
             <el-icon><ArrowUp /></el-icon>
           </button>
+          <button @click="openEditDialog(movie)" class="edit-movie-button">
+            <el-icon><EditPen /></el-icon>
+          </button>
           <button
             @click="moveDown(index)"
             :disabled="index === movies.length - 1"
@@ -105,12 +108,43 @@
         </div>
       </div>
     </div>
+
+    <!-- 编辑对话框 -->
+    <el-dialog v-model="editDialogVisible" title="编辑影片信息" width="80%">
+      <el-form :model="editFormData" label-width="80px">
+        <el-form-item label="标题">
+          <el-input v-model="editFormData.title" placeholder="请输入影片标题"></el-input>
+        </el-form-item>
+        <el-form-item label="演员">
+          <el-input v-model="editFormData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-input v-model="editFormData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="简介">
+          <el-input
+            v-model="editFormData.description"
+            type="textarea"
+            placeholder="请输入影片简介"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="评分">
+          <el-input v-model="editFormData.rating" placeholder="请输入评分(0-5)"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveMovie">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 // 导入 Element Plus 图标
-import { ArrowUp, ArrowDown } from '@element-plus/icons-vue'
+import { ArrowUp, ArrowDown, EditPen } from '@element-plus/icons-vue'
 
 import axios from 'axios'
 import { useViewStore } from '../store/view'
@@ -120,6 +154,7 @@ export default {
   components: {
     ArrowUp,
     ArrowDown,
+    EditPen,
   },
   setup() {
     const viewStore = useViewStore()
@@ -133,6 +168,8 @@ export default {
       selectedActors: [], // 当前选择的演员
       ratingRange: [3, 5], // 默认评分区间
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
+      editDialogVisible: false, // 控制编辑对话框的显示状态
+      editFormData: {}, // 当前正在编辑的影片数据
     }
   },
   methods: {
@@ -214,6 +251,31 @@ export default {
       }
 
       this.filteredMovies = filtered
+    },
+    openEditDialog(movie) {
+      this.editFormData = { ...movie } // 复制当前影片的数据
+      this.editDialogVisible = true // 打开编辑对话框
+    },
+    async saveMovie() {
+      try {
+        const response = await axios.put(
+          `/api/update-movie/${this.editFormData.id}`,
+          this.editFormData,
+        )
+        if (response.data.success) {
+          this.$message.success('影片信息已成功更新！')
+          this.editDialogVisible = false // 关闭对话框
+
+          // 更新本地影片数据
+          this.fetchMovies()
+          this.filterMovies()
+        } else {
+          this.$message.error('更新失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error updating movie:', error)
+        this.$message.error('更新失败，请稍后再试！')
+      }
     },
     async saveRanking() {
       const newRanking = this.filteredMovies.map((movie, index) => ({
@@ -356,6 +418,14 @@ export default {
 .tag-item:hover {
   cursor: pointer;
   background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
+}
+
+.edit-movie-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #409eff;
 }
 
 .up-down-button {
