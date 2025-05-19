@@ -11,26 +11,25 @@
 
     <!-- 全局底部 -->
     <Footer />
-    
   </div>
 </template>
 
 <script>
-import Footer from "./components/Footer.vue";
-import Header from "./components/Header.vue";
-import { useViewStore } from './store/view';
-import './assets/material-icons.scss';
+import Footer from './components/Footer.vue'
+import Header from './components/Header.vue'
+import { useViewStore } from './store/view'
+import './assets/material-icons.scss'
 export default {
-  name: "App",
+  name: 'App',
   components: {
     Header,
     Footer,
   },
   setup() {
-    const viewStore = useViewStore();
-    return { viewStore };
+    const viewStore = useViewStore()
+    return { viewStore }
   },
-};
+}
 </script>
 
 <style>
@@ -50,5 +49,4 @@ body {
   flex: 1;
   padding: 20px;
 }
-
 </style>

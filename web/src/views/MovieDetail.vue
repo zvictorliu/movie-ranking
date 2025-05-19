@@ -1,6 +1,12 @@
 <template>
   <div class="movie-detail">
-    <h1>{{ movie.title }}</h1>
+    <!-- 标题和编辑按钮 -->
+    <div class="title-container">
+      <h1>{{ movie.title }}</h1>
+      <button @click="openEditDialog" class="edit-movie-button">
+        <el-icon><Edit /></el-icon>
+      </button>
+    </div>
     <img :src="movie.cover" alt="封面" class="cover" @error="setDefaultCover($event)" />
     <p>
       <strong>主演：</strong>
@@ -53,12 +59,43 @@
       <button @click="goBack">返回</button>
       <button @click="navigate(1)" :disabled="!nextMovie">下一页</button>
     </div>
+
+    <!-- 编辑对话框 -->
+    <el-dialog v-model="editDialogVisible" title="编辑影片信息" width="80%">
+      <el-form :model="editFormData" label-width="80px">
+        <el-form-item label="标题">
+          <el-input v-model="editFormData.title" placeholder="请输入影片标题"></el-input>
+        </el-form-item>
+        <el-form-item label="演员">
+          <el-input v-model="editFormData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-input v-model="editFormData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="简介">
+          <el-input
+            v-model="editFormData.description"
+            type="textarea"
+            placeholder="请输入影片简介"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="评分">
+          <el-input v-model="editFormData.rating" placeholder="请输入评分(0-5)"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveMovie">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-
+import { Edit } from '@element-plus/icons-vue'
 export default {
   name: 'MovieDetail',
   data() {
@@ -66,7 +103,12 @@ export default {
       movie: {},
       prevMovie: null,
       nextMovie: null,
+      editDialogVisible: false, // 控制编辑对话框的显示状态
+      editFormData: {}, // 当前正在编辑的影片数据
     }
+  },
+  components: {
+    Edit,
   },
   async created() {
     const { id } = this.$route.params
@@ -86,6 +128,30 @@ export default {
         return response.data // 返回电影列表
       } catch (error) {
         console.error('请求失败:', error)
+      }
+    },
+    openEditDialog() {
+      this.editFormData = { ...this.movie } // 复制当前影片的数据
+      this.editDialogVisible = true // 打开编辑对话框
+    },
+    async saveMovie() {
+      try {
+        const response = await axios.put(
+          `/api/update-movie/${this.editFormData.id}`,
+          this.editFormData,
+        )
+        if (response.data.success) {
+          this.$message.success('影片信息已成功更新！')
+          this.editDialogVisible = false // 关闭对话框
+
+          // 刷新整个页面
+          location.reload() // 强制刷新页面
+        } else {
+          this.$message.error('更新失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error updating movie:', error)
+        this.$message.error('更新失败，请稍后再试！')
       }
     },
     setDefaultCover(event) {
@@ -141,6 +207,12 @@ export default {
   width: 100px;
   cursor: pointer;
 }
+
+.title-container {
+  display: flex;
+  flex-direction: row;
+}
+
 .movie-detail {
   padding-left: 10%;
   padding-right: 10%;
@@ -208,5 +280,13 @@ button:disabled {
 
 .star .material-icons.filled {
   color: #ffca28; /* 填充的星星颜色为黄色 */
+}
+
+.edit-movie-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #409eff;
 }
 </style>
