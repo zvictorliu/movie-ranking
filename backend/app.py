@@ -332,7 +332,9 @@ def update_movie(id):
     data = request.json
     title = data.get('title')
     actors = data.get('actors', '')
-    tags = data.get('tags', '').split(',')  # 将标签字符串转换为列表
+    tags = data.get('tags', '')
+    if type(tags) == str:
+        tags = tags.split(',')
     description = data.get('description', '')
     rating = data.get('rating', 0)
     file_path = os.path.join(CONTENT_FOLDER, id)
