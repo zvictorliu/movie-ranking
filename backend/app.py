@@ -62,7 +62,7 @@ def parse_actor_files():
 
 def append_mainwork(actor, movie):
     """
-    将演员的主要作品添加到演员数据中。
+    将演员的主要作品添加到演员数据中，覆盖更新 body 部分，header 不变。
     """
     actor_file = os.path.join(ACTORS_FOLDER, f"{actor}.md")
     if not os.path.exists(actor_file):
@@ -75,16 +75,32 @@ def append_mainwork(actor, movie):
         if "## 主要作品" not in body:
             body += "\n## 主要作品\n"
 
-        # 检查影片是否已存在于“主要作品”部分
+        # 拆分正文，定位“主要作品”部分
         mainworks_start = body.find("## 主要作品")
-        mainworks_section = body[mainworks_start:] if mainworks_start != -1 else ""
-        if f"- {movie}" not in mainworks_section:
-            body += f"\n- {movie}\n"
+        if mainworks_start != -1:
+            before = body[:mainworks_start]
+            mainworks_section = body[mainworks_start:]
+        else:
+            before = body
+            mainworks_section = "\n## 主要作品\n"
 
-        # 写回更新后的内容
+        # 检查影片是否已存在于“主要作品”部分
+        if f"- {movie}" not in mainworks_section:
+            # 添加影片到“主要作品”部分
+            if mainworks_section.endswith('\n'):
+                mainworks_section += f"- {movie}\n"
+            else:
+                mainworks_section += f"\n- {movie}\n"
+
+        # 组装新的正文
+        new_body = before.rstrip('\n') + '\n' + mainworks_section.lstrip('\n')
+
+        # 更新 post.content
+        post.content = new_body
+
+        # 写回更新后的内容（只覆盖正文，header 不变）
         f.seek(0)
         f.write(frontmatter.dumps(post))
-        f.write(body)
         f.truncate()
         print(f"Updated {actor}'s main works with {movie}")
 
