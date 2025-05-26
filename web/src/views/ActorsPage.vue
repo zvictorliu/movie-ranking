@@ -87,29 +87,6 @@ export default {
 .actor-name {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
   word-wrap: break-word; /* 长名字自动换行 */
-}
-
-.save-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-.save-button:hover {
-  background-color: #33a07c;
-}
-
-.new-button {
-  margin: 20px 10px;
-  background-color: #409eff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 </style>

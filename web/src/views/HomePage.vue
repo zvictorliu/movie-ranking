@@ -3,9 +3,7 @@
     <!-- 背景容器 -->
     <div class="welcome-container">
       <h1 class="welcome-title">欢迎来到影片排行榜网站</h1>
-      <p class="welcome-description">
-        这里为你提供最新的影片排行和演员信息，快来探索吧！
-      </p>
+      <p class="welcome-description">这里为你提供最新的影片排行和演员信息，快来探索吧！</p>
       <div class="welcome-buttons">
         <button class="welcome-button" @click="goToMovies">查看影片排行</button>
         <button class="welcome-button" @click="goToActors">查看演员列表</button>
@@ -19,13 +17,13 @@ export default {
   name: 'HomePage',
   methods: {
     goToMovies() {
-      this.$router.push('/movies'); // 跳转到影片排行榜页面 
+      this.$router.push('/movies') // 跳转到影片排行榜页面
     },
     goToActors() {
-      this.$router.push('/actors'); // 跳转到演员列表页面 
+      this.$router.push('/actors') // 跳转到演员列表页面
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -35,8 +33,8 @@ export default {
   align-items: center;
   height: 100vh; /* 占满整个屏幕高度 */
   background: url('/background.jpg') no-repeat center center/cover; /* 背景图片 */
-  color: white;
   text-align: center;
+  color: white;
 }
 
 .welcome-container {
@@ -76,5 +74,14 @@ export default {
 
 .welcome-button:hover {
   background-color: #33a07c; /* 鼠标悬停时改变颜色 */
+}
+
+body.dark-mode .home-page {
+  color: #a9a9b3;
+}
+
+body.dark-mode .welcome-button {
+  background-color: #3a3a3a; /* 夜间模式按钮颜色 */
+  color: #a9a9b3;
 }
 </style>

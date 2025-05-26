@@ -14,6 +14,9 @@
         <span @click="goToTags" class="nav-link" title="标签页页面">标签列表</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
+        <button class="theme-toggle" @click="toggleTheme">
+          <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+        </button>
       </div>
     </div>
 
@@ -35,6 +38,9 @@
         <span @click="goToTags" class="nav-link" title="标签页页面">标签</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
+        <button class="theme-toggle" @click="toggleTheme">
+          <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+        </button>
       </div>
     </div>
 
@@ -115,6 +121,7 @@ export default {
     return {
       isMobile: false, // 是否显示菜单按钮
       isMenuOpen: false, // 菜单是否展开
+      isDarkMode: false, // 是否启用夜间模式
       movieDialogVisible: false, // 控制浮动窗口的显示状态
       movieFormData: {
         title: '',
@@ -155,6 +162,10 @@ export default {
     },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen // 切换菜单状态
+    },
+    toggleTheme() {
+      this.isDarkMode = !this.isDarkMode // 切换夜间模式
+      document.body.classList.toggle('dark-mode', this.isDarkMode) // 动态切换 body 的主题类 [[7]]
     },
     checkScreenWidth() {
       this.isMobile = window.innerWidth < 768 // 当屏幕宽度小于 768px 时显示菜单按钮 [[1]]
@@ -261,27 +272,12 @@ export default {
   margin-left: auto; /* 将菜单按钮推到右侧 */
 }
 
-.toggle-icon {
+.theme-toggle {
+  background-color: transparent;
+  border: none;
+  color: black;
   font-size: 24px;
   cursor: pointer;
-  margin-right: 10px;
-  color: #999;
-}
-.toggle-icon.active {
-  color: #42b983; /* 高亮当前选中的图标 */
-}
-
-.toggle-button {
-  padding: 10px 20px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  margin-left: auto;
-}
-.toggle-button:hover {
-  background-color: #33a07c;
 }
 
 .material-icons {
@@ -349,5 +345,28 @@ export default {
 .dropdown-menu .nav-link:hover,
 .dropdown-menu .new-button:hover {
   color: #42b983; /* 鼠标悬停时改变颜色 */
+}
+
+body.dark-mode .title {
+  color: #a9a9b3;
+}
+
+body.dark-mode .app-header {
+  background-color: #252627;
+}
+
+body.dark-mode .header-nav .nav-link,
+body.dark-mode .header-nav .new-button,
+body.dark-mode .theme-toggle {
+  color: #a9a9b3;
+}
+
+body.dark-mode .dropdown-menu .nav-link,
+body.dark-mode .dropdown-menu .new-button,
+body.dark-mode .menu-button {
+  color: #a9a9b3;
+}
+body.dark-mode .dropdown-menu {
+  border-top: 2px solid #3a3b3d; /* 夜间模式下的上边框颜色 */
 }
 </style>

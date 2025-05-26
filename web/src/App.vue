@@ -49,4 +49,10 @@ body {
   flex: 1;
   padding: 20px;
 }
+
+/* 夜间模式 */
+body.dark-mode {
+  background-color: #292a2d;
+  color: #a9a9b3;
+}
 </style>

@@ -453,16 +453,6 @@ export default {
   background-color: #33a07c;
 }
 
-.add-button {
-  margin: 20px 10px;
-  background-color: #409eff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .filter-container {
   margin-bottom: 20px;
   align-items: left;
@@ -485,5 +475,10 @@ export default {
 
 .rating-filter span {
   margin-left: 10px;
+}
+
+body.dark-mode .save-button {
+  background-color: #3a3a3a; /* 夜间模式按钮颜色 */
+  color: #a9a9b3;
 }
 </style>

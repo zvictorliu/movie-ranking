@@ -73,7 +73,6 @@ export default {
 }
 
 .tag-name {
-  color: black; /* 名称颜色为黑色 */
   margin-right: 6px; /* 名称和数量之间的间距 */
 }
 
