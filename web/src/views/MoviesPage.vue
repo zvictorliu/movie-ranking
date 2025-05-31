@@ -185,6 +185,9 @@ export default {
         const temp = this.filteredMovies[index]
         this.filteredMovies.splice(index, 1)
         this.filteredMovies.splice(index - 1, 0, temp)
+
+        // 滚动到目标影片
+        this.scrollToMovie(index - 1)
       }
     },
     moveDown(index) {
@@ -196,7 +199,19 @@ export default {
         const temp = this.filteredMovies[index]
         this.filteredMovies.splice(index, 1)
         this.filteredMovies.splice(index + 1, 0, temp)
+
+        // 滚动到目标影片
+        this.scrollToMovie(index + 1)
       }
+    },
+    scrollToMovie(index) {
+      // 获取目标影片的 DOM 元素
+      this.$nextTick(() => {
+        const movieElement = this.$el.querySelectorAll('.movie-item')[index]
+        if (movieElement) {
+          movieElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      })
     },
     setDefaultCover(event) {
       event.target.src = this.defaultCover // 设置为默认图片路径
