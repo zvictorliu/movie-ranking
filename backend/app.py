@@ -12,6 +12,9 @@ CORS(app)  # 启用 CORS 支持 [[2]]
 CONTENT_FOLDER = os.path.join(os.getcwd(), '../content')
 IMGS_FOLDER = os.path.join(CONTENT_FOLDER, 'imgs')
 ACTORS_FOLDER = os.path.join(CONTENT_FOLDER, 'actors')
+COVER_FOLDER = '0_Cover'
+MOVIE_COVER_FOLDER = f'{COVER_FOLDER}/movie-cover'
+ACTOR_COVER_FOLDER = f'{COVER_FOLDER}/actor-cover'
 
 def parse_movie_files():
     """
@@ -31,7 +34,7 @@ def parse_movie_files():
                     "actors": post.get('actors', '未知演员'),
                     "tags": post.get('tags', []),
                     "description": post.get('description', '暂无描述'),
-                    "cover": f"/imgs/movie-cover/{post.get('cover')}",
+                    "cover": f"/imgs/{MOVIE_COVER_FOLDER}/{post.get('cover')}",
                     "order": post.get('order', float('inf')),
                     "rating": post.get('rating', 0),
                     "body_html": body_html,  # 添加正文 HTML 字段
@@ -55,7 +58,7 @@ def parse_actor_files():
                     "name": post.get('name', '未知演员'),
                     "birth": post.get('birth', '未知出生日期'),
                     "debut": post.get('debut', '未知出道日期'),
-                    "cover": f"/imgs/actor-cover/{post.get('cover')}",
+                    "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
                 }
                 actors.append(actor_data)
     return actors
@@ -183,7 +186,7 @@ def get_actor(actor_name):
             "name": post.get('name'),
             "birth": post.get('birth'),
             "debut": post.get('debut'),
-            "cover": f"/imgs/actor-cover/{post.get('cover')}",
+            "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
             "body_html": body_html,
         }
         return jsonify(actor_data)
@@ -311,7 +314,7 @@ def get_movie_by_name(movie_name):
                         "actors": post.get('actors', ''),
                         "tags": post.get('tags', []),
                         "description": post.get('description', ''),
-                        "cover": f"/imgs/movie-cover/{post.get('cover')}",
+                        "cover": f"/imgs/{MOVIE_COVER_FOLDER}/{post.get('cover')}",
                         "rating": post.get('rating', 0),
                         "body_html": body_html,
                     })
