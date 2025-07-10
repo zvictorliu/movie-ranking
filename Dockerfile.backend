@@ -1,0 +1,22 @@
+# Dockerfile.backend
+
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# 拷贝后端代码
+COPY backend/ ./backend
+
+# 拷贝 content 文件夹（这是你提醒的重要资源）
+COPY content/ ./content
+
+# 安装依赖
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+# Flask 默认监听 5000 端口
+EXPOSE 5000
+
+# 设置工作目录到 backend 子目录（app.py 在这里）
+WORKDIR /app/backend
+
+CMD ["python", "app.py"]
