@@ -116,6 +116,23 @@
         <el-form-item label="rating">
           <el-input v-model="movieFormData.rating" placeholder="请输入影片评分"></el-input>
         </el-form-item>
+        <el-form-item label="封面图片（可选）">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="#"
+            :auto-upload="false"
+            :on-change="handleMovieImageChange"
+            :file-list="movieImageFileList"
+            accept="image/*"
+          >
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <template #tip>
+              <div class="el-upload__tip">只能上传图片文件，且不超过2MB</div>
+            </template>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -144,6 +161,23 @@
             placeholder="请输入出道日期"
             style="width: 100%"
           ></el-input>
+        </el-form-item>
+        <el-form-item label="头像图片（可选）">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="#"
+            :auto-upload="false"
+            :on-change="handleActorImageChange"
+            :file-list="actorImageFileList"
+            accept="image/*"
+          >
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <template #tip>
+              <div class="el-upload__tip">只能上传图片文件，且不超过2MB</div>
+            </template>
+          </el-upload>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -192,6 +226,10 @@ export default {
       },
       imageFileList: [], // 图片文件列表
       selectedImageFile: null, // 选中的图片文件
+      movieImageFileList: [], // 新增影片图片文件列表
+      selectedMovieImageFile: null, // 新增影片选中的图片文件
+      actorImageFileList: [], // 新增演员图片文件列表
+      selectedActorImageFile: null, // 新增演员选中的图片文件
     }
   },
   setup() {
@@ -231,6 +269,14 @@ export default {
     openMovieDialog() {
       this.movieDialogVisible = true // 打开浮动窗口
     },
+    handleMovieImageChange(file) {
+      this.selectedMovieImageFile = file.raw
+      this.movieImageFileList = [file]
+    },
+    handleActorImageChange(file) {
+      this.selectedActorImageFile = file.raw
+      this.actorImageFileList = [file]
+    },
     resetMovieForm() {
       this.movieFormData = {
         title: '',
@@ -240,6 +286,8 @@ export default {
         order: 1,
         rating: 0,
       }
+      this.movieImageFileList = []
+      this.selectedMovieImageFile = null
     },
     openActorDialog() {
       this.actorDialogVisible = true
@@ -250,6 +298,8 @@ export default {
         birth: '',
         debut: '',
       }
+      this.actorImageFileList = []
+      this.selectedActorImageFile = null
     },
     openImageDialog() {
       this.imageDialogVisible = true
@@ -268,11 +318,29 @@ export default {
     },
     async saveMovie() {
       try {
-        const response = await axios.post('/api/create-movie', this.movieFormData)
+        // 如果上传了封面图片，则上传封面图片到服务器
+        let coverPath = ''
+        if (this.selectedMovieImageFile && this.movieFormData.title.trim()) {
+          const formData = new FormData()
+          formData.append('image', this.selectedMovieImageFile)
+          formData.append('name', this.movieFormData.title.trim())
+          formData.append('type', 'movie')
+          const imgRes = await axios.post('/api/upload-image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          })
+          if (imgRes.data.success) {
+            coverPath = imgRes.data.path
+          } else {
+            this.$message.error('封面图片上传失败，但影片信息仍会保存')
+          }
+        }
+        const payload = { ...this.movieFormData }
+        if (coverPath) payload.cover = coverPath
+        const response = await axios.post('/api/create-movie', payload)
         if (response.data.success) {
           this.$message.success('影片已成功创建！')
-          this.movieDialogVisible = false // 关闭浮动窗口
-          this.resetMovieForm() // 清空表单
+          this.movieDialogVisible = false
+          this.resetMovieForm()
         } else {
           this.$message.error('创建失败，请稍后再试！')
         }
@@ -283,14 +351,31 @@ export default {
     },
     async saveActor() {
       try {
-        const response = await axios.post('/api/create-actor', this.actorFormData)
+        // 如果上传了头像图片，则上传头像图片到服务器
+        let coverPath = ''
+        if (this.selectedActorImageFile && this.actorFormData.name.trim()) {
+          const formData = new FormData()
+          formData.append('image', this.selectedActorImageFile)
+          formData.append('name', this.actorFormData.name.trim())
+          formData.append('type', 'actor')
+          const imgRes = await axios.post('/api/upload-image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          })
+          if (imgRes.data.success) {
+            coverPath = imgRes.data.path
+          } else {
+            this.$message.error('头像图片上传失败，但演员信息仍会保存')
+          }
+        }
+        const payload = { ...this.actorFormData }
+        if (coverPath) payload.cover = coverPath
+        const response = await axios.post('/api/create-actor', payload)
         if (response.data.success) {
           this.$message.success('演员已成功创建！')
-          this.actorDialogVisible = false // 关闭浮动窗口
-          this.resetActorForm() // 清空表单
+          this.actorDialogVisible = false
+          this.resetActorForm()
         } else {
           this.$message.error('创建失败，请稍后再试！')
-          console.error('Error details:', response.data.message)
         }
       } catch (error) {
         console.error('Error details:', error.response ? error.response.data : error.message)
