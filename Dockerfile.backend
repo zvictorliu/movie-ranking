@@ -11,7 +11,7 @@ COPY backend/ ./backend
 COPY content/ ./content
 
 # 安装依赖
-RUN pip install --no-cache-dir -r backend/requirements.txt
+RUN pip install --no-cache-dir -r backend/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Flask 默认监听 5000 端口
 EXPOSE 5000
