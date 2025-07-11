@@ -14,6 +14,7 @@
         <span @click="goToTags" class="nav-link" title="标签页页面">标签列表</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
+        <button class="new-button" @click="openImageDialog">上传图片</button>
         <button class="theme-toggle" @click="toggleTheme">
           <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
         </button>
@@ -38,11 +39,54 @@
         <span @click="goToTags" class="nav-link" title="标签页页面">标签</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
+        <button class="new-button" @click="openImageDialog">上传图片</button>
         <button class="theme-toggle" @click="toggleTheme">
           <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
         </button>
       </div>
     </div>
+
+    <!-- 上传图片浮动窗口 -->
+    <el-dialog v-model="imageDialogVisible" title="上传图片" width="80%">
+      <el-form :model="imageFormData" label-width="80px">
+        <el-form-item label="图片名称">
+          <el-input v-model="imageFormData.name" placeholder="请输入图片名称（不需要包含文件后缀）"></el-input>
+        </el-form-item>
+        <el-form-item label="图片类型">
+          <el-select v-model="imageFormData.type" placeholder="请选择图片类型" style="width: 100%">
+            <el-option label="演员" value="actor"></el-option>
+            <el-option label="影片" value="movie"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="选择图片">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="#"
+            :auto-upload="false"
+            :on-change="handleImageChange"
+            :file-list="imageFileList"
+            accept="image/*"
+          >
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+              将文件拖到此处，或<em>点击上传</em>
+            </div>
+            <template #tip>
+              <div class="el-upload__tip">
+                只能上传jpg/png文件，且不超过2MB
+              </div>
+            </template>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="imageDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveImage">上传</el-button>
+        </span>
+      </template>
+    </el-dialog>
 
     <!-- 浮动窗口 -->
     <el-dialog v-model="movieDialogVisible" title="新增影片" width="80%">
@@ -115,8 +159,12 @@
 <script>
 import { useViewStore } from '../store/view'
 import axios from 'axios'
+import { UploadFilled } from '@element-plus/icons-vue'
 export default {
   name: 'Header',
+  components: {
+    UploadFilled
+  },
   data() {
     return {
       isMobile: false, // 是否显示菜单按钮
@@ -137,6 +185,13 @@ export default {
         birth: '',
         debut: '',
       },
+      imageDialogVisible: false, // 控制图片上传浮动窗口的显示状态
+      imageFormData: {
+        name: '',
+        type: '',
+      },
+      imageFileList: [], // 图片文件列表
+      selectedImageFile: null, // 选中的图片文件
     }
   },
   setup() {
@@ -196,6 +251,21 @@ export default {
         debut: '',
       }
     },
+    openImageDialog() {
+      this.imageDialogVisible = true
+    },
+    resetImageForm() {
+      this.imageFormData = {
+        name: '',
+        type: '',
+      }
+      this.imageFileList = []
+      this.selectedImageFile = null
+    },
+    handleImageChange(file) {
+      this.selectedImageFile = file.raw
+      this.imageFileList = [file]
+    },
     async saveMovie() {
       try {
         const response = await axios.post('/api/create-movie', this.movieFormData)
@@ -225,6 +295,44 @@ export default {
       } catch (error) {
         console.error('Error details:', error.response ? error.response.data : error.message)
         this.$message.error('创建失败，请稍后再试！')
+      }
+    },
+    async saveImage() {
+      if (!this.selectedImageFile) {
+        this.$message.error('请选择要上传的图片！')
+        return
+      }
+      if (!this.imageFormData.name.trim()) {
+        this.$message.error('请输入图片名称！')
+        return
+      }
+      if (!this.imageFormData.type) {
+        this.$message.error('请选择图片类型！')
+        return
+      }
+
+      try {
+        const formData = new FormData()
+        formData.append('image', this.selectedImageFile)
+        formData.append('name', this.imageFormData.name)
+        formData.append('type', this.imageFormData.type)
+
+        const response = await axios.post('/api/upload-image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+
+        if (response.data.success) {
+          this.$message.success('图片上传成功！')
+          this.imageDialogVisible = false
+          this.resetImageForm()
+        } else {
+          this.$message.error('上传失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message)
+        this.$message.error('上传失败，请稍后再试！')
       }
     },
   },

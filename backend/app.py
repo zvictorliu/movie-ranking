@@ -5,6 +5,7 @@ import frontmatter
 import markdown
 from pypinyin import lazy_pinyin
 
+
 app = Flask(__name__)
 CORS(app)  # 启用 CORS 支持 [[2]]
 
@@ -375,6 +376,65 @@ def update_movie(id):
         f.truncate()
 
     return jsonify({"success": True, "message": "影片信息更新成功"}), 200
+
+@app.route('/api/upload-image', methods=['POST'])
+def upload_image():
+    """
+    API 接口：处理图片上传。
+    """
+    try:
+        # 检查是否有文件上传
+        if 'image' not in request.files:
+            return jsonify({"success": False, "message": "没有选择图片文件"}), 400
+        
+        file = request.files['image']
+        name = request.form.get('name', '')
+        image_type = request.form.get('type', '')
+        
+        # 验证文件
+        if file.filename == '':
+            return jsonify({"success": False, "message": "没有选择文件"}), 400
+        
+        if not name.strip():
+            return jsonify({"success": False, "message": "请输入图片名称"}), 400
+        
+        if not image_type or image_type not in ['actor', 'movie']:
+            return jsonify({"success": False, "message": "请选择正确的图片类型"}), 400
+        
+        # 检查文件类型
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if not file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+            return jsonify({"success": False, "message": "不支持的文件类型"}), 400
+        
+        # 生成文件名，保持原始文件的后缀，如果存在同名文件则覆盖
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        filename = name + file_extension
+        
+        # 根据类型确定保存路径
+        if image_type == 'actor':
+            save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+        else:  # movie
+            save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
+        
+        # 确保文件夹存在
+        os.makedirs(save_folder, exist_ok=True)
+        
+        # 保存文件（如果存在同名文件则覆盖）
+        file_path = os.path.join(save_folder, filename)
+        file.save(file_path)
+        
+        print(f"图片上传成功: {file_path}")
+        
+        return jsonify({
+            "success": True, 
+            "message": "图片上传成功",
+            "filename": filename,
+            "path": f"/imgs/{ACTOR_COVER_FOLDER if image_type == 'actor' else MOVIE_COVER_FOLDER}/{filename}"
+        }), 200
+        
+    except Exception as e:
+        print(f"图片上传错误: {str(e)}")
+        return jsonify({"success": False, "message": f"上传失败: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="0.0.0.0")
