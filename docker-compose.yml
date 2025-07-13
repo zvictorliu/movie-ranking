@@ -16,3 +16,5 @@ services:
       dockerfile: Dockerfile.backend
     ports:
       - "5000:5000"
+    volumes:
+      - ./content:/app/content
