@@ -82,11 +82,28 @@
         <el-form-item label="评分">
           <el-input v-model="editFormData.rating" placeholder="请输入评分(0-5)"></el-input>
         </el-form-item>
+        <el-form-item label="封面图片（可选）">
+          <el-upload
+            class="upload-demo"
+            drag
+            action="#"
+            :auto-upload="false"
+            :on-change="handleEditImageChange"
+            :file-list="editImageFileList"
+            accept="image/*"
+          >
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <template #tip>
+              <div class="el-upload__tip">只能上传图片文件，且不超过2MB</div>
+            </template>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveMovie">保存</el-button>
+          <el-button type="primary" @click="updateMovie">保存</el-button>
         </span>
       </template>
     </el-dialog>
@@ -95,7 +112,7 @@
 
 <script>
 import axios from 'axios'
-import { Edit } from '@element-plus/icons-vue'
+import { Edit, UploadFilled } from '@element-plus/icons-vue'
 export default {
   name: 'MovieDetail',
   data() {
@@ -105,10 +122,13 @@ export default {
       nextMovie: null,
       editDialogVisible: false, // 控制编辑对话框的显示状态
       editFormData: {}, // 当前正在编辑的影片数据
+      editImageFileList: [], // 编辑时的图片文件列表
+      selectedEditImageFile: null, // 编辑时选中的图片文件
     }
   },
   components: {
     Edit,
+    UploadFilled,
   },
   async created() {
     const { id } = this.$route.params
@@ -133,13 +153,31 @@ export default {
     openEditDialog() {
       this.editFormData = { ...this.movie } // 复制当前影片的数据
       this.editDialogVisible = true // 打开编辑对话框
+      this.editImageFileList = [] // 清空图片列表
+      this.selectedEditImageFile = null // 清空选中的图片
     },
-    async saveMovie() {
+    handleEditImageChange(file) {
+      this.selectedEditImageFile = file.raw
+      this.editImageFileList = [file]
+    },
+    async updateMovie() {
       try {
-        const response = await axios.put(
-          `/api/update-movie/${this.editFormData.id}`,
-          this.editFormData,
-        )
+        const formData = new FormData()
+        formData.append('title', this.editFormData.title)
+        formData.append('actors', this.editFormData.actors)
+        formData.append('tags', this.editFormData.tags)
+        formData.append('description', this.editFormData.description)
+        formData.append('rating', this.editFormData.rating)
+
+        // 如果有图片，添加到表单数据中
+        if (this.selectedEditImageFile) {
+          formData.append('image', this.selectedEditImageFile)
+        }
+
+        const response = await axios.put(`/api/update-movie/${this.editFormData.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+
         if (response.data.success) {
           this.$message.success('影片信息已成功更新！')
           this.editDialogVisible = false // 关闭对话框

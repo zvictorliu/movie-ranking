@@ -397,35 +397,63 @@ def get_movies_by_tag(tag_name):
 @app.route('/api/update-movie/<id>', methods=['PUT'])
 def update_movie(id):
     """
-    API 接口：接收前端发送的影片信息，并更新对应的 Markdown 文件。
+    API 接口：接收前端发送的影片信息，并更新对应的 Markdown 文件，支持图片上传。
     """
-    data = request.json
-    title = data.get('title')
-    actors = data.get('actors', '')
-    tags = data.get('tags', '')
-    if type(tags) == str:
-        tags = tags.split(',')
-    description = data.get('description', '')
-    rating = data.get('rating', 0)
-    file_path = os.path.join(CONTENT_FOLDER, id)
+    try:
+        # 检查是否有文件上传
+        has_image = 'image' in request.files and request.files['image'].filename != ''
+        
+        # 获取表单数据
+        title = request.form.get('title', '')
+        actors = request.form.get('actors', '')
+        tags = request.form.get('tags', '')
+        if type(tags) == str:
+            tags = tags.split(',')
+        description = request.form.get('description', '')
+        rating = request.form.get('rating', 0)
+        
+        file_path = os.path.join(CONTENT_FOLDER, id)
 
-    if not os.path.exists(file_path):
-        return jsonify({"success": False, "message": "影片文件不存在"}), 404
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "影片文件不存在"}), 404
 
-    with open(file_path, 'r+', encoding='utf-8') as f:
-        post = frontmatter.load(f)
-        post['title'] = title
-        post['actors'] = actors
-        post['tags'] = [tag.strip() for tag in tags if tag.strip()]
-        # post['cover'] = data.get('cover', post.get('cover', ''))
-        post['description'] = description
-        post['rating'] = int(rating)
+        # 处理封面图片
+        cover_filename = None
+        if has_image:
+            file = request.files['image']
+            # 检查文件类型
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+                # 使用原始文件的后缀
+                file_extension = os.path.splitext(file.filename)[1].lower()
+                cover_filename = f"{title.replace(' ', '_')}{file_extension}"
+                
+                # 保存图片文件
+                save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
+                os.makedirs(save_folder, exist_ok=True)
+                image_path = os.path.join(save_folder, cover_filename)
+                file.save(image_path)
+                print(f"影片封面图片更新成功: {image_path}")
 
-        f.seek(0)
-        f.write(frontmatter.dumps(post))
-        f.truncate()
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post['title'] = title
+            post['actors'] = actors
+            post['tags'] = [tag.strip() for tag in tags if tag.strip()]
+            if cover_filename:
+                post['cover'] = cover_filename
+            post['description'] = description
+            post['rating'] = int(rating)
 
-    return jsonify({"success": True, "message": "影片信息更新成功"}), 200
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+
+        return jsonify({"success": True, "message": "影片信息更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新影片错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
 
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
