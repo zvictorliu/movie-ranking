@@ -220,81 +220,131 @@ def update_order():
 @app.route('/api/create-movie', methods=['POST'])
 def create_movie():
     """
-    API 接口：接收前端发送的影片数据并创建 Markdown 文件 [[3]]。
+    API 接口：接收前端发送的影片数据并创建 Markdown 文件，支持图片上传。
     """
-    data = request.json
-    title = data.get('title')
-    actors = data.get('actors', '')
-    tags = data.get('tags', '').split(',')  # 将标签字符串转换为列表
-    description = data.get('description', '')
-    order = data.get('order', 1)
-    rating = data.get('rating', 0)
+    try:
+        # 检查是否有文件上传
+        has_image = 'image' in request.files and request.files['image'].filename != ''
+        
+        # 获取表单数据
+        title = request.form.get('title', '')
+        actors = request.form.get('actors', '')
+        tags = request.form.get('tags', '').split(',')  # 将标签字符串转换为列表
+        description = request.form.get('description', '')
+        order = request.form.get('order', 1)
+        rating = request.form.get('rating', 0)
 
-    # 确保内容文件夹存在
-    if not os.path.exists(CONTENT_FOLDER):
-        os.makedirs(CONTENT_FOLDER)
+        # 确保内容文件夹存在
+        if not os.path.exists(CONTENT_FOLDER):
+            os.makedirs(CONTENT_FOLDER)
 
-    # 生成文件名
-    filename = f"{title.replace(' ', '_')}.md"
-    file_path = os.path.join(CONTENT_FOLDER, filename)
+        # 生成文件名
+        filename = f"{title.replace(' ', '_')}.md"
+        file_path = os.path.join(CONTENT_FOLDER, filename)
 
-    # 构建 Markdown 文件内容
-    post = frontmatter.Post("")
-    post.metadata = {
-        "title": title,
-        "actors": actors,
-        "tags": [tag.strip() for tag in tags if tag.strip()],
-        "description": description,
-        "order": int(order),  # 默认顺序值为无穷大
-        "rating": int(rating),  # 默认评分值为 0
-        "cover": f"{title.replace(' ', '_')}.jpg",  # 默认封面图片名
-    }
+        # 处理封面图片
+        cover_filename = f"{title.replace(' ', '_')}.jpg"  # 默认jpg格式
+        if has_image:
+            file = request.files['image']
+            # 检查文件类型
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+                # 使用原始文件的后缀
+                file_extension = os.path.splitext(file.filename)[1].lower()
+                cover_filename = f"{title.replace(' ', '_')}{file_extension}"
+                
+                # 保存图片文件
+                save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
+                os.makedirs(save_folder, exist_ok=True)
+                image_path = os.path.join(save_folder, cover_filename)
+                file.save(image_path)
+                print(f"影片封面图片保存成功: {image_path}")
 
-    # 写入文件
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(frontmatter.dumps(post))
+        # 构建 Markdown 文件内容
+        post = frontmatter.Post("")
+        post.metadata = {
+            "title": title,
+            "actors": actors,
+            "tags": [tag.strip() for tag in tags if tag.strip()],
+            "description": description,
+            "order": int(order),
+            "rating": int(rating),
+            "cover": cover_filename,
+        }
 
-    for actor in actors.split(','):
-        actor = actor.strip()
-        if actor:
-            append_mainwork(actor, title)
+        # 写入文件
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(frontmatter.dumps(post))
 
-    return jsonify({"success": True, "message": "Movie created successfully"}), 200
+        for actor in actors.split(','):
+            actor = actor.strip()
+            if actor:
+                append_mainwork(actor, title)
+
+        return jsonify({"success": True, "message": "Movie created successfully"}), 200
+        
+    except Exception as e:
+        print(f"创建影片错误: {str(e)}")
+        return jsonify({"success": False, "message": f"创建失败: {str(e)}"}), 500
 
 @app.route('/api/create-actor', methods=['POST'])
 def create_actor():
     """
-    API 接口：接收前端发送的演员数据并创建 Markdown 文件 [[1]]。
+    API 接口：接收前端发送的演员数据并创建 Markdown 文件，支持图片上传。
     """
-    data = request.json
-    name = data.get('name')
-    birth = data.get('birth')
-    debut = data.get('debut')
-    # bio = data.get('bio', '')
-    # cover = data.get('cover', '')
+    try:
+        # 检查是否有文件上传
+        has_image = 'image' in request.files and request.files['image'].filename != ''
+        
+        # 获取表单数据
+        name = request.form.get('name', '')
+        birth = request.form.get('birth', '')
+        debut = request.form.get('debut', '')
 
-    # 确保演员文件夹存在
-    if not os.path.exists(ACTORS_FOLDER):
-        os.makedirs(ACTORS_FOLDER)
+        # 确保演员文件夹存在
+        if not os.path.exists(ACTORS_FOLDER):
+            os.makedirs(ACTORS_FOLDER)
 
-    # 生成文件名
-    filename = f"{name.replace(' ', '_')}.md"
-    file_path = os.path.join(ACTORS_FOLDER, filename)
+        # 生成文件名
+        filename = f"{name.replace(' ', '_')}.md"
+        file_path = os.path.join(ACTORS_FOLDER, filename)
 
-    # 构建 Markdown 文件内容
-    post = frontmatter.Post("")
-    post.metadata = {
-        "name": name,
-        "birth": birth,
-        "debut": debut,
-        "cover": f"{name.replace(' ', '_')}.jpg",  # 默认封面图片名
-    }
+        # 处理头像图片
+        cover_filename = f"{name.replace(' ', '_')}.jpg"  # 默认jpg格式
+        if has_image:
+            file = request.files['image']
+            # 检查文件类型
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+                # 使用原始文件的后缀
+                file_extension = os.path.splitext(file.filename)[1].lower()
+                cover_filename = f"{name.replace(' ', '_')}{file_extension}"
+                
+                # 保存图片文件
+                save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+                os.makedirs(save_folder, exist_ok=True)
+                image_path = os.path.join(save_folder, cover_filename)
+                file.save(image_path)
+                print(f"演员头像图片保存成功: {image_path}")
 
-    # 写入文件
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(frontmatter.dumps(post))
+        # 构建 Markdown 文件内容
+        post = frontmatter.Post("")
+        post.metadata = {
+            "name": name,
+            "birth": birth,
+            "debut": debut,
+            "cover": cover_filename,
+        }
 
-    return jsonify({"success": True, "message": "Actor created successfully"}), 200
+        # 写入文件
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(frontmatter.dumps(post))
+
+        return jsonify({"success": True, "message": "Actor created successfully"}), 200
+        
+    except Exception as e:
+        print(f"创建演员错误: {str(e)}")
+        return jsonify({"success": False, "message": f"创建失败: {str(e)}"}), 500
 
 
 @app.route('/api/movie/<movie_name>', methods=['GET'])
