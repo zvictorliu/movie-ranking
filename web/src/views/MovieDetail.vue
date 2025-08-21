@@ -252,8 +252,9 @@ export default {
 }
 
 .movie-detail {
-  padding-left: 10%;
-  padding-right: 10%;
+  padding: 0 10px;
+  max-width: 600px;
+  margin: auto;
 }
 
 .actor-tag {
