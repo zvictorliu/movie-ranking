@@ -222,20 +222,17 @@ export default {
       })
     },
     getTagType(tag) {
-      const tagColors = {
-        介绍: 'info',
-        电影: 'primary',
-        博客: 'success',
-        2024: 'warning',
-        新片: 'danger',
-        期待: 'info',
-        好莱坞: 'primary',
-        经典: 'success',
-        推荐: 'warning',
-        回顾: 'info',
-        必看: 'danger',
+      // 根据标签名字生成固定的类型映射 [[6]]
+      const types = ['success', 'info', 'warning', 'danger']
+      const typeIndex = Math.abs(this.hashCode(tag)) % types.length
+      return types[typeIndex]
+    },
+    hashCode(str) {
+      let hash = 0
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash)
       }
-      return tagColors[tag] || 'info'
+      return hash
     },
     handlePageChange(page) {
       this.currentPage = page

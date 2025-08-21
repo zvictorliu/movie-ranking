@@ -1,0 +1,245 @@
+<template>
+  <div class="movie-preview" v-if="movie">
+    <div class="movie-item">
+      <!-- 封面 -->
+      <div class="cover-wrapper" @click="goToDetail(movie.id)">
+        <img :src="movie.cover" alt="封面" class="movie-cover" @error="setDefaultCover($event)" />
+      </div>
+      <!-- 详细信息 -->
+      <div class="details">
+        <h2>{{ movie.title }}</h2>
+        <!-- 评分 -->
+        <div class="rating">
+          <strong>评分：</strong>
+          <span v-for="i in 5" :key="i" class="star">
+            <span class="material-icons" :class="{ filled: i <= movie.rating }">
+              {{ i <= movie.rating ? 'star' : 'star_border' }}
+            </span>
+          </span>
+        </div>
+        <p><strong>简介：</strong>{{ movie.description }}</p>
+        <p>
+          <strong>主演：</strong>
+          <span v-if="movie.actors">
+            <el-tag
+              v-for="(actor, index) in movie.actors.split(', ')"
+              :key="index"
+              :type="getActorTagType(actor.trim())"
+              class="actor-tag"
+              @click="goToActor(actor.trim())"
+            >
+              {{ actor }}
+            </el-tag>
+          </span>
+          <span v-else>暂无演员信息</span>
+        </p>
+        <p>
+          <strong>标签：</strong>
+          <span v-if="movie.tags">
+            <el-tag
+              v-for="(tag, index) in movie.tags"
+              :key="index"
+              :type="getTagType(tag.trim())"
+              effect="plain"
+              class="tag-item"
+              @click="goToTagDetail(tag.trim())"
+            >
+              {{ tag }}
+            </el-tag>
+          </span>
+          <span v-else>暂无标签信息</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div v-else class="loading">
+    <p>加载中...</p>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+
+export default {
+  name: 'MoviePreview',
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      movie: null,
+      loading: false,
+      error: null,
+    }
+  },
+  async created() {
+    await this.fetchMovie(this.title)
+  },
+  watch: {
+    title: {
+      handler() {
+        this.fetchMovie(this.title)
+      },
+      immediate: true,
+    },
+  },
+  methods: {
+    async fetchMovie(title) {
+      this.loading = true
+      this.error = null
+
+      try {
+        // 直接使用现有的 API 接口，id 和 movie_name 通常是一样的
+        const response = await axios.get(`/api/movie/${title}`)
+        this.movie = response.data
+      } catch (error) {
+        console.error('获取电影信息失败:', error)
+        this.error = '获取电影信息失败'
+        this.movie = null
+      } finally {
+        this.loading = false
+      }
+    },
+    setDefaultCover(event) {
+      event.target.src = '/imgs/default_cover.jpg'
+    },
+    goToDetail(id) {
+      if (id) {
+        this.$router.push({ name: 'MovieDetail', params: { id } })
+      }
+    },
+    goToTagDetail(tagName) {
+      this.$router.push(`/tags/${tagName}`) // 跳转到标签详情页面
+    },
+    getActorTagType(actorName) {
+      // 根据演员名字生成固定的类型映射 [[6]]
+      const types = ['success', 'info', 'warning', 'danger']
+      const typeIndex = Math.abs(this.hashCode(actorName)) % types.length
+      return types[typeIndex]
+    },
+    getTagType(tag) {
+      // 根据标签名字生成固定的类型映射 [[6]]
+      const types = ['success', 'info', 'warning', 'danger']
+      const typeIndex = Math.abs(this.hashCode(tag)) % types.length
+      return types[typeIndex]
+    },
+    hashCode(str) {
+      let hash = 0
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      return hash
+    },
+    goToActor(name) {
+      this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
+    },
+  },
+}
+</script>
+
+<style scoped>
+.movie-preview {
+  width: 100%;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.movie-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.movie-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cover-wrapper {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.cover-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.details h2 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+/* 宽屏设备：横向排列 */
+@media (min-width: 768px) {
+  .movie-item {
+    flex-direction: row;
+  }
+  .movie-cover {
+    max-width: 350px;
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+    margin-right: 20px;
+    border-radius: 8px;
+  }
+  .details {
+    flex: 1;
+    text-align: left;
+  }
+}
+
+/* 窄屏设备：竖向排列 */
+@media (max-width: 768px) {
+  .movie-item {
+    flex-direction: column;
+    align-items: center;
+  }
+  .movie-cover {
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 15px;
+    border-radius: 8px;
+  }
+  .details {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star {
+  font-size: 20px;
+  color: #ccc;
+}
+
+.star .material-icons.filled {
+  color: #ffca28;
+}
+
+.tag-item {
+  margin-right: 5px;
+  border-radius: 12px;
+}
+
+.tag-item:hover {
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>

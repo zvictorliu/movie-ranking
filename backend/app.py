@@ -96,6 +96,39 @@ def parse_post_files():
     return posts
 
 
+def process_shortcodes(content, movies_data):
+    """
+    处理文章内容中的shortcode，将其替换为HTML。
+    """
+    import re
+    
+    # 处理 movie shortcode
+    def replace_movie_shortcode(match):
+        # 提取title参数
+        title_match = re.search(r'title="([^"]+)"', match.group(1))
+        
+        movie_title = title_match.group(1)
+        
+        # 在movies_data中查找对应的电影
+        movie = None
+        for m in movies_data:
+            if m['title'] == movie_title:
+                movie = m
+                break
+        
+        if not movie:
+            return f'<div class="movie-not-found">电影 "{movie_title}" 未找到</div>'
+        
+        movie_card_html = f'<MoviePreview title="{movie["title"]}" />'
+        
+        return movie_card_html
+    
+    # 使用正则表达式查找并替换movie shortcode
+    content = re.sub(r'\{\{< movie-preview ([^>]+) >\}\}', replace_movie_shortcode, content)
+    
+    return content
+
+
 def get_post_by_slug(slug):
     """
     根据slug获取特定的博客文章。
@@ -106,7 +139,16 @@ def get_post_by_slug(slug):
     
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
-        post.content = post.content.replace('src="./imgs', 'src="/imgs')  # 替换为绝对路径
+        
+        # 获取电影数据用于处理shortcode
+        movies_data = parse_movie_files()
+        
+        # 处理shortcode
+        processed_content = process_shortcodes(post.content, movies_data)
+        
+        # 替换图片路径
+        processed_content = processed_content.replace('src="./imgs', 'src="/imgs')
+        
         post_data = {
             "slug": slug,
             "title": post.get('title', '未知标题'),
@@ -114,7 +156,7 @@ def get_post_by_slug(slug):
             "author": post.get('author', '未知作者'),
             "tags": post.get('tags', []),
             "excerpt": post.get('excerpt', ''),
-            "content": post.content,
+            "content": processed_content,
         }
         return post_data
 
@@ -435,6 +477,9 @@ def get_movie_by_name(movie_name):
         "rating": 0,
         "body_html": '',
     })
+
+
+
 
 @app.route('/api/tags/<tag_name>', methods=['GET'])
 def get_movies_by_tag(tag_name):

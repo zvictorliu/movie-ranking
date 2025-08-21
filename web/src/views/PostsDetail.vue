@@ -56,7 +56,12 @@
 
       <!-- 文章正文 -->
       <div class="post-body">
-        <div v-html="renderedContent" class="markdown-content"></div>
+        <template v-for="(item, index) in parsedContent" :key="index">
+          <!-- 如果是 MoviePreview 组件 -->
+          <MoviePreview v-if="item.type === 'movie-preview'" :title="item.movieTitle" />
+          <!-- 如果是普通 HTML 内容 -->
+          <div v-else v-html="item.content"></div>
+        </template>
       </div>
 
       <!-- 文章底部 -->
@@ -121,6 +126,7 @@ import {
 } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { marked } from 'marked'
+import MoviePreview from '@/components/MoviePreview.vue'
 
 export default {
   name: 'PostsDetail',
@@ -132,6 +138,7 @@ export default {
     Share,
     ChatDotRound,
     LinkIcon,
+    MoviePreview,
   },
   data() {
     return {
@@ -147,9 +154,52 @@ export default {
       const wordCount = this.post.content.split(/\s+/).length
       return Math.ceil(wordCount / wordsPerMinute)
     },
-    renderedContent() {
-      if (!this.post || !this.post.content) return ''
-      return marked(this.post.content)
+    parsedContent() {
+      if (!this.post || !this.post.content) return []
+
+      // 先使用 marked 渲染 markdown
+      const renderedHtml = marked(this.post.content)
+
+      // 解析 HTML 内容，分离 MoviePreview 组件和普通内容
+      const contentItems = []
+      const moviePreviewRegex = /<MoviePreview\s+title=["']([^"']+)["']\s*\/>/g
+      let lastIndex = 0
+      let match
+
+      while ((match = moviePreviewRegex.exec(renderedHtml)) !== null) {
+        // 添加 MoviePreview 之前的普通内容
+        if (match.index > lastIndex) {
+          const htmlContent = renderedHtml.substring(lastIndex, match.index)
+          if (htmlContent.trim()) {
+            contentItems.push({
+              type: 'html',
+              content: htmlContent,
+            })
+          }
+        }
+
+        // 添加 MoviePreview 组件
+        const movieTitle = match[1] // 直接获取引号内的内容
+        contentItems.push({
+          type: 'movie-preview',
+          movieTitle: movieTitle,
+        })
+
+        lastIndex = match.index + match[0].length
+      }
+
+      // 添加最后剩余的普通内容
+      if (lastIndex < renderedHtml.length) {
+        const htmlContent = renderedHtml.substring(lastIndex)
+        if (htmlContent.trim()) {
+          contentItems.push({
+            type: 'html',
+            content: htmlContent,
+          })
+        }
+      }
+
+      return contentItems
     },
   },
   methods: {
@@ -180,6 +230,15 @@ export default {
     goToPost(slug) {
       this.$router.push({ name: 'PostsDetail', params: { slug } })
     },
+
+    async goToDetail(id) {
+      try {
+        this.$router.push({ name: 'MovieDetail', params: { id } })
+      } catch (error) {
+        console.error('电影记录不存在:', error)
+        this.$message.error('不存在对应的电影记录')
+      }
+    },
     formatDate(dateString) {
       const date = new Date(dateString)
       return date.toLocaleDateString('zh-CN', {
@@ -189,20 +248,17 @@ export default {
       })
     },
     getTagType(tag) {
-      const tagColors = {
-        介绍: 'info',
-        电影: 'primary',
-        博客: 'success',
-        2024: 'warning',
-        新片: 'danger',
-        期待: 'info',
-        好莱坞: 'primary',
-        经典: 'success',
-        推荐: 'warning',
-        回顾: 'info',
-        必看: 'danger',
+      // 根据标签名字生成固定的类型映射 [[6]]
+      const types = ['success', 'info', 'warning', 'danger']
+      const typeIndex = Math.abs(this.hashCode(tag)) % types.length
+      return types[typeIndex]
+    },
+    hashCode(str) {
+      let hash = 0
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash)
       }
-      return tagColors[tag] || 'info'
+      return hash
     },
     shareToWeibo() {
       const url = encodeURIComponent(window.location.href)
@@ -543,5 +599,168 @@ body.dark-mode .related-post-item p {
 
 body.dark-mode .related-post-date {
   color: #808080;
+}
+
+/* 电影卡片shortcode样式 - 与ActorDetail保持一致 */
+.movie-card-shortcode {
+  margin: 2rem 0;
+}
+
+.movie-card-content {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.movie-cover-wrapper {
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.movie-cover-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.movie-cover {
+  max-width: 350px;
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  margin-right: 20px;
+}
+
+.movie-details {
+  flex: 1;
+  text-align: left;
+}
+
+.movie-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.rating strong {
+  color: #666;
+  font-size: 0.9rem;
+  margin-right: 5px;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.stars .material-icons {
+  font-size: 20px;
+  color: #ccc;
+}
+
+.stars .material-icons.filled {
+  color: #ffca28;
+}
+
+.movie-description {
+  color: #555;
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+}
+
+.movie-actors {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.movie-actors strong {
+  color: #333;
+}
+
+.movie-not-found {
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  color: #666;
+  text-align: center;
+  font-style: italic;
+}
+
+/* 宽屏设备：横向排列 */
+@media (min-width: 768px) {
+  .movie-card-content {
+    flex-direction: row;
+  }
+  .movie-cover {
+    max-width: 350px;
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+    margin-right: 20px;
+  }
+  .movie-details {
+    flex: 1;
+    text-align: left;
+  }
+}
+
+/* 窄屏设备：竖向排列 */
+@media (max-width: 768px) {
+  .movie-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .movie-cover {
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  .movie-details {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+/* 暗色模式支持 */
+body.dark-mode .movie-card-content {
+  border-color: #404040;
+  background-color: #2d2d2d;
+}
+
+body.dark-mode .movie-title {
+  color: #e0e0e0;
+}
+
+body.dark-mode .rating strong {
+  color: #b0b0b0;
+}
+
+body.dark-mode .movie-description {
+  color: #c0c0c0;
+}
+
+body.dark-mode .movie-actors {
+  color: #b0b0b0;
+}
+
+body.dark-mode .movie-actors strong {
+  color: #e0e0e0;
+}
+
+body.dark-mode .movie-not-found {
+  background-color: #2d2d2d;
+  border-color: #404040;
+  color: #b0b0b0;
 }
 </style>
