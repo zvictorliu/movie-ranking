@@ -13,6 +13,7 @@ CORS(app)  # 启用 CORS 支持 [[2]]
 CONTENT_FOLDER = os.path.join(os.getcwd(), '../content')
 IMGS_FOLDER = os.path.join(CONTENT_FOLDER, 'imgs')
 ACTORS_FOLDER = os.path.join(CONTENT_FOLDER, 'actors')
+POSTS_FOLDER = os.path.join(CONTENT_FOLDER, 'posts')
 COVER_FOLDER = '0_Cover'
 MOVIE_COVER_FOLDER = f'{COVER_FOLDER}/movie-cover'
 ACTOR_COVER_FOLDER = f'{COVER_FOLDER}/actor-cover'
@@ -63,6 +64,59 @@ def parse_actor_files():
                 }
                 actors.append(actor_data)
     return actors
+
+
+def parse_post_files():
+    """
+    解析 posts 文件夹中的所有 Markdown 文件，并返回解析后的数据列表。
+    """
+    posts = []
+    if not os.path.exists(POSTS_FOLDER):
+        return posts
+    
+    for filename in os.listdir(POSTS_FOLDER):
+        if filename.endswith('.md'):
+            file_path = os.path.join(POSTS_FOLDER, filename)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.load(f)
+                slug = os.path.splitext(filename)[0]  # 去掉.md后缀作为slug
+                post_data = {
+                    "slug": slug,
+                    "title": post.get('title', '未知标题'),
+                    "date": post.get('date', ''),
+                    "author": post.get('author', '未知作者'),
+                    "tags": post.get('tags', []),
+                    "excerpt": post.get('excerpt', ''),
+                    "content": post.content,
+                }
+                posts.append(post_data)
+    
+    # 按日期排序，最新的在前面
+    posts.sort(key=lambda x: x['date'], reverse=True)
+    return posts
+
+
+def get_post_by_slug(slug):
+    """
+    根据slug获取特定的博客文章。
+    """
+    file_path = os.path.join(POSTS_FOLDER, f"{slug}.md")
+    if not os.path.exists(file_path):
+        return None
+    
+    with open(file_path, 'r', encoding='utf-8') as f:
+        post = frontmatter.load(f)
+        post.content = post.content.replace('src="./imgs', 'src="/imgs')  # 替换为绝对路径
+        post_data = {
+            "slug": slug,
+            "title": post.get('title', '未知标题'),
+            "date": post.get('date', ''),
+            "author": post.get('author', '未知作者'),
+            "tags": post.get('tags', []),
+            "excerpt": post.get('excerpt', ''),
+            "content": post.content,
+        }
+        return post_data
 
 def append_mainwork(actor, movie):
     """
@@ -119,6 +173,8 @@ def serve_image(filename):
     imgs_fd = IMGS_FOLDER
     if not os.path.exists(os.path.join(imgs_fd, filename)):
         imgs_fd = f'{ACTORS_FOLDER}/imgs'
+    if not os.path.exists(os.path.join(imgs_fd, filename)):
+        imgs_fd = f'{POSTS_FOLDER}/imgs'
     return send_from_directory(imgs_fd, filename)
 
 
@@ -513,6 +569,45 @@ def upload_image():
     except Exception as e:
         print(f"图片上传错误: {str(e)}")
         return jsonify({"success": False, "message": f"上传失败: {str(e)}"}), 500
+
+
+@app.route('/api/posts', methods=['GET'])
+def get_posts():
+    """
+    API 接口：获取所有博客文章列表。
+    """
+    try:
+        posts = parse_post_files()
+        return jsonify({
+            "success": True,
+            "posts": posts
+        }), 200
+    except Exception as e:
+        print(f"获取博客文章列表错误: {str(e)}")
+        return jsonify({"success": False, "message": f"获取失败: {str(e)}"}), 500
+
+
+@app.route('/api/posts/<slug>', methods=['GET'])
+def get_post(slug):
+    """
+    API 接口：根据slug获取特定的博客文章。
+    """
+    try:
+        post = get_post_by_slug(slug)
+        if post:
+            return jsonify({
+                "success": True,
+                "post": post
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "message": "文章未找到"
+            }), 404
+    except Exception as e:
+        print(f"获取博客文章错误: {str(e)}")
+        return jsonify({"success": False, "message": f"获取失败: {str(e)}"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="0.0.0.0")

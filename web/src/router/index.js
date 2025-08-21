@@ -6,6 +6,8 @@ import ActorsPage from '../views/ActorsPage.vue' // 引入演员页面
 import MoviesPage from '../views/MoviesPage.vue' // 引入影片页面
 import TagsPage from '../views/TagsPage.vue' // 引入标签页面
 import TagDetail from '../views/TagDetail.vue' // 引入标签详情页面
+import PostsPage from '../views/PostsPage.vue' // 引入博客列表页面
+import PostsDetail from '../views/PostsDetail.vue' // 引入博客详情页面
 
 const routes = [
   {
@@ -42,6 +44,16 @@ const routes = [
     path: '/tags/:tagName', // 动态路由参数
     name: 'TagDetail',
     component: TagDetail, // 标签详情页面路由
+  },
+  {
+    path: '/posts',
+    name: 'PostsPage',
+    component: PostsPage, // 博客列表页面路由
+  },
+  {
+    path: '/posts/:slug',
+    name: 'PostsDetail',
+    component: PostsDetail, // 博客详情页面路由
   },
 ]
 

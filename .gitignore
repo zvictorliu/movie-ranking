@@ -1,4 +1,6 @@
 content/
+temp/
+tmp/
 
 *.tar
 *.tar.gz
