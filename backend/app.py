@@ -17,6 +17,7 @@ POSTS_FOLDER = os.path.join(CONTENT_FOLDER, 'posts')
 COVER_FOLDER = '0_Cover'
 MOVIE_COVER_FOLDER = f'{COVER_FOLDER}/movie-cover'
 ACTOR_COVER_FOLDER = f'{COVER_FOLDER}/actor-cover'
+POST_COVER_FOLDER = f'{COVER_FOLDER}/post-cover'
 
 def parse_movie_files():
     """
@@ -28,8 +29,6 @@ def parse_movie_files():
             file_path = os.path.join(CONTENT_FOLDER, filename)
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)  # 使用 frontmatter 解析 Markdown 文件 [[3]]
-                body_html = markdown.markdown(post.content)  # 将正文转换为 HTML [[3]]
-                body_html = body_html.replace('src="./imgs', 'src="/imgs')  # 替换为绝对路径
                 movie_data = {
                     "id": filename,
                     "title": post.get('title', '未知标题'),
@@ -39,7 +38,7 @@ def parse_movie_files():
                     "cover": f"/imgs/{MOVIE_COVER_FOLDER}/{post.get('cover')}",
                     "order": post.get('order', float('inf')),
                     "rating": post.get('rating', 0),
-                    "body_html": body_html,  # 添加正文 HTML 字段
+                    "body": post.content,  # 只返回原始正文内容
                 }
                 movies.append(movie_data)
     movies.sort(key=lambda x: (x['order'], x['title']))
@@ -96,37 +95,7 @@ def parse_post_files():
     return posts
 
 
-def process_shortcodes(content, movies_data):
-    """
-    处理文章内容中的shortcode，将其替换为HTML。
-    """
-    import re
-    
-    # 处理 movie shortcode
-    def replace_movie_shortcode(match):
-        # 提取title参数
-        title_match = re.search(r'title="([^"]+)"', match.group(1))
-        
-        movie_title = title_match.group(1)
-        
-        # 在movies_data中查找对应的电影
-        movie = None
-        for m in movies_data:
-            if m['title'] == movie_title:
-                movie = m
-                break
-        
-        if not movie:
-            return f'<div class="movie-not-found">电影 "{movie_title}" 未找到</div>'
-        
-        movie_card_html = f'<MoviePreview title="{movie["title"]}" />'
-        
-        return movie_card_html
-    
-    # 使用正则表达式查找并替换movie shortcode
-    content = re.sub(r'\{\{< movie-preview ([^>]+) >\}\}', replace_movie_shortcode, content)
-    
-    return content
+
 
 
 def get_post_by_slug(slug):
@@ -140,14 +109,8 @@ def get_post_by_slug(slug):
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
         
-        # 获取电影数据用于处理shortcode
-        movies_data = parse_movie_files()
-        
-        # 处理shortcode
-        processed_content = process_shortcodes(post.content, movies_data)
-        
         # 替换图片路径
-        processed_content = processed_content.replace('src="./imgs', 'src="/imgs')
+        processed_content = post.content.replace('src="./imgs', 'src="/imgs')
         
         post_data = {
             "slug": slug,
@@ -279,14 +242,12 @@ def get_actor(actor_name):
 
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
-        body_html = markdown.markdown(post.content)  # 将正文转换为 HTML
-        body_html = body_html.replace('src="./imgs', 'src="/imgs')
         actor_data = {
             "name": post.get('name'),
             "birth": post.get('birth'),
             "debut": post.get('debut'),
             "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
-            "body_html": body_html,
+            "body": post.content,  # 只返回原始正文内容
         }
         return jsonify(actor_data)
     
@@ -456,7 +417,6 @@ def get_movie_by_name(movie_name):
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
                 if post.get('title') == movie_name:  # 匹配电影标题 [[3]]
-                    body_html = markdown.markdown(post.content)
                     return jsonify({
                         "id": filename,
                         "title": post.get('title'),
@@ -465,7 +425,7 @@ def get_movie_by_name(movie_name):
                         "description": post.get('description', ''),
                         "cover": f"/imgs/{MOVIE_COVER_FOLDER}/{post.get('cover')}",
                         "rating": post.get('rating', 0),
-                        "body_html": body_html,
+                        "body": post.content,  # 只返回原始正文内容
                     })
     return jsonify({
         "id": None,
@@ -475,7 +435,7 @@ def get_movie_by_name(movie_name):
         "description": '待观看',
         "cover": '/imgs/default_cover.jpg',
         "rating": 0,
-        "body_html": '',
+        "body": '',
     })
 
 
@@ -512,6 +472,7 @@ def update_movie(id):
             tags = tags.split(',')
         description = request.form.get('description', '')
         rating = request.form.get('rating', 0)
+        order = request.form.get('order', 1)
         
         file_path = os.path.join(CONTENT_FOLDER, id)
 
@@ -545,7 +506,7 @@ def update_movie(id):
                 post['cover'] = cover_filename
             post['description'] = description
             post['rating'] = int(rating)
-
+            post['order'] = int(order)
             f.seek(0)
             f.write(frontmatter.dumps(post))
             f.truncate()
@@ -555,6 +516,216 @@ def update_movie(id):
     except Exception as e:
         print(f"更新影片错误: {str(e)}")
         return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
+@app.route('/api/update-movie-body/<id>', methods=['PUT'])
+def update_movie_body(id):
+    """
+    API 接口：更新电影的正文内容。
+    """
+    try:
+        data = request.json
+        body_content = data.get('body', '')
+        
+        file_path = os.path.join(CONTENT_FOLDER, id)
+        
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "影片文件不存在"}), 404
+        
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post.content = body_content
+            
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+        
+        return jsonify({"success": True, "message": "正文内容更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新正文内容错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
+@app.route('/api/update-actor-body/<actor_name>', methods=['PUT'])
+def update_actor_body(actor_name):
+    """
+    API 接口：更新演员的正文内容。
+    """
+    try:
+        data = request.json
+        body_content = data.get('body', '')
+        
+        file_path = os.path.join(ACTORS_FOLDER, f"{actor_name}.md")
+        
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "演员文件不存在"}), 404
+        
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post.content = body_content
+            
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+        
+        return jsonify({"success": True, "message": "正文内容更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新演员正文内容错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
+@app.route('/api/update-actor/<actor_name>', methods=['PUT'])
+def update_actor(actor_name):
+    """
+    API 接口：接收前端发送的演员信息，并更新对应的 Markdown 文件，支持图片上传。
+    """
+    try:
+        # 检查是否有文件上传
+        has_image = 'image' in request.files and request.files['image'].filename != ''
+        
+        # 获取表单数据
+        name = request.form.get('name', '')
+        birth = request.form.get('birth', '')
+        debut = request.form.get('debut', '')
+        tags = request.form.get('tags', '')
+        if type(tags) == str:
+            tags = tags.split(',')
+        
+        file_path = os.path.join(ACTORS_FOLDER, f"{actor_name}.md")
+
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "演员文件不存在"}), 404
+
+        # 处理封面图片
+        cover_filename = None
+        if has_image:
+            file = request.files['image']
+            # 检查文件类型
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+                # 使用原始文件的后缀
+                file_extension = os.path.splitext(file.filename)[1].lower()
+                cover_filename = f"{name.replace(' ', '_')}{file_extension}"
+                
+                # 保存图片文件
+                save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+                os.makedirs(save_folder, exist_ok=True)
+                image_path = os.path.join(save_folder, cover_filename)
+                file.save(image_path)
+                print(f"演员封面图片更新成功: {image_path}")
+
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post['name'] = name
+            post['birth'] = birth
+            post['debut'] = debut
+            post['tags'] = [tag.strip() for tag in tags if tag.strip()]
+            if cover_filename:
+                post['cover'] = cover_filename
+
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+
+        return jsonify({"success": True, "message": "演员信息更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新演员错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
+@app.route('/api/update-post-body/<slug>', methods=['PUT'])
+def update_post_body(slug):
+    """
+    API 接口：更新文章的正文内容。
+    """
+    try:
+        data = request.json
+        body_content = data.get('body', '')
+        
+        file_path = os.path.join(POSTS_FOLDER, f"{slug}.md")
+        
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "文章文件不存在"}), 404
+        
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post.content = body_content
+            
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+        
+        return jsonify({"success": True, "message": "正文内容更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新文章正文内容错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
+@app.route('/api/update-post/<slug>', methods=['PUT'])
+def update_post(slug):
+    """
+    API 接口：接收前端发送的文章信息，并更新对应的 Markdown 文件，支持图片上传。
+    """
+    try:
+        # 检查是否有文件上传
+        has_image = 'image' in request.files and request.files['image'].filename != ''
+        
+        # 获取表单数据
+        title = request.form.get('title', '')
+        author = request.form.get('author', '')
+        date = request.form.get('date', '')
+        excerpt = request.form.get('excerpt', '')
+        tags = request.form.get('tags', '')
+        if type(tags) == str:
+            tags = tags.split(',')
+        
+        file_path = os.path.join(POSTS_FOLDER, f"{slug}.md")
+
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "文章文件不存在"}), 404
+
+        # 处理封面图片
+        cover_filename = None
+        if has_image:
+            file = request.files['image']
+            # 检查文件类型
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+            if file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
+                # 使用原始文件的后缀
+                file_extension = os.path.splitext(file.filename)[1].lower()
+                cover_filename = f"{title.replace(' ', '_')}{file_extension}"
+                
+                # 保存图片文件
+                save_folder = os.path.join(IMGS_FOLDER, POST_COVER_FOLDER)
+                os.makedirs(save_folder, exist_ok=True)
+                image_path = os.path.join(save_folder, cover_filename)
+                file.save(image_path)
+                print(f"文章封面图片更新成功: {image_path}")
+
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post['title'] = title
+            post['author'] = author
+            post['date'] = date
+            post['excerpt'] = excerpt
+            post['tags'] = [tag.strip() for tag in tags if tag.strip()]
+            if cover_filename:
+                post['cover'] = cover_filename
+
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+
+        return jsonify({"success": True, "message": "文章信息更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新文章错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
 
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
@@ -577,7 +748,7 @@ def upload_image():
         if not name.strip():
             return jsonify({"success": False, "message": "请输入图片名称"}), 400
         
-        if not image_type or image_type not in ['actor', 'movie']:
+        if not image_type or image_type not in ['actor', 'movie', 'post']:
             return jsonify({"success": False, "message": "请选择正确的图片类型"}), 400
         
         # 检查文件类型
@@ -592,6 +763,8 @@ def upload_image():
         # 根据类型确定保存路径
         if image_type == 'actor':
             save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+        elif image_type == 'post':
+            save_folder = os.path.join(IMGS_FOLDER, POST_COVER_FOLDER)
         else:  # movie
             save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
         
@@ -604,11 +777,19 @@ def upload_image():
         
         print(f"图片上传成功: {file_path}")
         
+        # 确定返回的路径
+        if image_type == 'actor':
+            return_path = f"/imgs/{ACTOR_COVER_FOLDER}/{filename}"
+        elif image_type == 'post':
+            return_path = f"/imgs/{POST_COVER_FOLDER}/{filename}"
+        else:  # movie
+            return_path = f"/imgs/{MOVIE_COVER_FOLDER}/{filename}"
+        
         return jsonify({
             "success": True, 
             "message": "图片上传成功",
             "filename": filename,
-            "path": f"/imgs/{ACTOR_COVER_FOLDER if image_type == 'actor' else MOVIE_COVER_FOLDER}/{filename}"
+            "path": return_path
         }), 200
         
     except Exception as e:

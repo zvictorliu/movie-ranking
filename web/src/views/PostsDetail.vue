@@ -17,7 +17,23 @@
 
       <!-- 文章头部 -->
       <div class="post-header">
-        <h1 class="post-title">{{ post.title }}</h1>
+        <div class="title-container">
+          <h1 class="post-title">{{ post.title }}</h1>
+          <div class="edit-buttons">
+            <el-tooltip content="编辑文章信息" placement="top">
+              <button @click="openEditMetaDialog" class="edit-meta-button">
+                <el-icon><Setting /></el-icon>
+                <span class="button-text">信息</span>
+              </button>
+            </el-tooltip>
+            <el-tooltip content="编辑正文内容" placement="top">
+              <button @click="openEditBodyDialog" class="edit-body-button">
+                <el-icon><Document /></el-icon>
+                <span class="button-text">正文</span>
+              </button>
+            </el-tooltip>
+          </div>
+        </div>
         <div class="post-meta">
           <div class="meta-item">
             <el-icon><Calendar /></el-icon>
@@ -55,7 +71,7 @@
       </div>
 
       <!-- 文章正文 -->
-      <div class="post-body">
+      <div class="post-body" v-if="!editBodyDialogVisible">
         <template v-for="(item, index) in parsedContent" :key="index">
           <!-- 如果是 MoviePreview 组件 -->
           <MoviePreview v-if="item.type === 'movie-preview'" :title="item.movieTitle" />
@@ -63,6 +79,25 @@
           <div v-else v-html="item.content"></div>
         </template>
       </div>
+
+      <!-- 编辑正文对话框 -->
+      <el-dialog
+        v-model="editBodyDialogVisible"
+        title="编辑正文内容"
+        width="90%"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        class="body-editor-dialog"
+      >
+        <LiveEditor
+          v-if="post"
+          v-model="post.content"
+          :title="`编辑《${post.title}》正文`"
+          :post-slug="post.slug"
+          @saved="onBodySaved"
+          @cancelled="editBodyDialogVisible = false"
+        />
+      </el-dialog>
 
       <!-- 文章底部 -->
       <div class="post-footer">
@@ -111,6 +146,17 @@
         </template>
       </el-result>
     </div>
+
+    <!-- 编辑元信息对话框 -->
+    <MetaEditor
+      v-if="post"
+      v-model:visible="editMetaDialogVisible"
+      type="post"
+      :data="post"
+      :id="post.slug"
+      @saved="onMetaSaved"
+      @cancelled="editMetaDialogVisible = false"
+    />
   </div>
 </template>
 
@@ -123,10 +169,14 @@ import {
   Share,
   ChatDotRound,
   Link as LinkIcon,
+  Document,
+  Setting,
 } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { marked } from 'marked'
 import MoviePreview from '@/components/MoviePreview.vue'
+import LiveEditor from '@/components/LiveEditor.vue'
+import MetaEditor from '@/components/MetaEditor.vue'
 
 export default {
   name: 'PostsDetail',
@@ -138,13 +188,19 @@ export default {
     Share,
     ChatDotRound,
     LinkIcon,
+    Document,
+    Setting,
     MoviePreview,
+    LiveEditor,
+    MetaEditor,
   },
   data() {
     return {
       post: null,
       loading: true,
       relatedPosts: [],
+      editBodyDialogVisible: false, // 控制编辑正文对话框的显示状态
+      editMetaDialogVisible: false, // 控制编辑元信息对话框的显示状态
     }
   },
   computed: {
@@ -162,7 +218,7 @@ export default {
 
       // 解析 HTML 内容，分离 MoviePreview 组件和普通内容
       const contentItems = []
-      const moviePreviewRegex = /<MoviePreview\s+title=["']([^"']+)["']\s*\/>/g
+      const moviePreviewRegex = /<movie\s+title=["']([^"']+)["']\s*\/?>/g
       let lastIndex = 0
       let match
 
@@ -206,11 +262,32 @@ export default {
     async fetchPost() {
       try {
         const slug = this.$route.params.slug
+        console.log('fetchPost called with slug:', slug)
+
+        if (!slug) {
+          console.error('Slug parameter is missing')
+          this.$message.error('文章标识符缺失')
+          return
+        }
+
         const response = await axios.get(`/api/posts/${slug}`)
-        this.post = response.data.post
-        this.fetchRelatedPosts()
+        console.log('API response:', response.data)
+
+        if (response.data && response.data.post) {
+          this.post = response.data.post
+          console.log('Post loaded successfully:', this.post.title)
+          this.fetchRelatedPosts()
+        } else {
+          console.error('Invalid API response format')
+          this.$message.error('文章数据格式错误')
+        }
       } catch (error) {
         console.error('获取文章详情失败:', error)
+        if (error.response && error.response.status === 404) {
+          this.$message.error('文章不存在')
+        } else {
+          this.$message.error('获取文章失败，请稍后重试')
+        }
       } finally {
         this.loading = false
       }
@@ -226,6 +303,21 @@ export default {
     },
     goBack() {
       this.$router.push({ name: 'PostsPage' })
+    },
+    openEditBodyDialog() {
+      this.editBodyDialogVisible = true // 打开编辑正文对话框
+    },
+    openEditMetaDialog() {
+      this.editMetaDialogVisible = true
+    },
+    onMetaSaved() {
+      // 刷新整个页面以显示更新后的信息
+      location.reload()
+    },
+    async onBodySaved(newBody) {
+      // 更新本地数据
+      this.post.content = newBody
+      this.editBodyDialogVisible = false
     },
     goToPost(slug) {
       this.$router.push({ name: 'PostsDetail', params: { slug } })
@@ -261,6 +353,7 @@ export default {
       return hash
     },
     shareToWeibo() {
+      if (!this.post) return
       const url = encodeURIComponent(window.location.href)
       const title = encodeURIComponent(this.post.title)
       window.open(`https://service.weibo.com/share/share.php?url=${url}&title=${title}`)
@@ -278,12 +371,17 @@ export default {
     },
   },
   mounted() {
+    console.log('PostsDetail mounted, route params:', this.$route.params)
     this.fetchPost()
   },
   watch: {
-    '$route.params.slug'() {
-      this.loading = true
-      this.fetchPost()
+    '$route.params.slug'(newSlug, oldSlug) {
+      console.log('Route slug changed:', { newSlug, oldSlug })
+      if (newSlug !== oldSlug) {
+        this.loading = true
+        this.post = null // 重置 post 数据
+        this.fetchPost()
+      }
     },
   },
 }
@@ -309,12 +407,85 @@ export default {
   text-align: center;
 }
 
+.title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.title-container .post-title {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 12px;
+}
+
 .post-title {
   font-size: 2.5rem;
   color: #333;
   margin-bottom: 20px;
   line-height: 1.3;
   font-weight: 700;
+}
+
+.edit-meta-button,
+.edit-body-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.edit-meta-button {
+  color: #409eff;
+  border-color: #409eff;
+}
+
+.edit-meta-button:hover {
+  background: #409eff;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+.edit-body-button {
+  color: #67c23a;
+  border-color: #67c23a;
+}
+
+.edit-body-button:hover {
+  background: #67c23a;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+}
+
+.button-text {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 编辑正文对话框样式 */
+:deep(.body-editor-dialog .el-dialog) {
+  height: 90vh;
+}
+
+:deep(.body-editor-dialog .el-dialog__body) {
+  height: calc(90vh - 120px);
+  padding: 0;
 }
 
 .post-meta {

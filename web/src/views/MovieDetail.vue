@@ -3,9 +3,20 @@
     <!-- 标题和编辑按钮 -->
     <div class="title-container">
       <h1>{{ movie.title }}</h1>
-      <button @click="openEditDialog" class="edit-movie-button">
-        <el-icon><Edit /></el-icon>
-      </button>
+      <div class="edit-buttons">
+        <el-tooltip content="编辑影片信息" placement="top">
+          <button @click="openEditMetaDialog" class="edit-meta-button">
+            <el-icon><Setting /></el-icon>
+            <span class="button-text">信息</span>
+          </button>
+        </el-tooltip>
+        <el-tooltip content="编辑正文内容" placement="top">
+          <button @click="openEditBodyDialog" class="edit-body-button">
+            <el-icon><Document /></el-icon>
+            <span class="button-text">正文</span>
+          </button>
+        </el-tooltip>
+      </div>
     </div>
     <img :src="movie.cover" alt="封面" class="cover" @error="setDefaultCover($event)" />
     <p>
@@ -51,7 +62,25 @@
     <p><strong>简介：</strong>{{ movie.description }}</p>
 
     <!-- 显示 Markdown 正文 -->
-    <div v-html="movie.body_html" class="content"></div>
+    <div v-html="renderedBody" class="content" v-if="!editBodyDialogVisible"></div>
+
+    <!-- 编辑正文对话框 -->
+    <el-dialog
+      v-model="editBodyDialogVisible"
+      title="编辑正文内容"
+      width="90%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      class="body-editor-dialog"
+    >
+      <LiveEditor
+        v-model="movie.body"
+        :title="`编辑《${movie.title}》正文`"
+        :movie-id="movie.id"
+        @saved="onBodySaved"
+        @cancelled="editBodyDialogVisible = false"
+      />
+    </el-dialog>
 
     <!-- 上一页、下一页按钮 -->
     <div class="navigation">
@@ -60,75 +89,50 @@
       <button @click="navigate(1)" :disabled="!nextMovie">下一页</button>
     </div>
 
-    <!-- 编辑对话框 -->
-    <el-dialog v-model="editDialogVisible" title="编辑影片信息" width="80%">
-      <el-form :model="editFormData" label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="editFormData.title" placeholder="请输入影片标题"></el-input>
-        </el-form-item>
-        <el-form-item label="演员">
-          <el-input v-model="editFormData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
-        </el-form-item>
-        <el-form-item label="标签">
-          <el-input v-model="editFormData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
-        </el-form-item>
-        <el-form-item label="简介">
-          <el-input
-            v-model="editFormData.description"
-            type="textarea"
-            placeholder="请输入影片简介"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="评分">
-          <el-input v-model="editFormData.rating" placeholder="请输入评分(0-5)"></el-input>
-        </el-form-item>
-        <el-form-item label="封面图片（可选）">
-          <el-upload
-            class="upload-demo"
-            drag
-            action="#"
-            :auto-upload="false"
-            :on-change="handleEditImageChange"
-            :file-list="editImageFileList"
-            accept="image/*"
-          >
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            <template #tip>
-              <div class="el-upload__tip">只能上传图片文件，且不超过2MB</div>
-            </template>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="updateMovie">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <!-- 编辑元信息对话框 -->
+    <MetaEditor
+      v-model:visible="editDialogVisible"
+      type="movie"
+      :data="movie"
+      :id="movie.id"
+      @saved="onMetaSaved"
+      @cancelled="editDialogVisible = false"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { Edit, UploadFilled } from '@element-plus/icons-vue'
+import { Setting, Document } from '@element-plus/icons-vue'
+import LiveEditor from '@/components/LiveEditor.vue'
+import MetaEditor from '@/components/MetaEditor.vue'
+import { marked } from 'marked'
+
 export default {
   name: 'MovieDetail',
+  components: {
+    Setting,
+    Document,
+    LiveEditor,
+    MetaEditor,
+  },
   data() {
     return {
       movie: {},
       prevMovie: null,
       nextMovie: null,
       editDialogVisible: false, // 控制编辑对话框的显示状态
-      editFormData: {}, // 当前正在编辑的影片数据
-      editImageFileList: [], // 编辑时的图片文件列表
-      selectedEditImageFile: null, // 编辑时选中的图片文件
+      editBodyDialogVisible: false, // 控制编辑正文对话框的显示状态
     }
   },
-  components: {
-    Edit,
-    UploadFilled,
+  computed: {
+    renderedBody() {
+      if (!this.movie.body) return ''
+      // 使用 marked 渲染 markdown
+      const renderedHtml = marked(this.movie.body)
+      // 替换图片路径为绝对路径（全局替换）
+      return renderedHtml.replace(/src="\.\/imgs/g, 'src="/imgs')
+    },
   },
   async created() {
     const { id } = this.$route.params
@@ -150,47 +154,21 @@ export default {
         console.error('请求失败:', error)
       }
     },
-    openEditDialog() {
-      this.editFormData = { ...this.movie } // 复制当前影片的数据
+    openEditMetaDialog() {
       this.editDialogVisible = true // 打开编辑对话框
-      this.editImageFileList = [] // 清空图片列表
-      this.selectedEditImageFile = null // 清空选中的图片
     },
-    handleEditImageChange(file) {
-      this.selectedEditImageFile = file.raw
-      this.editImageFileList = [file]
+    openEditBodyDialog() {
+      this.editBodyDialogVisible = true // 打开编辑正文对话框
     },
-    async updateMovie() {
-      try {
-        const formData = new FormData()
-        formData.append('title', this.editFormData.title)
-        formData.append('actors', this.editFormData.actors)
-        formData.append('tags', this.editFormData.tags)
-        formData.append('description', this.editFormData.description)
-        formData.append('rating', this.editFormData.rating)
+    onMetaSaved() {
+      // 刷新整个页面以显示更新后的信息
+      location.reload()
+    },
 
-        // 如果有图片，添加到表单数据中
-        if (this.selectedEditImageFile) {
-          formData.append('image', this.selectedEditImageFile)
-        }
-
-        const response = await axios.put(`/api/update-movie/${this.editFormData.id}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-
-        if (response.data.success) {
-          this.$message.success('影片信息已成功更新！')
-          this.editDialogVisible = false // 关闭对话框
-
-          // 刷新整个页面
-          location.reload() // 强制刷新页面
-        } else {
-          this.$message.error('更新失败，请稍后再试！')
-        }
-      } catch (error) {
-        console.error('Error updating movie:', error)
-        this.$message.error('更新失败，请稍后再试！')
-      }
+    async onBodySaved(newBody) {
+      // 更新本地数据
+      this.movie.body = newBody
+      this.editBodyDialogVisible = false
     },
     setDefaultCover(event) {
       event.target.src = '/imgs/default_cover.jpg' // 默认图片路径
@@ -249,6 +227,19 @@ export default {
 .title-container {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.title-container h1 {
+  margin: 0;
+  flex: 1;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 12px;
 }
 
 .movie-detail {
@@ -321,11 +312,82 @@ button:disabled {
   color: #ffca28; /* 填充的星星颜色为黄色 */
 }
 
-.edit-movie-button {
-  background: none;
-  border: none;
+.edit-meta-button,
+.edit-body-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.edit-meta-button {
   color: #409eff;
+  border-color: #409eff;
+}
+
+.edit-meta-button:hover {
+  background: #409eff;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+.edit-body-button {
+  color: #67c23a;
+  border-color: #67c23a;
+}
+
+.edit-body-button:hover {
+  background: #67c23a;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+}
+
+.button-text {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .title-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .edit-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .edit-meta-button,
+  .edit-body-button {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+  }
+
+  .button-text {
+    font-size: 11px;
+  }
+}
+
+/* 编辑正文对话框样式 */
+:deep(.body-editor-dialog .el-dialog) {
+  height: 90vh;
+}
+
+:deep(.body-editor-dialog .el-dialog__body) {
+  height: calc(90vh - 120px);
+  padding: 0;
 }
 </style>

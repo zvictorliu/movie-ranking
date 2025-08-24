@@ -15,7 +15,7 @@
         <span @click="goToPosts" class="nav-link" title="博客列表页面">博客列表</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
-        <button class="new-button" @click="openImageDialog">上传图片</button>
+        <button class="new-button" @click="openImageDialog">上传封面</button>
         <button class="theme-toggle" @click="toggleTheme">
           <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
         </button>
@@ -41,7 +41,7 @@
         <span @click="goToPosts" class="nav-link" title="博客列表页面">博客列表</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
-        <button class="new-button" @click="openImageDialog">上传图片</button>
+        <button class="new-button" @click="openImageDialog">上传封面</button>
         <button class="theme-toggle" @click="toggleTheme">
           <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
         </button>
@@ -61,6 +61,7 @@
           <el-select v-model="imageFormData.type" placeholder="请选择图片类型" style="width: 100%">
             <el-option label="演员" value="actor"></el-option>
             <el-option label="影片" value="movie"></el-option>
+            <el-option label="博客" value="post"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="选择图片">

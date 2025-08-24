@@ -109,62 +109,25 @@
       </div>
     </div>
 
-    <!-- 编辑对话框 -->
-    <el-dialog v-model="editDialogVisible" title="编辑影片信息" width="80%">
-      <el-form :model="editFormData" label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="editFormData.title" placeholder="请输入影片标题"></el-input>
-        </el-form-item>
-        <el-form-item label="演员">
-          <el-input v-model="editFormData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
-        </el-form-item>
-        <el-form-item label="标签">
-          <el-input v-model="editFormData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
-        </el-form-item>
-        <el-form-item label="简介">
-          <el-input
-            v-model="editFormData.description"
-            type="textarea"
-            placeholder="请输入影片简介"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="评分">
-          <el-input v-model="editFormData.rating" placeholder="请输入评分(0-5)"></el-input>
-        </el-form-item>
-        <el-form-item label="封面图片（可选）">
-          <el-upload
-            class="upload-demo"
-            drag
-            action="#"
-            :auto-upload="false"
-            :on-change="handleEditImageChange"
-            :file-list="editImageFileList"
-            accept="image/*"
-          >
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            <template #tip>
-              <div class="el-upload__tip">只能上传图片文件，且不超过2MB</div>
-            </template>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="updateMovie">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <!-- 编辑元信息对话框 -->
+    <MetaEditor
+      v-model:visible="editDialogVisible"
+      type="movie"
+      :data="editFormData"
+      :id="editFormData.id"
+      @saved="onMetaSaved"
+      @cancelled="editDialogVisible = false"
+    />
   </div>
 </template>
 
 <script>
 // 导入 Element Plus 图标
-import { ArrowUp, ArrowDown, EditPen, UploadFilled } from '@element-plus/icons-vue'
+import { ArrowUp, ArrowDown, EditPen } from '@element-plus/icons-vue'
 
 import axios from 'axios'
 import { useViewStore } from '../store/view'
+import MetaEditor from '@/components/MetaEditor.vue'
 
 export default {
   name: 'MoviesPage',
@@ -172,7 +135,7 @@ export default {
     ArrowUp,
     ArrowDown,
     EditPen,
-    UploadFilled,
+    MetaEditor,
   },
   setup() {
     const viewStore = useViewStore()
@@ -188,8 +151,6 @@ export default {
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
       editDialogVisible: false, // 控制编辑对话框的显示状态
       editFormData: {}, // 当前正在编辑的影片数据
-      editImageFileList: [], // 编辑时的图片文件列表
-      selectedEditImageFile: null, // 编辑时选中的图片文件
     }
   },
   methods: {
@@ -290,46 +251,13 @@ export default {
     openEditDialog(movie) {
       this.editFormData = { ...movie } // 复制当前影片的数据
       this.editDialogVisible = true // 打开编辑对话框
-      this.editImageFileList = [] // 清空图片列表
-      this.selectedEditImageFile = null // 清空选中的图片
     },
-    handleEditImageChange(file) {
-      this.selectedEditImageFile = file.raw
-      this.editImageFileList = [file]
+    onMetaSaved() {
+      // 更新本地影片数据
+      this.fetchMovies()
+      this.filterMovies()
     },
-    async updateMovie() {
-      try {
-        const formData = new FormData()
-        formData.append('title', this.editFormData.title)
-        formData.append('actors', this.editFormData.actors)
-        formData.append('tags', this.editFormData.tags)
-        formData.append('description', this.editFormData.description)
-        formData.append('rating', this.editFormData.rating)
 
-        // 如果有图片，添加到表单数据中
-        if (this.selectedEditImageFile) {
-          formData.append('image', this.selectedEditImageFile)
-        }
-
-        const response = await axios.put(`/api/update-movie/${this.editFormData.id}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-
-        if (response.data.success) {
-          this.$message.success('影片信息已成功更新！')
-          this.editDialogVisible = false // 关闭对话框
-
-          // 更新本地影片数据
-          this.fetchMovies()
-          this.filterMovies()
-        } else {
-          this.$message.error('更新失败，请稍后再试！')
-        }
-      } catch (error) {
-        console.error('Error updating movie:', error)
-        this.$message.error('更新失败，请稍后再试！')
-      }
-    },
     async saveRanking() {
       const newRanking = this.filteredMovies.map((movie, index) => ({
         id: movie.id,
