@@ -15,6 +15,7 @@
         <span @click="goToPosts" class="nav-link" title="博客列表页面">博客列表</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
+        <button class="new-button" @click="openPostDialog">新建博客</button>
         <button class="new-button" @click="openImageDialog">上传封面</button>
         <button class="theme-toggle" @click="toggleTheme">
           <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
@@ -37,10 +38,11 @@
       <div v-if="isMenuOpen" class="dropdown-menu">
         <span @click="goToMovies" class="nav-link" title="影片排行页面">影片排行</span>
         <span @click="goToActors" class="nav-link" title="演员列表页面">演员列表</span>
-        <span @click="goToTags" class="nav-link" title="标签页页面">标签</span>
+        <span @click="goToTags" class="nav-link" title="标签页页面">标签列表</span>
         <span @click="goToPosts" class="nav-link" title="博客列表页面">博客列表</span>
         <button class="new-button" @click="openMovieDialog">新增影片</button>
         <button class="new-button" @click="openActorDialog">新增演员</button>
+        <button class="new-button" @click="openPostDialog">新建博客</button>
         <button class="new-button" @click="openImageDialog">上传封面</button>
         <button class="theme-toggle" @click="toggleTheme">
           <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
@@ -189,6 +191,62 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 新建博客浮动窗口 -->
+    <el-dialog v-model="postDialogVisible" title="新建博客" width="80%">
+      <el-form :model="postFormData" label-width="80px">
+        <el-form-item label="标题">
+          <el-input v-model="postFormData.title" placeholder="请输入博客标题"></el-input>
+        </el-form-item>
+        <el-form-item label="Slug">
+          <el-input
+            v-model="postFormData.slug"
+            placeholder="请输入URL友好的标识符（可选，留空将使用标题自动生成）"
+          ></el-input>
+          <div v-if="!postFormData.slug.trim() && postFormData.title.trim()" class="slug-preview">
+            <small>预览: {{ generateSlugPreview(postFormData.title) }}</small>
+          </div>
+        </el-form-item>
+        <el-form-item label="作者">
+          <el-input v-model="postFormData.author" placeholder="请输入作者姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-input v-model="postFormData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
+        </el-form-item>
+        <el-form-item label="摘要">
+          <el-input
+            v-model="postFormData.excerpt"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入博客摘要"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="内容">
+          <el-input
+            v-model="postFormData.content"
+            type="textarea"
+            :rows="10"
+            placeholder="请输入博客内容"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="发布日期">
+          <el-date-picker
+            v-model="postFormData.date"
+            type="date"
+            placeholder="选择发布日期"
+            style="width: 100%"
+            format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="postDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="savePost">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </header>
 </template>
 
@@ -232,6 +290,16 @@ export default {
       selectedMovieImageFile: null, // 新增影片选中的图片文件
       actorImageFileList: [], // 新增演员图片文件列表
       selectedActorImageFile: null, // 新增演员选中的图片文件
+      postDialogVisible: false, // 控制博客浮动窗口的显示状态
+      postFormData: {
+        title: '',
+        slug: '',
+        author: '',
+        tags: '',
+        excerpt: '',
+        content: '',
+        date: '',
+      },
     }
   },
   setup() {
@@ -310,6 +378,13 @@ export default {
     openImageDialog() {
       this.imageDialogVisible = true
     },
+    openPostDialog() {
+      this.postDialogVisible = true
+      // 设置默认日期为今天
+      if (!this.postFormData.date) {
+        this.postFormData.date = new Date().toISOString().split('T')[0]
+      }
+    },
     resetImageForm() {
       this.imageFormData = {
         name: '',
@@ -317,6 +392,25 @@ export default {
       }
       this.imageFileList = []
       this.selectedImageFile = null
+    },
+    resetPostForm() {
+      this.postFormData = {
+        title: '',
+        slug: '',
+        author: '',
+        tags: '',
+        excerpt: '',
+        content: '',
+        date: new Date().toISOString().split('T')[0], // 默认设置为今天
+      }
+    },
+    generateSlugPreview(title) {
+      if (!title) return ''
+      return title
+        .toLowerCase()
+        .replace(/[^a-z0-9\u4e00-\u9fa5]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
     },
     handleImageChange(file) {
       this.selectedImageFile = file.raw
@@ -417,6 +511,62 @@ export default {
       } catch (error) {
         console.error('Error details:', error.response ? error.response.data : error.message)
         this.$message.error('上传失败，请稍后再试！')
+      }
+    },
+    async savePost() {
+      try {
+        // 验证必填字段
+        if (!this.postFormData.title.trim()) {
+          this.$message.error('请输入博客标题！')
+          return
+        }
+        if (!this.postFormData.author.trim()) {
+          this.$message.error('请输入作者姓名！')
+          return
+        }
+        if (!this.postFormData.content.trim()) {
+          this.$message.error('请输入博客内容！')
+          return
+        }
+
+        // 生成slug（URL友好的标题）
+        const generateSlug = (title) => {
+          return title
+            .toLowerCase()
+            .replace(/[^a-z0-9\u4e00-\u9fa5]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '')
+        }
+
+        // 优先使用用户输入的slug，如果没有输入则使用标题生成
+        const slug = this.postFormData.slug.trim() || generateSlug(this.postFormData.title)
+
+        const postData = {
+          slug: slug,
+          title: this.postFormData.title,
+          author: this.postFormData.author,
+          tags: this.postFormData.tags
+            ? this.postFormData.tags.split(',').map((tag) => tag.trim())
+            : [],
+          excerpt: this.postFormData.excerpt,
+          content: this.postFormData.content,
+          date: this.postFormData.date || new Date().toISOString().split('T')[0],
+        }
+
+        const response = await axios.post('/api/create-post', postData)
+
+        if (response.data.success) {
+          this.$message.success('博客已成功创建！')
+          this.postDialogVisible = false
+          this.resetPostForm()
+          // 可以选择跳转到博客列表页面
+          this.$router.push({ name: 'PostsPage' })
+        } else {
+          this.$message.error('创建失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error details:', error.response ? error.response.data : error.message)
+        this.$message.error('创建失败，请稍后再试！')
       }
     },
   },
@@ -560,5 +710,15 @@ body.dark-mode .menu-button {
 }
 body.dark-mode .dropdown-menu {
   border-top: 2px solid #3a3b3d; /* 夜间模式下的上边框颜色 */
+}
+
+.slug-preview {
+  margin-top: 5px;
+  color: #666;
+  font-size: 12px;
+}
+
+body.dark-mode .slug-preview {
+  color: #b0b0b0;
 }
 </style>

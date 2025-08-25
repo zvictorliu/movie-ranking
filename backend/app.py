@@ -406,6 +406,53 @@ def create_actor():
         return jsonify({"success": False, "message": f"创建失败: {str(e)}"}), 500
 
 
+@app.route('/api/create-post', methods=['POST'])
+def create_post():
+    """
+    API 接口：接收前端发送的博客数据并创建 Markdown 文件。
+    """
+    try:
+        # 获取JSON数据
+        data = request.get_json()
+        
+        # 获取表单数据
+        slug = data.get('slug', '')
+        title = data.get('title', '')
+        author = data.get('author', '')
+        tags = data.get('tags', [])
+        excerpt = data.get('excerpt', '')
+        content = data.get('content', '')
+        date = data.get('date', '')
+
+        # 确保博客文件夹存在
+        if not os.path.exists(POSTS_FOLDER):
+            os.makedirs(POSTS_FOLDER)
+
+        # 生成文件名
+        filename = f"{slug}.md"
+        file_path = os.path.join(POSTS_FOLDER, filename)
+
+        # 构建 Markdown 文件内容
+        post = frontmatter.Post(content)
+        post.metadata = {
+            "title": title,
+            "date": date,
+            "author": author,
+            "tags": tags,
+            "excerpt": excerpt,
+        }
+
+        # 写入文件
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(frontmatter.dumps(post))
+
+        return jsonify({"success": True, "message": "Post created successfully"}), 200
+        
+    except Exception as e:
+        print(f"创建博客错误: {str(e)}")
+        return jsonify({"success": False, "message": f"创建失败: {str(e)}"}), 500
+
+
 @app.route('/api/movie/<movie_name>', methods=['GET'])
 def get_movie_by_name(movie_name):
     """
