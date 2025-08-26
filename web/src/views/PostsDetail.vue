@@ -72,12 +72,7 @@
 
       <!-- 文章正文 -->
       <div class="post-body" v-if="!editBodyDialogVisible">
-        <template v-for="(item, index) in parsedContent" :key="index">
-          <!-- 如果是 MoviePreview 组件 -->
-          <MoviePreview v-if="item.type === 'movie-preview'" :title="item.movieTitle" />
-          <!-- 如果是普通 HTML 内容 -->
-          <div v-else v-html="item.content"></div>
-        </template>
+        <MarkdownRender :content="post.content" />
       </div>
 
       <!-- 编辑正文对话框 -->
@@ -173,10 +168,9 @@ import {
   Setting,
 } from '@element-plus/icons-vue'
 import axios from 'axios'
-import { marked } from 'marked'
-import MoviePreview from '@/components/MoviePreview.vue'
 import LiveEditor from '@/components/LiveEditor.vue'
 import MetaEditor from '@/components/MetaEditor.vue'
+import MarkdownRender from '@/components/MarkdownRender.vue'
 
 export default {
   name: 'PostsDetail',
@@ -190,9 +184,9 @@ export default {
     LinkIcon,
     Document,
     Setting,
-    MoviePreview,
     LiveEditor,
     MetaEditor,
+    MarkdownRender,
   },
   data() {
     return {
@@ -209,53 +203,6 @@ export default {
       const wordsPerMinute = 200
       const wordCount = this.post.content.split(/\s+/).length
       return Math.ceil(wordCount / wordsPerMinute)
-    },
-    parsedContent() {
-      if (!this.post || !this.post.content) return []
-
-      // 先使用 marked 渲染 markdown
-      const renderedHtml = marked(this.post.content)
-
-      // 解析 HTML 内容，分离 MoviePreview 组件和普通内容
-      const contentItems = []
-      const moviePreviewRegex = /<movie\s+title=["']([^"']+)["']\s*\/?>/g
-      let lastIndex = 0
-      let match
-
-      while ((match = moviePreviewRegex.exec(renderedHtml)) !== null) {
-        // 添加 MoviePreview 之前的普通内容
-        if (match.index > lastIndex) {
-          const htmlContent = renderedHtml.substring(lastIndex, match.index)
-          if (htmlContent.trim()) {
-            contentItems.push({
-              type: 'html',
-              content: htmlContent,
-            })
-          }
-        }
-
-        // 添加 MoviePreview 组件
-        const movieTitle = match[1] // 直接获取引号内的内容
-        contentItems.push({
-          type: 'movie-preview',
-          movieTitle: movieTitle,
-        })
-
-        lastIndex = match.index + match[0].length
-      }
-
-      // 添加最后剩余的普通内容
-      if (lastIndex < renderedHtml.length) {
-        const htmlContent = renderedHtml.substring(lastIndex)
-        if (htmlContent.trim()) {
-          contentItems.push({
-            type: 'html',
-            content: htmlContent,
-          })
-        }
-      }
-
-      return contentItems
     },
   },
   methods: {
@@ -534,84 +481,6 @@ export default {
   margin-bottom: 60px;
 }
 
-.markdown-content {
-  line-height: 1.8;
-  font-size: 1.05rem;
-  color: #333;
-}
-
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #333;
-  font-weight: 600;
-}
-
-.markdown-content h1 {
-  font-size: 2rem;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 0.5rem;
-}
-
-.markdown-content h2 {
-  font-size: 1.6rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.3rem;
-}
-
-.markdown-content h3 {
-  font-size: 1.3rem;
-}
-
-.markdown-content p {
-  margin-bottom: 1.2rem;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-  margin-bottom: 1.2rem;
-  padding-left: 2rem;
-}
-
-.markdown-content li {
-  margin-bottom: 0.5rem;
-}
-
-.markdown-content blockquote {
-  background: #f8f9fa;
-  border-left: 4px solid #007bff;
-  padding: 15px;
-  margin: 1.5rem 0;
-  font-style: italic;
-  color: #555;
-}
-
-.markdown-content code {
-  background: #f1f3f4;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-}
-
-.markdown-content pre {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 5px;
-  overflow-x: auto;
-  margin: 1.5rem 0;
-}
-
-.markdown-content pre code {
-  background: none;
-  padding: 0;
-}
-
 .post-footer {
   border-top: 1px solid #eee;
   padding-top: 40px;
@@ -718,36 +587,9 @@ body.dark-mode .meta-item {
   color: #b0b0b0;
 }
 
-body.dark-mode .markdown-content {
-  color: #e0e0e0;
-}
-
-body.dark-mode .markdown-content h1,
-body.dark-mode .markdown-content h2,
-body.dark-mode .markdown-content h3,
-body.dark-mode .markdown-content h4,
-body.dark-mode .markdown-content h5,
-body.dark-mode .markdown-content h6 {
-  color: #e0e0e0;
-}
-
 body.dark-mode .post-excerpt blockquote {
   background: #2d2d2d;
   color: #c0c0c0;
-}
-
-body.dark-mode .markdown-content blockquote {
-  background: #2d2d2d;
-  color: #c0c0c0;
-}
-
-body.dark-mode .markdown-content code {
-  background: #404040;
-  color: #e0e0e0;
-}
-
-body.dark-mode .markdown-content pre {
-  background: #2d2d2d;
 }
 
 body.dark-mode .related-post-item {

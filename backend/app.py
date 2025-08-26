@@ -147,13 +147,15 @@ def append_mainwork(actor, movie):
             before = body
             mainworks_section = "\n## 主要作品\n"
 
-        # 检查影片是否已存在于“主要作品”部分
-        if f"- {movie}" not in mainworks_section:
-            # 添加影片到“主要作品”部分
-            if mainworks_section.endswith('\n'):
-                mainworks_section += f"- {movie}\n"
-            else:
-                mainworks_section += f"\n- {movie}\n"
+        # 检查影片是否已存在于"主要作品"部分
+        if f"<movie title=\"{movie}\" />" not in mainworks_section:
+            # 添加影片到"主要作品"部分，确保有空行间隔
+            if not mainworks_section.endswith('\n\n'):
+                if mainworks_section.endswith('\n'):
+                    mainworks_section += '\n'
+                else:
+                    mainworks_section += '\n\n'
+            mainworks_section += f"<movie title=\"{movie}\" />\n"
 
         # 组装新的正文
         new_body = before.rstrip('\n') + '\n' + mainworks_section.lstrip('\n')

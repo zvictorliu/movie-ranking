@@ -62,7 +62,9 @@
     <p><strong>简介：</strong>{{ movie.description }}</p>
 
     <!-- 显示 Markdown 正文 -->
-    <div v-html="renderedBody" class="content" v-if="!editBodyDialogVisible"></div>
+    <div class="content" v-if="!editBodyDialogVisible">
+      <MarkdownRender :content="movie.body" />
+    </div>
 
     <!-- 编辑正文对话框 -->
     <el-dialog
@@ -106,7 +108,7 @@ import axios from 'axios'
 import { Setting, Document } from '@element-plus/icons-vue'
 import LiveEditor from '@/components/LiveEditor.vue'
 import MetaEditor from '@/components/MetaEditor.vue'
-import { marked } from 'marked'
+import MarkdownRender from '@/components/MarkdownRender.vue'
 
 export default {
   name: 'MovieDetail',
@@ -115,6 +117,7 @@ export default {
     Document,
     LiveEditor,
     MetaEditor,
+    MarkdownRender,
   },
   data() {
     return {
@@ -125,15 +128,7 @@ export default {
       editBodyDialogVisible: false, // 控制编辑正文对话框的显示状态
     }
   },
-  computed: {
-    renderedBody() {
-      if (!this.movie.body) return ''
-      // 使用 marked 渲染 markdown
-      const renderedHtml = marked(this.movie.body)
-      // 替换图片路径为绝对路径（全局替换）
-      return renderedHtml.replace(/src="\.\/imgs/g, 'src="/imgs')
-    },
-  },
+
   async created() {
     const { id } = this.$route.params
     const allMovies = await this.fetchMovies()

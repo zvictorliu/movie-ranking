@@ -21,8 +21,10 @@
     <p><strong>出生日期：</strong>{{ actor.birth }}</p>
     <p><strong>出道日期：</strong>{{ actor.debut }}</p>
 
-    <!-- 渲染移除了"主要作品"部分的完整内容 -->
-    <div v-html="filteredBodyHtml" class="content" v-if="!editBodyDialogVisible"></div>
+    <!-- 渲染正文内容 -->
+    <div class="content" v-if="!editBodyDialogVisible">
+      <MarkdownRender :content="actor.body" />
+    </div>
 
     <!-- 编辑正文对话框 -->
     <el-dialog
@@ -42,32 +44,6 @@
       />
     </el-dialog>
 
-    <!-- 主要作品 -->
-    <h2>主要作品</h2>
-    <div v-if="movies.length > 0" class="movie-list">
-      <div v-for="movie in movies" :key="movie.id" class="movie-item">
-        <!-- 封面 -->
-        <div class="cover-wrapper" @click="goToDetail(movie.id)">
-          <img :src="movie.cover" alt="封面" class="movie-cover" @error="setDefaultCover($event)" />
-        </div>
-        <!-- 详细信息 -->
-        <div class="details">
-          <h2>{{ movie.title }}</h2>
-          <!-- 评分 -->
-          <div class="rating">
-            <strong>评分：</strong>
-            <span v-for="i in 5" :key="i" class="star">
-              <span class="material-icons" :class="{ filled: i <= movie.rating }">
-                {{ i <= movie.rating ? 'star' : 'star_border' }}
-              </span>
-            </span>
-          </div>
-          <p><strong>简介：</strong>{{ movie.description }}</p>
-        </div>
-      </div>
-    </div>
-    <p v-else>暂无主要作品信息</p>
-
     <!-- 返回按钮 -->
     <button @click="goBack">返回</button>
 
@@ -85,10 +61,10 @@
 
 <script>
 import axios from 'axios'
-import { marked } from 'marked'
 import { Document, Setting } from '@element-plus/icons-vue'
 import LiveEditor from '@/components/LiveEditor.vue'
 import MetaEditor from '@/components/MetaEditor.vue'
+import MarkdownRender from '@/components/MarkdownRender.vue'
 
 export default {
   name: 'ActorDetailPage',
@@ -97,43 +73,20 @@ export default {
     Setting,
     LiveEditor,
     MetaEditor,
+    MarkdownRender,
   },
   data() {
     return {
       actor: {},
-      movies: [], // 存储主要作品的影片信息
       editBodyDialogVisible: false, // 控制编辑正文对话框的显示状态
       editMetaDialogVisible: false, // 控制编辑元信息对话框的显示状态
     }
-  },
-  computed: {
-    renderedBody() {
-      if (!this.actor.body) return ''
-      // 使用 marked 渲染 markdown
-      const renderedHtml = marked(this.actor.body)
-      // 替换图片路径为绝对路径（全局替换）
-      return renderedHtml.replace(/src="\.\/imgs/g, 'src="/imgs')
-    },
-    filteredBodyHtml() {
-      // 提取并移除"主要作品"部分
-      return this.removeMainWorksSection(this.renderedBody)
-    },
   },
   async created() {
     const { name } = this.$route.params
     try {
       const response = await axios.get(`/api/actor/${name}`)
       this.actor = response.data
-
-      // 提取主要作品部分的条目
-      const mainWorks = this.extractMainWorks(this.renderedBody)
-      // 根据条目请求影片信息
-      this.movies = await Promise.all(
-        mainWorks.map(async (movieName) => {
-          const movieResponse = await axios.get(`/api/movie/${movieName}`)
-          return movieResponse.data
-        }),
-      )
     } catch (error) {
       console.error('请求失败:', error)
     }
@@ -153,70 +106,7 @@ export default {
       this.actor.body = newBody
       this.editBodyDialogVisible = false
     },
-    async goToDetail(id) {
-      try {
-        this.$router.push({ name: 'MovieDetail', params: { id } })
-      } catch (error) {
-        console.error('电影记录不存在:', error)
-        alert('不存在对应的电影记录')
-      }
-    },
-    extractMainWorks(html) {
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(html, 'text/html') // 将 HTML 字符串解析为 DOM
 
-      // 查找 <h2> 标签，匹配"主要作品"
-      const mainWorksHeading = Array.from(doc.querySelectorAll('h2')).find(
-        (h2) => h2.textContent.trim() === '主要作品',
-      )
-      if (!mainWorksHeading) return []
-
-      // 获取 <h2> 后的下一个兄弟节点，直到遇到下一个 <h2> 或文档结束
-      const items = []
-      let sibling = mainWorksHeading.nextElementSibling
-      while (sibling && sibling.tagName !== 'H2') {
-        if (sibling.tagName === 'UL') {
-          // 提取 <ul> 中的所有 <li> 内容
-          sibling.querySelectorAll('li').forEach((li) => {
-            items.push(li.textContent.trim())
-          })
-        }
-        sibling = sibling.nextElementSibling
-      }
-
-      return items
-    },
-    removeMainWorksSection(html) {
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(html, 'text/html')
-
-      const mainWorksHeading = Array.from(doc.querySelectorAll('h2')).find(
-        (h2) => h2.textContent.trim() === '主要作品',
-      )
-      if (!mainWorksHeading) {
-        console.log('No "主要作品" section found.')
-        return html
-      }
-
-      const parent = mainWorksHeading.parentNode
-      let sibling = mainWorksHeading
-
-      while (sibling) {
-        const nextSibling = sibling.nextElementSibling
-
-        // 如果遇到下一个 <h2> 或到达文档末尾，停止删除
-        if (nextSibling && nextSibling.tagName === 'H2') break
-
-        // 删除当前节点
-        // console.log('Removing node:', sibling.outerHTML) // 打印正在删除的节点
-        parent.removeChild(sibling)
-
-        // 移动到下一个兄弟节点
-        sibling = nextSibling
-      }
-
-      return parent.innerHTML
-    },
     openEditMetaDialog() {
       this.editMetaDialogVisible = true
     },
@@ -349,48 +239,5 @@ button {
 :deep(.body-editor-dialog .el-dialog__body) {
   height: calc(90vh - 120px);
   padding: 0;
-}
-
-.movie-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-/* 宽屏设备：横向排列 */
-@media (min-width: 768px) {
-  .movie-item {
-    flex-direction: row; /* 横向排列 */
-  }
-  .movie-cover {
-    max-width: 350px; /* 设置最大宽度，避免图片过大 */
-    object-fit: cover; /* 确保图片填充整个区域，避免拉伸或变形 */
-    aspect-ratio: 16 / 9; /* 设置宽高比为 16:9 */
-    margin-right: 20px;
-  }
-  .details {
-    flex: 1;
-    text-align: left;
-  }
-}
-
-/* 窄屏设备：竖向排列 */
-@media (max-width: 768px) {
-  .movie-item {
-    flex-direction: column; /* 竖向排列 */
-    align-items: flex-start; /* 左对齐 */
-  }
-  .movie-cover {
-    max-width: 100%; /* 让封面占满容器宽度 */
-    margin-right: 0; /* 移除右侧间距 */
-    margin-bottom: 10px; /* 添加底部间距 */
-  }
-  .details {
-    width: 100%; /* 占满容器宽度 */
-    text-align: left;
-  }
 }
 </style>
