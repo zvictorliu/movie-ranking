@@ -50,6 +50,16 @@
         <el-form-item label="出道日期" prop="debut">
           <el-input v-model="formData.debut" placeholder="请输入出道日期"></el-input>
         </el-form-item>
+
+        <el-form-item label="喜爱度" prop="favorite">
+          <el-input-number
+            v-model="formData.favorite"
+            :min="1"
+            :max="5"
+            :precision="0"
+            placeholder="请输入喜爱度(1-5)"
+          ></el-input-number>
+        </el-form-item>
       </template>
 
       <!-- Post 特有字段 -->
@@ -195,6 +205,11 @@ export default {
       // 根据类型初始化表单数据
       this.formData = { ...this.data }
 
+      // 为actor设置喜爱度默认值
+      if (this.type === 'actor' && !this.formData.favorite) {
+        this.formData.favorite = 1
+      }
+
       // 处理标签字段
       if (this.formData.tags && Array.isArray(this.formData.tags)) {
         this.formData.tags = this.formData.tags.join(', ')
@@ -228,6 +243,7 @@ export default {
           formData.append('name', this.formData.name)
           formData.append('birth', this.formData.birth)
           formData.append('debut', this.formData.debut)
+          formData.append('favorite', this.formData.favorite)
         } else if (this.type === 'post') {
           formData.append('title', this.formData.title)
           formData.append('author', this.formData.author)

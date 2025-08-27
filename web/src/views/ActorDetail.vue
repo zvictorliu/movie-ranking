@@ -20,6 +20,22 @@
     <img :src="actor.cover" alt="演员封面" class="cover" @error="setDefaultCover($event)" />
     <p><strong>出生日期：</strong>{{ actor.birth }}</p>
     <p><strong>出道日期：</strong>{{ actor.debut }}</p>
+    <div class="favorite-section">
+      <strong>喜爱度：</strong>
+      <span class="favorite-hearts">
+        <span
+          v-for="i in 5"
+          :key="i"
+          class="heart"
+          :class="{ filled: i <= actor.favorite, empty: i > actor.favorite }"
+          @click="updateFavorite(i)"
+        >
+          <span class="material-icons">
+            {{ i <= actor.favorite ? 'favorite' : 'favorite_border' }}
+          </span>
+        </span>
+      </span>
+    </div>
 
     <!-- 渲染正文内容 -->
     <div class="content" v-if="!editBodyDialogVisible">
@@ -114,6 +130,22 @@ export default {
       // 刷新整个页面以显示更新后的信息
       location.reload()
     },
+    async updateFavorite(value) {
+      try {
+        const response = await axios.put(`/api/update-actor-favorite/${this.actor.name}`, {
+          favorite: value,
+        })
+        if (response.data.success) {
+          this.actor.favorite = value
+          this.$message.success('喜爱度更新成功！')
+        } else {
+          this.$message.error('更新失败，请稍后再试！')
+        }
+      } catch (error) {
+        console.error('Error updating favorite:', error)
+        this.$message.error('更新失败，请稍后再试！')
+      }
+    },
   },
 }
 </script>
@@ -148,6 +180,44 @@ button {
 }
 
 /* 编辑按钮样式已移至 article-title.scss */
+
+/* 喜爱度样式 */
+.favorite-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.favorite-hearts {
+  display: flex;
+  gap: 2px;
+}
+
+.heart {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.heart .material-icons {
+  font-size: 24px;
+}
+
+.heart.filled .material-icons {
+  color: #e91e63; /* 粉色爱心 */
+}
+
+.heart.empty .material-icons {
+  color: #ddd; /* 灰色爱心 */
+}
+
+.heart:hover {
+  transform: scale(1.1);
+}
+
+.heart:hover .material-icons {
+  color: #e91e63; /* 悬停时显示粉色 */
+}
 
 /* 编辑正文对话框样式 */
 :deep(.body-editor-dialog .el-dialog) {

@@ -59,6 +59,7 @@ def parse_actor_files():
                     "name": post.get('name', '未知演员'),
                     "birth": post.get('birth', '未知出生日期'),
                     "debut": post.get('debut', '未知出道日期'),
+                    "favorite": post.get('favorite', 1),  # 默认喜爱度为1
                     "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
                 }
                 actors.append(actor_data)
@@ -248,6 +249,7 @@ def get_actor(actor_name):
             "name": post.get('name'),
             "birth": post.get('birth'),
             "debut": post.get('debut'),
+            "favorite": post.get('favorite', 1),  # 默认喜爱度为1
             "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
             "body": post.content,  # 只返回原始正文内容
         }
@@ -672,6 +674,7 @@ def update_actor(actor_name):
         name = request.form.get('name', '')
         birth = request.form.get('birth', '')
         debut = request.form.get('debut', '')
+        favorite = request.form.get('favorite', '1')  # 默认值为1
         tags = request.form.get('tags', '')
         if type(tags) == str:
             tags = tags.split(',')
@@ -704,6 +707,7 @@ def update_actor(actor_name):
             post['name'] = name
             post['birth'] = birth
             post['debut'] = debut
+            post['favorite'] = int(favorite)  # 转换为整数
             post['tags'] = [tag.strip() for tag in tags if tag.strip()]
             if cover_filename:
                 post['cover'] = cover_filename
@@ -716,6 +720,39 @@ def update_actor(actor_name):
         
     except Exception as e:
         print(f"更新演员错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
+@app.route('/api/update-actor-favorite/<actor_name>', methods=['PUT'])
+def update_actor_favorite(actor_name):
+    """
+    API 接口：更新演员的喜爱度。
+    """
+    try:
+        data = request.json
+        favorite = data.get('favorite', 1)
+        
+        # 验证喜爱度范围
+        if not isinstance(favorite, int) or favorite < 1 or favorite > 5:
+            return jsonify({"success": False, "message": "喜爱度必须在1-5之间"}), 400
+        
+        file_path = os.path.join(ACTORS_FOLDER, f"{actor_name}.md")
+        
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "演员文件不存在"}), 404
+        
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post['favorite'] = favorite
+            
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+        
+        return jsonify({"success": True, "message": "喜爱度更新成功"}), 200
+        
+    except Exception as e:
+        print(f"更新演员喜爱度错误: {str(e)}")
         return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
 
 
