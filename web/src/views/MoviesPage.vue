@@ -724,55 +724,53 @@ export default {
 }
 
 /* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .page-title h1 {
-    color: #e4e7ed;
-  }
+body.dark-mode .page-title h1 {
+  color: #e4e7ed;
+}
 
-  .subtitle {
-    color: #a8abb2;
-  }
+body.dark-mode .subtitle {
+  color: #a8abb2;
+}
 
-  .top-bar {
-    border-bottom-color: #4c4d4f;
-  }
+body.dark-mode .top-bar {
+  border-bottom-color: #4c4d4f;
+}
 
-  .filter-panel {
-    background: #2b2b2b;
-    border-color: #4c4d4f;
-  }
+body.dark-mode .filter-panel {
+  background: #2b2b2b;
+  border-color: #4c4d4f;
+}
 
-  .filter-header h3 {
-    color: #e4e7ed;
-  }
+body.dark-mode .filter-header h3 {
+  color: #e4e7ed;
+}
 
-  .filter-label {
-    color: #a8abb2;
-  }
+body.dark-mode .filter-label {
+  color: #a8abb2;
+}
 
-  .rating-display {
-    color: #a8abb2;
-  }
+body.dark-mode .rating-display {
+  color: #a8abb2;
+}
 
-  .edit-movie-button,
-  .up-down-button {
-    color: #64b5f6;
-  }
+body.dark-mode .edit-movie-button,
+body.dark-mode .up-down-button {
+  color: #64b5f6;
+}
 
-  .edit-movie-button:hover,
-  .up-down-button:hover {
-    background-color: rgba(100, 181, 246, 0.1);
-  }
+body.dark-mode .edit-movie-button:hover,
+body.dark-mode .up-down-button:hover {
+  background-color: rgba(100, 181, 246, 0.1);
+}
 
-  .save-button {
-    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-    box-shadow: 0 4px 15px rgba(45, 55, 72, 0.3);
-  }
+body.dark-mode .save-button {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  box-shadow: 0 4px 15px rgba(45, 55, 72, 0.3);
+}
 
-  .save-button:hover {
-    background: linear-gradient(135deg, #1a202c 0%, #0f1419 100%);
-    box-shadow: 0 6px 20px rgba(45, 55, 72, 0.4);
-  }
+body.dark-mode .save-button:hover {
+  background: linear-gradient(135deg, #1a202c 0%, #0f1419 100%);
+  box-shadow: 0 6px 20px rgba(45, 55, 72, 0.4);
 }
 
 /* 响应式设计 */

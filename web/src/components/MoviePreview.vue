@@ -408,10 +408,8 @@ export default {
 }
 
 /* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .star-icon {
-    color: #555;
-  }
+body.dark-mode .star-icon {
+  color: #555;
 }
 
 /* 动画定义 */

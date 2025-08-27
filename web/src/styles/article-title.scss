@@ -120,34 +120,32 @@
 }
 
 /* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .title-container h1 {
-    color: #e4e7ed;
-  }
+body.dark-mode .title-container h1 {
+  color: #e4e7ed;
+}
 
-  .edit-meta-button,
-  .edit-body-button {
-    background: #2b2b2b;
-    color: #e4e7ed;
-  }
+body.dark-mode .edit-meta-button,
+body.dark-mode .edit-body-button {
+  background: #2b2b2b;
+  color: #e4e7ed;
+}
 
-  .edit-meta-button {
-    border-color: #64b5f6;
-    color: #64b5f6;
-  }
+body.dark-mode .edit-meta-button {
+  border-color: #64b5f6;
+  color: #64b5f6;
+}
 
-  .edit-meta-button:hover {
-    background: #64b5f6;
-    color: #2b2b2b;
-  }
+body.dark-mode .edit-meta-button:hover {
+  background: #64b5f6;
+  color: #2b2b2b;
+}
 
-  .edit-body-button {
-    border-color: #81c784;
-    color: #81c784;
-  }
+body.dark-mode .edit-body-button {
+  border-color: #81c784;
+  color: #81c784;
+}
 
-  .edit-body-button:hover {
-    background: #81c784;
-    color: #2b2b2b;
-  }
+body.dark-mode .edit-body-button:hover {
+  background: #81c784;
+  color: #2b2b2b;
 }
