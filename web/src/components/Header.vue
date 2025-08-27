@@ -9,17 +9,58 @@
         <h1 class="title">影片排行榜</h1>
       </div>
       <div class="header-nav">
-        <span @click="goToMovies" class="nav-link" title="影片排行页面">影片排行</span>
-        <span @click="goToActors" class="nav-link" title="演员列表页面">演员列表</span>
-        <span @click="goToTags" class="nav-link" title="标签页页面">标签列表</span>
-        <span @click="goToPosts" class="nav-link" title="博客列表页面">博客列表</span>
-        <button class="new-button" @click="openMovieDialog">新增影片</button>
-        <button class="new-button" @click="openActorDialog">新增演员</button>
-        <button class="new-button" @click="openPostDialog">新建博客</button>
-        <button class="new-button" @click="openImageDialog">上传封面</button>
-        <button class="theme-toggle" @click="toggleTheme">
-          <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
-        </button>
+        <!-- 导航图标区域 -->
+        <div class="nav-icons">
+          <span @click="goToMovies" class="nav-icon" title="影片排行页面">
+            <span class="material-icons">movie</span>
+          </span>
+          <span @click="goToActors" class="nav-icon" title="演员列表页面">
+            <span class="material-icons">people</span>
+          </span>
+          <span @click="goToTags" class="nav-icon" title="标签页页面">
+            <span class="material-icons">local_offer</span>
+          </span>
+          <span @click="goToPosts" class="nav-icon" title="博客列表页面">
+            <span class="material-icons">article</span>
+          </span>
+        </div>
+
+        <!-- 操作区域 -->
+        <div class="action-area">
+          <!-- 新建下拉菜单 -->
+          <div class="create-dropdown" @click="toggleCreateMenu">
+            <button class="create-button">
+              <span class="material-icons">add</span>
+              <span class="create-text">新建</span>
+              <span class="material-icons dropdown-arrow">{{
+                isCreateMenuOpen ? 'expand_less' : 'expand_more'
+              }}</span>
+            </button>
+            <div v-if="isCreateMenuOpen" class="create-menu">
+              <div @click="openMovieDialog" class="create-menu-item">
+                <span class="material-icons">movie</span>
+                <span>新增影片</span>
+              </div>
+              <div @click="openActorDialog" class="create-menu-item">
+                <span class="material-icons">person_add</span>
+                <span>新增演员</span>
+              </div>
+              <div @click="openPostDialog" class="create-menu-item">
+                <span class="material-icons">post_add</span>
+                <span>新建博客</span>
+              </div>
+              <div @click="openImageDialog" class="create-menu-item">
+                <span class="material-icons">image</span>
+                <span>上传封面</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 主题切换 -->
+          <button class="theme-toggle" @click="toggleTheme">
+            <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -36,17 +77,50 @@
         </button>
       </div>
       <div v-if="isMenuOpen" class="dropdown-menu">
-        <span @click="goToMovies" class="nav-link" title="影片排行页面">影片排行</span>
-        <span @click="goToActors" class="nav-link" title="演员列表页面">演员列表</span>
-        <span @click="goToTags" class="nav-link" title="标签页页面">标签列表</span>
-        <span @click="goToPosts" class="nav-link" title="博客列表页面">博客列表</span>
-        <button class="new-button" @click="openMovieDialog">新增影片</button>
-        <button class="new-button" @click="openActorDialog">新增演员</button>
-        <button class="new-button" @click="openPostDialog">新建博客</button>
-        <button class="new-button" @click="openImageDialog">上传封面</button>
-        <button class="theme-toggle" @click="toggleTheme">
-          <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
-        </button>
+        <!-- 导航图标区域 -->
+        <div class="nav-icons-mobile">
+          <span @click="goToMovies" class="nav-icon" title="影片排行页面">
+            <span class="material-icons">movie</span>
+            <span class="nav-text">影片排行</span>
+          </span>
+          <span @click="goToActors" class="nav-icon" title="演员列表页面">
+            <span class="material-icons">people</span>
+            <span class="nav-text">演员列表</span>
+          </span>
+          <span @click="goToTags" class="nav-icon" title="标签页页面">
+            <span class="material-icons">local_offer</span>
+            <span class="nav-text">标签列表</span>
+          </span>
+          <span @click="goToPosts" class="nav-icon" title="博客列表页面">
+            <span class="material-icons">article</span>
+            <span class="nav-text">博客列表</span>
+          </span>
+        </div>
+
+        <!-- 操作区域 -->
+        <div class="action-area-mobile">
+          <button class="new-button" @click="openMovieDialog" title="新增影片">
+            <span class="material-icons">movie</span>
+            <span class="button-text">新增影片</span>
+          </button>
+          <button class="new-button" @click="openActorDialog" title="新增演员">
+            <span class="material-icons">person_add</span>
+            <span class="button-text">新增演员</span>
+          </button>
+          <button class="new-button" @click="openPostDialog" title="新建博客">
+            <span class="material-icons">post_add</span>
+            <span class="button-text">新建博客</span>
+          </button>
+          <button class="new-button" @click="openImageDialog" title="上传封面">
+            <span class="material-icons">image</span>
+            <span class="button-text">上传封面</span>
+          </button>
+        </div>
+        <div class="theme-toggle-mobile">
+          <button class="theme-toggle" @click="toggleTheme">
+            <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -321,6 +395,7 @@ export default {
         content: '',
         date: '',
       },
+      isCreateMenuOpen: false, // 控制新建操作下拉菜单的显示状态
     }
   },
   setup() {
@@ -355,6 +430,16 @@ export default {
       this.isDarkMode = !this.isDarkMode // 切换夜间模式
       document.body.classList.toggle('dark-mode', this.isDarkMode) // 动态切换 body 的主题类 [[7]]
     },
+    toggleCreateMenu() {
+      this.isCreateMenuOpen = !this.isCreateMenuOpen
+    },
+    handleClickOutside(event) {
+      // 检查点击是否在新建下拉菜单外部
+      const createDropdown = event.target.closest('.create-dropdown')
+      if (!createDropdown && this.isCreateMenuOpen) {
+        this.isCreateMenuOpen = false
+      }
+    },
     checkScreenWidth() {
       this.isMobile = window.innerWidth < 768 // 当屏幕宽度小于 768px 时显示菜单按钮 [[1]]
     },
@@ -364,6 +449,7 @@ export default {
     openMovieDialog() {
       this.movieDialogVisible = true // 打开浮动窗口
       this.fetchAvailableActors() // 获取可选择的演员列表
+      this.isCreateMenuOpen = false // 关闭新建菜单
     },
     handleMovieImageChange(file) {
       this.selectedMovieImageFile = file.raw
@@ -401,6 +487,7 @@ export default {
     },
     openActorDialog() {
       this.actorDialogVisible = true
+      this.isCreateMenuOpen = false // 关闭新建菜单
     },
     resetActorForm() {
       this.actorFormData = {
@@ -413,9 +500,11 @@ export default {
     },
     openImageDialog() {
       this.imageDialogVisible = true
+      this.isCreateMenuOpen = false // 关闭新建菜单
     },
     openPostDialog() {
       this.postDialogVisible = true
+      this.isCreateMenuOpen = false // 关闭新建菜单
       // 设置默认日期为今天
       if (!this.postFormData.date) {
         this.postFormData.date = new Date().toISOString().split('T')[0]
@@ -609,9 +698,12 @@ export default {
   created() {
     this.checkScreenWidth() // 初始化检查屏幕宽度
     window.addEventListener('resize', this.checkScreenWidth) // 监听窗口大小变化
+    // 添加点击外部关闭下拉菜单的监听器
+    document.addEventListener('click', this.handleClickOutside)
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.checkScreenWidth) // 移除监听器
+    document.removeEventListener('click', this.handleClickOutside) // 移除点击外部监听器
   },
 }
 </script>
@@ -694,6 +786,186 @@ export default {
   text-decoration: underline; /* 鼠标悬停时添加下划线 */
 }
 
+/* 导航图标样式 */
+.nav-icons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.nav-icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-icon .material-icons {
+  font-size: 24px;
+}
+
+/* 操作区域样式 */
+.action-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 新建下拉菜单样式 */
+.create-dropdown {
+  position: relative;
+}
+
+.create-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.create-button:hover {
+  background-color: #3aa876;
+  transform: translateY(-1px);
+}
+
+.create-text {
+  font-weight: 500;
+}
+
+.dropdown-arrow {
+  font-size: 18px !important;
+  transition: transform 0.3s ease;
+}
+
+.create-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 160px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.create-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: #333;
+}
+
+.create-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.create-menu-item .material-icons {
+  font-size: 20px;
+  color: #666;
+}
+
+/* 移动端样式 */
+.nav-icons-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  align-items: center;
+}
+
+.nav-icons-mobile .nav-icon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;
+}
+
+.nav-icons-mobile .nav-icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-icons-mobile .nav-icon .material-icons {
+  font-size: 20px;
+}
+
+.nav-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.action-area-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+.action-area-mobile .new-button {
+  background-color: #42b983;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  color: white;
+  border: none;
+  font-size: 14px;
+  height: 48px;
+}
+
+.action-area-mobile .new-button:hover {
+  background-color: #3aa876;
+  transform: translateY(-2px);
+}
+
+.action-area-mobile .new-button .material-icons {
+  font-size: 20px;
+}
+
+.button-text {
+  font-weight: 500;
+  font-size: 14px;
+}
+
 .mobile-header-content {
   width: 100%; /* 占满整个 Header 宽度 */
 }
@@ -746,6 +1018,61 @@ body.dark-mode .menu-button {
 }
 body.dark-mode .dropdown-menu {
   border-top: 2px solid #3a3b3d; /* 夜间模式下的上边框颜色 */
+}
+
+/* 夜间模式下的新样式 */
+body.dark-mode .nav-icon {
+  color: #a9a9b3;
+}
+
+body.dark-mode .nav-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .create-menu {
+  background-color: #2c2c2c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .create-menu-item {
+  color: #a9a9b3;
+}
+
+body.dark-mode .create-menu-item:hover {
+  background-color: #3a3a3a;
+}
+
+body.dark-mode .create-menu-item .material-icons {
+  color: #888;
+}
+
+body.dark-mode .nav-icons-mobile .nav-icon {
+  color: #a9a9b3;
+}
+
+body.dark-mode .nav-icons-mobile .nav-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .nav-text {
+  color: #a9a9b3;
+}
+
+body.dark-mode .action-area-mobile {
+  border-top: 1px solid #3a3b3d;
+  border-bottom: 1px solid #3a3b3d;
+}
+
+body.dark-mode .action-area-mobile .new-button {
+  background-color: #42b983;
+}
+
+body.dark-mode .action-area-mobile .new-button:hover {
+  background-color: #3aa876;
+}
+
+body.dark-mode .button-text {
+  color: white;
 }
 
 .slug-preview {
