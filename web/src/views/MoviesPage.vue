@@ -2,28 +2,50 @@
   <div class="movies-container">
     <!-- 影片视图 -->
     <div class="movie-view">
-      <div class="save-button-container">
-        <button
-          @click="saveRanking"
-          class="save-button"
-          :class="{ saving: savingRanking }"
-          :disabled="savingRanking"
-          :title="savingRanking ? '保存中...' : '保存排行'"
-        >
-          <span class="material-icons">{{ savingRanking ? 'hourglass_empty' : 'save' }}</span>
-          <span class="button-text">{{ savingRanking ? '保存中...' : '保存排行' }}</span>
-        </button>
+      <!-- 顶部操作栏 -->
+      <div class="top-bar">
+        <div class="page-title">
+          <h1>电影排行管理</h1>
+          <p class="subtitle">管理您的电影收藏和排行</p>
+        </div>
+
+        <div class="top-actions">
+          <button
+            @click="saveRanking"
+            class="save-button"
+            :class="{ saving: savingRanking }"
+            :disabled="savingRanking"
+            :title="savingRanking ? '保存中...' : '保存排行'"
+          >
+            <span class="material-icons">{{ savingRanking ? 'hourglass_empty' : 'save' }}</span>
+            <span class="button-text">{{ savingRanking ? '保存中...' : '保存排行' }}</span>
+          </button>
+        </div>
       </div>
-      <!-- 筛选器 -->
-      <div class="filter-container">
-        <!-- 搜索框 -->
-        <div class="search-filter">
-          <label for="search-input">搜索：</label>
+
+      <!-- 筛选器面板 -->
+      <div class="filter-panel">
+        <div class="filter-header">
+          <h3>筛选与搜索</h3>
+          <el-button
+            size="small"
+            type="info"
+            plain
+            @click="clearAllFilters"
+            :disabled="!hasActiveFilters"
+          >
+            <el-icon><DeleteIcon /></el-icon>
+            清除筛选
+          </el-button>
+        </div>
+
+        <!-- 搜索区域 -->
+        <div class="search-section">
           <el-input
             v-model="searchQuery"
             placeholder="搜索影片标题、演员或标签..."
             clearable
-            style="width: 300px"
+            size="large"
             @input="filterMovies"
             @clear="filterMovies"
           >
@@ -33,16 +55,17 @@
           </el-input>
         </div>
 
-        <div class="filter-row">
-          <div class="actor-filter">
-            <label for="actor-filter">按演员筛选：</label>
+        <!-- 筛选器区域 -->
+        <div class="filters-section">
+          <div class="filter-group">
+            <label class="filter-label">演员筛选</label>
             <el-select
               v-model="selectedActors"
               multiple
               clearable
               filterable
-              placeholder="请选择演员"
-              style="width: 150px"
+              placeholder="选择演员"
+              style="width: 200px"
               @change="filterMovies"
             >
               <el-option
@@ -54,15 +77,15 @@
             </el-select>
           </div>
 
-          <div class="tag-filter">
-            <label for="tag-filter">按标签筛选：</label>
+          <div class="filter-group">
+            <label class="filter-label">标签筛选</label>
             <el-select
               v-model="selectedTags"
               multiple
               clearable
               filterable
-              placeholder="请选择标签"
-              style="width: 150px"
+              placeholder="选择标签"
+              style="width: 200px"
               @change="filterMovies"
             >
               <el-option
@@ -74,29 +97,29 @@
             </el-select>
           </div>
 
-          <div class="rating-filter">
-            <label for="rating-filter">按评分筛选：</label>
-            <el-slider
-              v-model="ratingRange"
-              range
-              :min="0"
-              :max="5"
-              :step="1"
-              style="width: 100px"
-              @change="filterMovies"
-            ></el-slider>
-            <span style="margin-left: 20px">{{ ratingRange[0] }} - {{ ratingRange[1] }}</span>
+          <div class="filter-group">
+            <label class="filter-label">评分范围</label>
+            <div class="rating-slider-container">
+              <el-slider
+                v-model="ratingRange"
+                range
+                :min="0"
+                :max="5"
+                :step="1"
+                style="width: 150px"
+                @change="filterMovies"
+              ></el-slider>
+              <span class="rating-display">{{ ratingRange[0] }} - {{ ratingRange[1] }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- 清除筛选器按钮 -->
-        <div class="filter-actions">
-          <el-button size="small" @click="clearAllFilters" :disabled="!hasActiveFilters">
-            清除所有筛选
-          </el-button>
-          <span class="filter-count" v-if="hasActiveFilters">
+        <!-- 筛选结果统计 -->
+        <div class="filter-stats" v-if="hasActiveFilters">
+          <el-tag type="info" size="large">
+            <el-icon><FilterIcon /></el-icon>
             已筛选 {{ filteredMovies.length }} 部影片
-          </span>
+          </el-tag>
         </div>
       </div>
 
@@ -141,7 +164,7 @@
 
 <script>
 // 导入 Element Plus 图标
-import { ArrowUp, ArrowDown, EditPen, Search } from '@element-plus/icons-vue'
+import { ArrowUp, ArrowDown, EditPen, Search, Delete, Filter } from '@element-plus/icons-vue'
 
 import axios from 'axios'
 import { useViewStore } from '../store/view'
@@ -155,6 +178,8 @@ export default {
     ArrowDown,
     EditPen,
     SearchIcon: Search,
+    DeleteIcon: Delete,
+    FilterIcon: Filter,
     MetaEditor,
     MoviePreview,
   },
@@ -376,31 +401,80 @@ export default {
 }
 
 .movie-view {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 5px;
 }
 
-.save-button-container {
+/* 顶部操作栏 */
+.top-bar {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 0;
+  border-bottom: 1px solid #e4e7ed;
+  margin-bottom: 30px;
 }
 
-/* 电影项样式已移至 MoviePreview 组件，这里只保留控制按钮样式 */
+.page-title h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #303133;
+}
 
+.subtitle {
+  margin: 0;
+  color: #909399;
+  font-size: 14px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 控制按钮样式 */
 .controls {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-left: 10px;
+  align-self: center; /* 垂直居中 */
+  flex-shrink: 0; /* 防止被压缩 */
 }
 
 @media (max-width: 768px) {
   .controls {
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between; /* 分散对齐，覆盖更多宽度 */
+    gap: 0; /* 移除固定间距，使用justify-content控制 */
+    margin: 0 auto; /* 水平居中 */
+    margin-top: 10px; /* 距离上方内容有一定距离 */
+    align-self: center; /* 在移动端居中 */
+    width: 100%; /* 占满容器宽度 */
+    max-width: 500px; /* 限制最大宽度，避免过宽 */
+  }
+
+  .controls .edit-movie-button,
+  .controls .up-down-button {
+    font-size: 18px; /* 稍微调小图标 */
+    padding: 12px; /* 增加点击区域 */
+    flex: 1; /* 让按钮平均分配空间 */
+    max-width: 80px; /* 限制最大宽度，保持美观 */
+  }
+
+  .controls .edit-movie-button {
+    order: 2; /* 编辑按钮放在中间 */
+  }
+
+  .controls .up-down-button:first-child {
+    order: 1; /* 上移按钮放在左边 */
+  }
+
+  .controls .up-down-button:last-child {
+    order: 3; /* 下移按钮放在右边 */
   }
 }
 
@@ -410,6 +484,14 @@ export default {
   cursor: pointer;
   font-size: 20px;
   color: #409eff;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.edit-movie-button:hover {
+  background-color: rgba(64, 158, 255, 0.1);
+  transform: scale(1.05);
 }
 
 .up-down-button {
@@ -418,30 +500,42 @@ export default {
   cursor: pointer;
   font-size: 20px;
   color: #409eff;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.up-down-button:hover {
+  background-color: rgba(64, 158, 255, 0.1);
+  transform: scale(1.05);
 }
 
 .up-down-button:disabled {
   color: #ccc;
   cursor: not-allowed;
+  background-color: transparent;
+  transform: none;
+}
+
+.up-down-button:disabled:hover {
+  background-color: transparent;
+  transform: none;
 }
 
 .save-button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 12px 24px;
   background: linear-gradient(135deg, #42b983 0%, #3aa876 100%);
   color: white;
   border: none;
-  border-radius: 25px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 4px 15px rgba(66, 185, 131, 0.3);
+  box-shadow: 0 2px 8px rgba(66, 185, 131, 0.2);
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  position: relative;
 }
 
 .save-button::before {
@@ -465,6 +559,79 @@ export default {
 .save-button:hover::before {
   opacity: 1;
   visibility: visible;
+}
+
+/* 筛选器面板 */
+.filter-panel {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  border: 1px solid #e4e7ed;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #303133;
+}
+
+/* 搜索区域 */
+.search-section {
+  margin-bottom: 24px;
+}
+
+.search-section .el-input {
+  width: 100%;
+}
+
+/* 筛选器区域 */
+.filters-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-weight: 500;
+  color: #606266;
+  font-size: 14px;
+}
+
+.rating-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.rating-display {
+  font-weight: 500;
+  color: #606266;
+  font-size: 14px;
+  min-width: 60px;
+}
+
+/* 筛选统计 */
+.filter-stats {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid #e4e7ed;
 }
 
 .save-button:hover {
@@ -528,86 +695,75 @@ export default {
   }
 }
 
-.filter-container {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.search-filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.search-filter label {
-  font-weight: 500;
-  color: #333;
-  min-width: 60px;
-}
-
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  align-items: center;
-}
-
-.actor-filter,
-.tag-filter,
-.rating-filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.actor-filter label,
-.tag-filter label,
-.rating-filter label {
-  font-weight: 500;
-  color: #333;
-  min-width: 80px;
-}
-
-.rating-filter span {
-  margin-left: 10px;
-  font-weight: 500;
-  color: #666;
-}
-
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .filter-row {
+  .top-bar {
     flex-direction: column;
+    gap: 20px;
     align-items: flex-start;
-    gap: 15px;
   }
 
-  .search-filter {
-    width: 100%;
+  .page-title h1 {
+    font-size: 24px;
   }
 
-  .search-filter .el-input {
-    width: 100% !important;
+  .filter-panel {
+    padding: 16px;
   }
-}
 
-.filter-actions {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 10px;
-}
+  .filters-section {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 
-.filter-count {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
+  .filter-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
 }
 
 /* 深色模式支持 */
 @media (prefers-color-scheme: dark) {
+  .page-title h1 {
+    color: #e4e7ed;
+  }
+
+  .subtitle {
+    color: #a8abb2;
+  }
+
+  .top-bar {
+    border-bottom-color: #4c4d4f;
+  }
+
+  .filter-panel {
+    background: #2b2b2b;
+    border-color: #4c4d4f;
+  }
+
+  .filter-header h3 {
+    color: #e4e7ed;
+  }
+
+  .filter-label {
+    color: #a8abb2;
+  }
+
+  .rating-display {
+    color: #a8abb2;
+  }
+
+  .edit-movie-button,
+  .up-down-button {
+    color: #64b5f6;
+  }
+
+  .edit-movie-button:hover,
+  .up-down-button:hover {
+    background-color: rgba(100, 181, 246, 0.1);
+  }
+
   .save-button {
     background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
     box-shadow: 0 4px 15px rgba(45, 55, 72, 0.3);

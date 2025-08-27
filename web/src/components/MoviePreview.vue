@@ -235,7 +235,8 @@ export default {
 
 .movie-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* 改为center以便垂直居中 */
+  justify-content: space-between; /* 添加空间分布 */
   margin-bottom: 20px;
   border: 1px solid #ddd;
   padding: 15px;
@@ -278,6 +279,7 @@ export default {
   .details {
     flex: 1;
     text-align: left;
+    margin-right: 20px; /* 为controls留出空间 */
   }
 }
 
@@ -286,6 +288,7 @@ export default {
   .movie-item {
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start; /* 内容从顶部开始 */
   }
   .movie-cover {
     max-width: 100%;
@@ -296,6 +299,7 @@ export default {
   .details {
     width: 100%;
     text-align: left;
+    margin-right: 0; /* 移除右边距 */
   }
 }
 
@@ -304,12 +308,19 @@ export default {
   align-items: center;
   gap: 8px;
   margin: 12px 0;
+  flex-wrap: wrap; /* 允许换行 */
+}
+
+.rating strong {
+  white-space: nowrap; /* 防止标签文字换行 */
+  flex-shrink: 0; /* 防止标签被压缩 */
 }
 
 .stars-container {
   display: flex;
   align-items: center;
   gap: 2px;
+  flex-shrink: 0; /* 防止星星容器被压缩 */
 }
 
 .star-wrapper {
@@ -370,21 +381,29 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .rating {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    flex-direction: row; /* 保持横向排列 */
+    align-items: center;
+    gap: 6px; /* 稍微减少间距 */
+    flex-wrap: wrap; /* 允许换行，但优先保持并列 */
   }
 
   .stars-container {
     gap: 1px;
   }
 
-  .star-icon {
-    font-size: 20px;
+  .star-wrapper {
+    padding: 2px; /* 减少内边距 */
+  }
+}
+
+/* 极窄屏幕优化 */
+@media (max-width: 480px) {
+  .rating {
+    gap: 4px; /* 进一步减少间距 */
   }
 
   .star-wrapper {
-    padding: 3px;
+    padding: 1px; /* 最小内边距 */
   }
 }
 
