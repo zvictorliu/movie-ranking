@@ -11,22 +11,22 @@ CORS(app)  # 启用 CORS 支持 [[2]]
 
 # 定义存放 Markdown 文件和图片的文件夹路径
 CONTENT_FOLDER = os.path.join(os.getcwd(), '../content')
-IMGS_FOLDER = os.path.join(CONTENT_FOLDER, 'imgs')
+MOVIES_FOLDER = os.path.join(CONTENT_FOLDER, 'movies')
 ACTORS_FOLDER = os.path.join(CONTENT_FOLDER, 'actors')
 POSTS_FOLDER = os.path.join(CONTENT_FOLDER, 'posts')
-COVER_FOLDER = '0_Cover'
-MOVIE_COVER_FOLDER = f'{COVER_FOLDER}/movie-cover'
-ACTOR_COVER_FOLDER = f'{COVER_FOLDER}/actor-cover'
-POST_COVER_FOLDER = f'{COVER_FOLDER}/post-cover'
+COVER_FOLDER = 'covers'
+MOVIE_COVER_FOLDER = os.path.join(COVER_FOLDER, 'movie-cover')
+ACTOR_COVER_FOLDER = os.path.join(COVER_FOLDER, 'actor-cover')
+POST_COVER_FOLDER = os.path.join(COVER_FOLDER, 'post-cover')
 
 def parse_movie_files():
     """
     解析 content 文件夹中的所有 Markdown 文件，并返回解析后的数据列表。
     """
     movies = []
-    for filename in os.listdir(CONTENT_FOLDER):
+    for filename in os.listdir(MOVIES_FOLDER):
         if filename.endswith('.md'):
-            file_path = os.path.join(CONTENT_FOLDER, filename)
+            file_path = os.path.join(MOVIES_FOLDER, filename)
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)  # 使用 frontmatter 解析 Markdown 文件 [[3]]
                 movie_data = {
@@ -110,9 +110,6 @@ def get_post_by_slug(slug):
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
         
-        # 替换图片路径
-        processed_content = post.content.replace('src="./imgs', 'src="/imgs')
-        
         post_data = {
             "slug": slug,
             "title": post.get('title', '未知标题'),
@@ -120,7 +117,7 @@ def get_post_by_slug(slug):
             "author": post.get('author', '未知作者'),
             "tags": post.get('tags', []),
             "excerpt": post.get('excerpt', ''),
-            "content": processed_content,
+            "content": post.content,
         }
         return post_data
 
@@ -178,7 +175,9 @@ def serve_image(filename):
     提供对 imgs 文件夹中图片的访问。
     """
     print(f"Serving image: {filename}")
-    imgs_fd = IMGS_FOLDER
+    imgs_fd = CONTENT_FOLDER
+    if not os.path.exists(os.path.join(imgs_fd, filename)):
+        imgs_fd = f'{MOVIES_FOLDER}/imgs'
     if not os.path.exists(os.path.join(imgs_fd, filename)):
         imgs_fd = f'{ACTORS_FOLDER}/imgs'
     if not os.path.exists(os.path.join(imgs_fd, filename)):
@@ -263,7 +262,7 @@ def update_order():
         new_ranking = data.get('ranking')
 
         for item in new_ranking:
-            file_path = os.path.join(CONTENT_FOLDER, item['id'])
+            file_path = os.path.join(MOVIES_FOLDER, item['id'])
             if not os.path.exists(file_path):
                 return jsonify({"error": f"File not found: {item['id']}"}), 404
 
@@ -303,7 +302,7 @@ def create_movie():
 
         # 生成文件名
         filename = f"{title.replace(' ', '_')}.md"
-        file_path = os.path.join(CONTENT_FOLDER, filename)
+        file_path = os.path.join(MOVIES_FOLDER, filename)
 
         # 处理封面图片
         cover_filename = f"{title.replace(' ', '_')}.jpg"  # 默认jpg格式
@@ -317,7 +316,7 @@ def create_movie():
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
+                save_folder = MOVIE_COVER_FOLDER
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -384,7 +383,7 @@ def create_actor():
                 cover_filename = f"{name.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+                save_folder = ACTOR_COVER_FOLDER
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -462,9 +461,9 @@ def get_movie_by_name(movie_name):
     """
     API 接口：根据电影名称获取影片详细信息 [[3]]。
     """
-    for filename in os.listdir(CONTENT_FOLDER):
+    for filename in os.listdir(MOVIES_FOLDER):
         if filename.endswith('.md'):
-            file_path = os.path.join(CONTENT_FOLDER, filename)
+            file_path = os.path.join(MOVIES_FOLDER, filename)
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
                 if post.get('title') == movie_name:  # 匹配电影标题 [[3]]
@@ -525,7 +524,7 @@ def update_movie(id):
         rating = request.form.get('rating', 0)
         order = request.form.get('order', 1)
         
-        file_path = os.path.join(CONTENT_FOLDER, id)
+        file_path = os.path.join(MOVIES_FOLDER, id)
 
         if not os.path.exists(file_path):
             return jsonify({"success": False, "message": "影片文件不存在"}), 404
@@ -542,7 +541,7 @@ def update_movie(id):
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
+                save_folder = MOVIE_COVER_FOLDER
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -578,7 +577,7 @@ def update_movie_body(id):
         data = request.json
         body_content = data.get('body', '')
         
-        file_path = os.path.join(CONTENT_FOLDER, id)
+        file_path = os.path.join(MOVIES_FOLDER, id)
         
         if not os.path.exists(file_path):
             return jsonify({"success": False, "message": "影片文件不存在"}), 404
@@ -611,7 +610,7 @@ def update_movie_rating(id):
         if not isinstance(rating, (int, float)) or rating < 0 or rating > 5:
             return jsonify({"success": False, "message": "评分必须在0-5之间"}), 400
         
-        file_path = os.path.join(CONTENT_FOLDER, id)
+        file_path = os.path.join(MOVIES_FOLDER, id)
         
         if not os.path.exists(file_path):
             return jsonify({"success": False, "message": "影片文件不存在"}), 404
@@ -696,7 +695,7 @@ def update_actor(actor_name):
                 cover_filename = f"{name.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+                save_folder = ACTOR_COVER_FOLDER
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -820,7 +819,7 @@ def update_post(slug):
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = os.path.join(IMGS_FOLDER, POST_COVER_FOLDER)
+                save_folder = POST_COVER_FOLDER
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -882,11 +881,11 @@ def upload_image():
         
         # 根据类型确定保存路径
         if image_type == 'actor':
-            save_folder = os.path.join(IMGS_FOLDER, ACTOR_COVER_FOLDER)
+            save_folder = ACTOR_COVER_FOLDER
         elif image_type == 'post':
-            save_folder = os.path.join(IMGS_FOLDER, POST_COVER_FOLDER)
+            save_folder = POST_COVER_FOLDER
         else:  # movie
-            save_folder = os.path.join(IMGS_FOLDER, MOVIE_COVER_FOLDER)
+            save_folder = MOVIE_COVER_FOLDER
         
         # 确保文件夹存在
         os.makedirs(save_folder, exist_ok=True)
