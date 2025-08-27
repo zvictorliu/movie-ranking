@@ -18,7 +18,7 @@
       <!-- 文章头部 -->
       <div class="post-header">
         <div class="title-container">
-          <h1 class="post-title">{{ post.title }}</h1>
+          <h1>{{ post.title }}</h1>
           <div class="edit-buttons">
             <el-tooltip content="编辑文章信息" placement="top">
               <button @click="openEditMetaDialog" class="edit-meta-button">
@@ -354,76 +354,9 @@ export default {
   text-align: center;
 }
 
-.title-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
+/* title-container 基础样式已移至 article-title.scss */
 
-.title-container .post-title {
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
-.edit-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.post-title {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 20px;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-.edit-meta-button,
-.edit-body-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: 2px solid;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  background: white;
-}
-
-.edit-meta-button {
-  color: #409eff;
-  border-color: #409eff;
-}
-
-.edit-meta-button:hover {
-  background: #409eff;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
-}
-
-.edit-body-button {
-  color: #67c23a;
-  border-color: #67c23a;
-}
-
-.edit-body-button:hover {
-  background: #67c23a;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
-}
-
-.button-text {
-  font-size: 12px;
-  font-weight: 600;
-}
+/* 编辑按钮样式已移至 article-title.scss */
 
 /* 编辑正文对话框样式 */
 :deep(.body-editor-dialog .el-dialog) {

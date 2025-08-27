@@ -219,23 +219,7 @@ export default {
   cursor: pointer;
 }
 
-.title-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.title-container h1 {
-  margin: 0;
-  flex: 1;
-}
-
-.edit-buttons {
-  display: flex;
-  gap: 12px;
-}
+/* title-container 样式已移至 article-title.scss */
 
 .movie-detail {
   padding: 0 10px;
@@ -298,74 +282,9 @@ button:disabled {
   color: #ffca28; /* 填充的星星颜色为黄色 */
 }
 
-.edit-meta-button,
-.edit-body-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: 2px solid;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  background: white;
-}
+/* 编辑按钮样式已移至 article-title.scss */
 
-.edit-meta-button {
-  color: #409eff;
-  border-color: #409eff;
-}
-
-.edit-meta-button:hover {
-  background: #409eff;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
-}
-
-.edit-body-button {
-  color: #67c23a;
-  border-color: #67c23a;
-}
-
-.edit-body-button:hover {
-  background: #67c23a;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
-}
-
-.button-text {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .title-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .edit-buttons {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .edit-meta-button,
-  .edit-body-button {
-    flex: 1;
-    justify-content: center;
-    padding: 10px 12px;
-  }
-
-  .button-text {
-    font-size: 11px;
-  }
-}
+/* 响应式设计已移至 article-title.scss */
 
 /* 编辑正文对话框样式 */
 :deep(.body-editor-dialog .el-dialog) {

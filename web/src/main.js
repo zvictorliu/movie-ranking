@@ -5,6 +5,9 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { createPinia } from 'pinia'
 
+// 导入共享样式
+import './styles/article-title.scss'
+
 // 创建 Vue 应用实例
 const app = createApp(App)
 
