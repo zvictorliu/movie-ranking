@@ -121,7 +121,7 @@ export default {
 <style scoped>
 .actor-detail {
   text-align: left;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #ddd;

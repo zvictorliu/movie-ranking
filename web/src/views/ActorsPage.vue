@@ -3,8 +3,19 @@
     <!-- 演员视图 -->
     <div class="actor-view">
       <h1>演员列表</h1>
+
+      <!-- 搜索框 -->
+      <div class="search-container">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="搜索演员姓名..."
+          class="search-input"
+        />
+      </div>
+
       <div class="actor-grid">
-        <div v-for="actor in actors" :key="actor.name" class="actor-item">
+        <div v-for="actor in filteredActors" :key="actor.name" class="actor-item">
           <img
             :src="actor.cover"
             alt="演员封面"
@@ -26,8 +37,20 @@ export default {
   data() {
     return {
       actors: [],
+      searchQuery: '', // 搜索查询
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
     }
+  },
+  computed: {
+    // 根据搜索查询过滤演员列表
+    filteredActors() {
+      if (!this.searchQuery.trim()) {
+        return this.actors
+      }
+      return this.actors.filter((actor) =>
+        actor.name.toLowerCase().includes(this.searchQuery.toLowerCase()),
+      )
+    },
   },
   methods: {
     goToActor(name) {
@@ -58,6 +81,32 @@ export default {
   margin: auto;
 }
 
+/* 搜索容器样式 */
+.search-container {
+  margin: 20px 10px;
+  text-align: center;
+}
+
+.search-input {
+  width: 80%;
+  max-width: 400px;
+  padding: 12px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
 .actor-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -82,9 +131,16 @@ export default {
   object-fit: cover;
   margin-right: 10px;
   border-radius: 10%; /* 圆形封面 */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.actor-cover:hover {
+  transform: scale(1.05);
 }
 
 .actor-name {
+  margin-top: 10px;
   font-size: 16px;
   font-weight: bold;
   word-wrap: break-word; /* 长名字自动换行 */
