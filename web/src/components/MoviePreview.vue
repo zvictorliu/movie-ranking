@@ -11,13 +11,33 @@
         <!-- 评分 -->
         <div class="rating">
           <strong>评分：</strong>
-          <span v-for="i in 5" :key="i" class="star">
-            <span class="material-icons" :class="{ filled: i <= movie.rating }">
-              {{ i <= movie.rating ? 'star' : 'star_border' }}
+          <div class="stars-container">
+            <span
+              v-for="i in 5"
+              :key="i"
+              class="star-wrapper"
+              :class="{
+                clickable: allowRating && !ratingUpdating,
+                'hover-effect': allowRating && i <= movie.rating,
+                updating: ratingUpdating,
+              }"
+              :title="allowRating ? `点击评分 ${i} 星` : ''"
+              @click="handleRatingClick(i)"
+              @mouseenter="allowRating && handleStarHover(i)"
+              @mouseleave="allowRating && handleStarLeave()"
+            >
+              <span
+                class="material-icons star-icon"
+                :class="{
+                  filled: i <= movie.rating,
+                  hover: allowRating && i <= hoverRating,
+                }"
+              >
+                {{ i <= movie.rating ? 'star' : 'star_border' }}
+              </span>
             </span>
-          </span>
+          </div>
         </div>
-        <p><strong>简介：</strong>{{ movie.description }}</p>
         <p>
           <strong>主演：</strong>
           <span v-if="movie.actors">
@@ -49,7 +69,10 @@
           </span>
           <span v-else>暂无标签信息</span>
         </p>
+        <p><strong>简介：</strong>{{ movie.description }}</p>
       </div>
+      <!-- 插槽：用于添加额外的控制按钮 -->
+      <slot name="controls"></slot>
     </div>
   </div>
   <div v-else class="loading">
@@ -67,12 +90,19 @@ export default {
       type: String,
       required: true,
     },
+    // 新增：是否允许点击评分
+    allowRating: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       movie: null,
       loading: false,
       error: null,
+      hoverRating: 0, // 鼠标悬停时的评分
+      ratingUpdating: false, // 评分更新状态
     }
   },
   async created() {
@@ -135,6 +165,36 @@ export default {
     },
     goToActor(name) {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
+    },
+    // 新增：处理评分点击
+    handleRatingClick(rating) {
+      if (this.allowRating && !this.ratingUpdating) {
+        this.ratingUpdating = true
+
+        // 添加点击动画效果
+        const starElement = event.target.closest('.star-wrapper')
+        if (starElement) {
+          starElement.style.transform = 'scale(1.2)'
+          setTimeout(() => {
+            starElement.style.transform = ''
+          }, 150)
+        }
+
+        this.$emit('rating-changed', this.movie, rating)
+
+        // 重置更新状态
+        setTimeout(() => {
+          this.ratingUpdating = false
+        }, 500)
+      }
+    },
+    // 处理星星悬停效果
+    handleStarHover(rating) {
+      this.hoverRating = rating
+    },
+    // 处理星星离开效果
+    handleStarLeave() {
+      this.hoverRating = 0
     },
   },
 }
@@ -220,16 +280,110 @@ export default {
 .rating {
   display: flex;
   align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.stars-container {
+  display: flex;
+  align-items: center;
   gap: 2px;
 }
 
-.star {
-  font-size: 20px;
-  color: #ccc;
+.star-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
-.star .material-icons.filled {
+.star-wrapper.clickable {
+  cursor: pointer;
+}
+
+.star-wrapper.clickable:hover {
+  background-color: rgba(255, 202, 40, 0.1);
+  transform: scale(1.1);
+}
+
+.star-wrapper.hover-effect {
+  background-color: rgba(255, 202, 40, 0.05);
+}
+
+.star-wrapper.updating {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.star-wrapper.updating .star-icon {
+  animation: pulse 1s infinite;
+}
+
+.star-icon {
+  font-size: 24px;
+  color: #ddd;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.star-icon.filled {
   color: #ffca28;
+  text-shadow: 0 0 8px rgba(255, 202, 40, 0.3);
+}
+
+.star-icon.hover {
+  color: #ffd54f;
+  text-shadow: 0 0 12px rgba(255, 202, 40, 0.5);
+  transform: scale(1.05);
+}
+
+.star-wrapper.clickable:hover .star-icon {
+  color: #ffd54f;
+  text-shadow: 0 0 12px rgba(255, 202, 40, 0.5);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .rating {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .stars-container {
+    gap: 1px;
+  }
+
+  .star-icon {
+    font-size: 20px;
+  }
+
+  .star-wrapper {
+    padding: 3px;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .star-icon {
+    color: #555;
+  }
+}
+
+/* 动画定义 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .tag-item {

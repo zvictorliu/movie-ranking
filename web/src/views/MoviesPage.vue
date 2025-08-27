@@ -40,73 +40,32 @@
         </div>
       </div>
 
-      <div v-for="(movie, index) in filteredMovies" :key="movie.id" class="movie-item">
-        <!-- 封面 -->
-        <div class="cover-wrapper" @click="goToDetail(movie.id)">
-          <img :src="movie.cover" alt="封面" class="cover" @error="setDefaultCover($event)" />
-        </div>
-        <!-- 详细信息 -->
-        <div class="details">
-          <h2>{{ movie.title }}</h2>
-          <p>
-            <strong>主演：</strong>
-            <span v-if="movie.actors">
-              <el-tag
-                v-for="(actor, index) in movie.actors.split(', ')"
-                :key="index"
-                :type="getActorTagType(actor.trim())"
-                class="actor-tag"
-                @click="goToActor(actor.trim())"
-              >
-                {{ actor }}
-              </el-tag>
-            </span>
-            <span v-else>暂无演员信息</span>
-          </p>
-          <!-- 评分 -->
-          <div class="rating">
-            <strong>评分：</strong>
-            <span v-for="i in 5" :key="i" class="star" @click="setRating(movie, i)">
-              <span class="material-icons" :class="{ filled: i <= movie.rating }">
-                {{ i <= movie.rating ? 'star' : 'star_border' }}
-              </span>
-            </span>
+      <MoviePreview
+        v-for="(movie, index) in filteredMovies"
+        :key="movie.id"
+        :title="movie.title"
+        :allow-rating="true"
+        @rating-changed="setRating"
+      >
+        <template #controls>
+          <!-- 上移/下移按钮 -->
+          <div class="controls">
+            <button @click="moveUp(index)" :disabled="index === 0" class="up-down-button">
+              <el-icon><ArrowUp /></el-icon>
+            </button>
+            <button @click="openEditDialog(movie)" class="edit-movie-button">
+              <el-icon><EditPen /></el-icon>
+            </button>
+            <button
+              @click="moveDown(index)"
+              :disabled="index === movies.length - 1"
+              class="up-down-button"
+            >
+              <el-icon><ArrowDown /></el-icon>
+            </button>
           </div>
-          <p>
-            <strong>标签：</strong>
-            <span v-if="movie.tags">
-              <el-tag
-                v-for="(tag, index) in movie.tags"
-                :key="index"
-                :type="getTagType(tag.trim())"
-                effect="plain"
-                class="tag-item"
-                @click="goToTagDetail(tag.trim())"
-              >
-                {{ tag }}
-              </el-tag>
-            </span>
-            <span v-else>暂无标签信息</span>
-          </p>
-          <p><strong>简介：</strong>{{ movie.description }}</p>
-        </div>
-        <!-- 上移/下移按钮 -->
-        <div class="controls">
-          <button @click="moveUp(index)" :disabled="index === 0" class="up-down-button">
-            <el-icon><ArrowUp /></el-icon>
-          </button>
-          <button @click="openEditDialog(movie)" class="edit-movie-button">
-            <el-icon><EditPen /></el-icon>
-          </button>
-          <button
-            @click="moveDown(index)"
-            :disabled="index === movies.length - 1"
-            class="up-down-button"
-          >
-            <el-icon><ArrowDown /></el-icon>
-          </button>
-        </div>
-      </div>
+        </template>
+      </MoviePreview>
     </div>
 
     <!-- 编辑元信息对话框 -->
@@ -128,6 +87,7 @@ import { ArrowUp, ArrowDown, EditPen } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useViewStore } from '../store/view'
 import MetaEditor from '@/components/MetaEditor.vue'
+import MoviePreview from '@/components/MoviePreview.vue'
 
 export default {
   name: 'MoviesPage',
@@ -136,6 +96,7 @@ export default {
     ArrowDown,
     EditPen,
     MetaEditor,
+    MoviePreview,
   },
   setup() {
     const viewStore = useViewStore()
@@ -194,39 +155,7 @@ export default {
         }
       })
     },
-    setDefaultCover(event) {
-      event.target.src = this.defaultCover // 设置为默认图片路径
-    },
-    goToDetail(id) {
-      console.log('跳转到详情页，电影 ID:', id) // 调试信息
-      // 使用 Vue Router 跳转到详情页
-      this.$router.push({ name: 'MovieDetail', params: { id } }) // 跳转到详情页
-    },
-    goToActor(name) {
-      this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
-    },
-    goToTagDetail(tagName) {
-      this.$router.push(`/tags/${tagName}`) // 跳转到标签详情页面
-    },
-    getActorTagType(actorName) {
-      // 根据演员名字生成固定的类型映射 [[6]]
-      const types = ['success', 'info', 'warning', 'danger']
-      const typeIndex = Math.abs(this.hashCode(actorName)) % types.length
-      return types[typeIndex]
-    },
-    getTagType(tag) {
-      // 根据标签名字生成固定的类型映射 [[6]]
-      const types = ['success', 'info', 'warning', 'danger']
-      const typeIndex = Math.abs(this.hashCode(tag)) % types.length
-      return types[typeIndex]
-    },
-    hashCode(str) {
-      let hash = 0
-      for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash)
-      }
-      return hash
-    },
+    // 以下方法已移至 MoviePreview 组件：goToDetail, goToActor, goToTagDetail, getActorTagType, getTagType, hashCode
     filterMovies() {
       let filtered = [...this.movies]
       if (this.selectedActors.length > 0) {
@@ -315,91 +244,21 @@ export default {
   margin: auto;
 }
 
-.movie-item {
+/* 电影项样式已移至 MoviePreview 组件，这里只保留控制按钮样式 */
+
+.controls {
   display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: 10px;
 }
 
-/* 宽屏设备：横向排列 */
-@media (min-width: 768px) {
-  .movie-item {
-    flex-direction: row; /* 横向排列 */
-  }
-  .cover {
-    max-width: 350px; /* 设置最大宽度，避免图片过大 */
-    object-fit: cover; /* 确保图片填充整个区域，避免拉伸或变形 */
-    aspect-ratio: 16 / 9; /* 设置宽高比为 16:9 */
-    margin-right: 20px;
-  }
-  .details {
-    flex: 1;
-    text-align: left;
-  }
-  .controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-/* 窄屏设备：竖向排列 */
 @media (max-width: 768px) {
-  .movie-item {
-    flex-direction: column; /* 竖向排列 */
-    align-items: flex-start; /* 左对齐 */
-  }
-  .cover {
-    max-width: 100%; /* 让封面占满容器宽度 */
-    margin-right: 0; /* 移除右侧间距 */
-    margin-bottom: 10px; /* 添加底部间距 */
-  }
-  .details {
-    width: 100%; /* 占满容器宽度 */
-    text-align: left;
-  }
   .controls {
-    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
   }
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 2px; /* 星星之间的间距 */
-}
-
-.star {
-  font-size: 20px; /* 星星图标的大小 */
-  color: #ccc; /* 默认颜色为灰色 */
-}
-
-.star .material-icons.filled {
-  color: #ffca28; /* 填充的星星颜色为黄色 */
-}
-
-.star:hover {
-  cursor: pointer; /* 鼠标悬停时显示为手型 */
-}
-
-.actor-tag {
-  margin-right: 5px;
-  cursor: pointer;
-}
-
-.tag-item {
-  margin-right: 5px;
-}
-
-.tag-item:hover {
-  cursor: pointer;
-  background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
 }
 
 .edit-movie-button {
