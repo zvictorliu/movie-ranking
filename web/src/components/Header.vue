@@ -99,7 +99,26 @@
           <el-input v-model="movieFormData.title" placeholder="请输入影片标题"></el-input>
         </el-form-item>
         <el-form-item label="演员">
-          <el-input v-model="movieFormData.actors" placeholder="请输入演员，用逗号分隔"></el-input>
+          <el-select
+            v-model="movieFormData.selectedActors"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            placeholder="请选择演员或输入新演员名称"
+            style="width: 100%"
+            @change="handleActorSelection"
+          >
+            <el-option
+              v-for="actor in availableActors"
+              :key="actor.name"
+              :label="actor.name"
+              :value="actor.name"
+            />
+          </el-select>
+          <div v-if="movieFormData.selectedActors.length > 0" class="selected-actors">
+            <small>已选择: {{ movieFormData.selectedActors.join(', ') }}</small>
+          </div>
         </el-form-item>
         <el-form-item label="标签">
           <el-input v-model="movieFormData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
@@ -268,11 +287,13 @@ export default {
       movieFormData: {
         title: '',
         actors: '',
+        selectedActors: [],
         tags: '',
         description: '',
         order: 10,
         rating: 0,
       },
+      availableActors: [], // 可选择的演员列表
       actorDialogVisible: false, // 控制浮动窗口的显示状态
       actorFormData: {
         name: '',
@@ -342,6 +363,7 @@ export default {
     },
     openMovieDialog() {
       this.movieDialogVisible = true // 打开浮动窗口
+      this.fetchAvailableActors() // 获取可选择的演员列表
     },
     handleMovieImageChange(file) {
       this.selectedMovieImageFile = file.raw
@@ -355,6 +377,7 @@ export default {
       this.movieFormData = {
         title: '',
         actors: '',
+        selectedActors: [],
         tags: '',
         description: '',
         order: 1,
@@ -362,6 +385,19 @@ export default {
       }
       this.movieImageFileList = []
       this.selectedMovieImageFile = null
+    },
+    async fetchAvailableActors() {
+      try {
+        const response = await axios.get('/api/actors')
+        this.availableActors = response.data
+      } catch (error) {
+        console.error('Error fetching actors:', error)
+        this.availableActors = []
+      }
+    },
+    handleActorSelection(selectedActors) {
+      // 将选中的演员名称转换为逗号分隔的字符串
+      this.movieFormData.actors = selectedActors.join(', ')
     },
     openActorDialog() {
       this.actorDialogVisible = true
@@ -719,6 +755,16 @@ body.dark-mode .dropdown-menu {
 }
 
 body.dark-mode .slug-preview {
+  color: #b0b0b0;
+}
+
+.selected-actors {
+  margin-top: 5px;
+  color: #666;
+  font-size: 12px;
+}
+
+body.dark-mode .selected-actors {
   color: #b0b0b0;
 }
 </style>

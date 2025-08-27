@@ -4,7 +4,7 @@
     <div class="actor-view">
       <h1>演员列表</h1>
       <div class="actor-grid">
-        <div v-for="(actor, index) in actors" :key="actor.name" class="actor-item">
+        <div v-for="actor in actors" :key="actor.name" class="actor-item">
           <img
             :src="actor.cover"
             alt="演员封面"
