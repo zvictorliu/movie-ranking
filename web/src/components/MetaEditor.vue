@@ -89,7 +89,7 @@
       </template>
 
       <!-- 通用字段 -->
-      <el-form-item label="标签" prop="tags">
+      <el-form-item label="标签" prop="tags" v-if="type !== 'actor'">
         <el-input v-model="formData.tags" placeholder="请输入标签，用逗号分隔"></el-input>
       </el-form-item>
 
@@ -239,6 +239,7 @@ export default {
           formData.append('description', this.formData.description)
           formData.append('rating', this.formData.rating)
           formData.append('order', this.formData.order)
+          formData.append('tags', this.formData.tags)
         } else if (this.type === 'actor') {
           formData.append('name', this.formData.name)
           formData.append('birth', this.formData.birth)
@@ -249,10 +250,8 @@ export default {
           formData.append('author', this.formData.author)
           formData.append('date', this.formData.date)
           formData.append('excerpt', this.formData.excerpt)
+          formData.append('tags', this.formData.tags)
         }
-
-        // 通用字段
-        formData.append('tags', this.formData.tags)
 
         // 如果有图片，添加到表单数据中
         if (this.selectedImageFile) {

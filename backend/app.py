@@ -316,7 +316,7 @@ def create_movie():
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = MOVIE_COVER_FOLDER
+                save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -362,6 +362,7 @@ def create_actor():
         name = request.form.get('name', '')
         birth = request.form.get('birth', '')
         debut = request.form.get('debut', '')
+        favorite = request.form.get('favorite', '1')  # 默认值为1
 
         # 确保演员文件夹存在
         if not os.path.exists(ACTORS_FOLDER):
@@ -383,7 +384,7 @@ def create_actor():
                 cover_filename = f"{name.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = ACTOR_COVER_FOLDER
+                save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -395,6 +396,7 @@ def create_actor():
             "name": name,
             "birth": birth,
             "debut": debut,
+            "favorite": int(favorite),  # 转换为整数
             "cover": cover_filename,
         }
 
@@ -541,7 +543,7 @@ def update_movie(id):
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = MOVIE_COVER_FOLDER
+                save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -695,7 +697,7 @@ def update_actor(actor_name):
                 cover_filename = f"{name.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = ACTOR_COVER_FOLDER
+                save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -819,7 +821,7 @@ def update_post(slug):
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
                 # 保存图片文件
-                save_folder = POST_COVER_FOLDER
+                save_folder = os.path.join(CONTENT_FOLDER, POST_COVER_FOLDER)
                 os.makedirs(save_folder, exist_ok=True)
                 image_path = os.path.join(save_folder, cover_filename)
                 file.save(image_path)
@@ -881,11 +883,11 @@ def upload_image():
         
         # 根据类型确定保存路径
         if image_type == 'actor':
-            save_folder = ACTOR_COVER_FOLDER
+            save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
         elif image_type == 'post':
-            save_folder = POST_COVER_FOLDER
+            save_folder = os.path.join(CONTENT_FOLDER, POST_COVER_FOLDER)
         else:  # movie
-            save_folder = MOVIE_COVER_FOLDER
+            save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
         
         # 确保文件夹存在
         os.makedirs(save_folder, exist_ok=True)

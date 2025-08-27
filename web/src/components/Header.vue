@@ -259,6 +259,15 @@
             style="width: 100%"
           ></el-input>
         </el-form-item>
+        <el-form-item label="喜爱度">
+          <el-input-number
+            v-model="actorFormData.favorite"
+            :min="1"
+            :max="5"
+            :precision="0"
+            placeholder="请输入喜爱度(1-5)"
+          ></el-input-number>
+        </el-form-item>
         <el-form-item label="头像图片（可选）">
           <el-upload
             class="upload-demo"
@@ -373,6 +382,7 @@ export default {
         name: '',
         birth: '',
         debut: '',
+        favorite: 1,
       },
       imageDialogVisible: false, // 控制图片上传浮动窗口的显示状态
       imageFormData: {
@@ -494,6 +504,7 @@ export default {
         name: '',
         birth: '',
         debut: '',
+        favorite: 1,
       }
       this.actorImageFileList = []
       this.selectedActorImageFile = null
@@ -578,6 +589,7 @@ export default {
         formData.append('name', this.actorFormData.name)
         formData.append('birth', this.actorFormData.birth)
         formData.append('debut', this.actorFormData.debut)
+        formData.append('favorite', this.actorFormData.favorite)
 
         // 如果有图片，添加到表单数据中
         if (this.selectedActorImageFile) {
