@@ -596,6 +596,40 @@ def update_movie_body(id):
         return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
 
 
+@app.route('/api/update-movie-rating/<id>', methods=['PUT'])
+def update_movie_rating(id):
+    """
+    API 接口：专门用于更新电影的评分，轻量级操作。
+    """
+    try:
+        data = request.json
+        rating = data.get('rating', 0)
+        
+        # 验证评分范围
+        if not isinstance(rating, (int, float)) or rating < 0 or rating > 5:
+            return jsonify({"success": False, "message": "评分必须在0-5之间"}), 400
+        
+        file_path = os.path.join(CONTENT_FOLDER, id)
+        
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "影片文件不存在"}), 404
+        
+        # 只更新评分字段，保持其他字段不变
+        with open(file_path, 'r+', encoding='utf-8') as f:
+            post = frontmatter.load(f)
+            post['rating'] = int(rating)
+            
+            f.seek(0)
+            f.write(frontmatter.dumps(post))
+            f.truncate()
+        
+        return jsonify({"success": True, "message": "评分更新成功", "rating": rating}), 200
+        
+    except Exception as e:
+        print(f"更新评分错误: {str(e)}")
+        return jsonify({"success": False, "message": f"更新失败: {str(e)}"}), 500
+
+
 @app.route('/api/update-actor-body/<actor_name>', methods=['PUT'])
 def update_actor_body(actor_name):
     """

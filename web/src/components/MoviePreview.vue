@@ -167,7 +167,7 @@ export default {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
     },
     // 新增：处理评分点击
-    handleRatingClick(rating) {
+    async handleRatingClick(rating) {
       if (this.allowRating && !this.ratingUpdating) {
         this.ratingUpdating = true
 
@@ -180,12 +180,34 @@ export default {
           }, 150)
         }
 
-        this.$emit('rating-changed', this.movie, rating)
+        try {
+          // 调用专门的评分更新API
+          await this.updateMovieRating(rating)
 
-        // 重置更新状态
-        setTimeout(() => {
-          this.ratingUpdating = false
-        }, 500)
+          this.$message.success('评分已更新！')
+        } catch (error) {
+          console.error('评分更新失败:', error)
+          this.$message.error('评分更新失败，请稍后再试！')
+        } finally {
+          // 重置更新状态
+          setTimeout(() => {
+            this.ratingUpdating = false
+          }, 500)
+        }
+      }
+    },
+    // 新增：更新电影评分的API调用
+    async updateMovieRating(rating) {
+      const response = await axios.put(`/api/update-movie-rating/${this.movie.id}`, {
+        rating: rating,
+      })
+
+      if (response.data.success) {
+        // 更新本地数据
+        this.movie.rating = rating
+        return response.data
+      } else {
+        throw new Error('评分更新失败')
       }
     },
     // 处理星星悬停效果

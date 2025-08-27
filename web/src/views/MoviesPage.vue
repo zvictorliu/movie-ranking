@@ -45,7 +45,6 @@
         :key="movie.id"
         :title="movie.title"
         :allow-rating="true"
-        @rating-changed="setRating"
       >
         <template #controls>
           <!-- 上移/下移按钮 -->
@@ -115,9 +114,6 @@ export default {
     }
   },
   methods: {
-    setRating(movie, rating) {
-      movie.rating = rating // 更新当前影片的评分
-    },
     moveUp(index) {
       if (this.filteredMovies.length !== this.movies.length) {
         this.$message.warning('请显示全部影片后再排序')
