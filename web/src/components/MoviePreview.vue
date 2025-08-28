@@ -116,6 +116,16 @@ export default {
       immediate: true,
     },
   },
+  mounted() {
+    // 监听影片创建事件，因为可能会影响当前影片信息
+    this.$eventBus.on('movie-created', () => {
+      this.fetchMovie(this.title)
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('movie-created')
+  },
   methods: {
     async fetchMovie(title) {
       this.loading = true

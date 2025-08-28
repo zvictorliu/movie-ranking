@@ -106,6 +106,15 @@ export default {
     } catch (error) {
       console.error('请求失败:', error)
     }
+
+    // 监听演员创建事件，因为可能会影响当前演员信息
+    this.$eventBus.on('actor-created', () => {
+      this.refreshActorData()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('actor-created')
   },
   methods: {
     setDefaultCover(event) {
@@ -144,6 +153,15 @@ export default {
       } catch (error) {
         console.error('Error updating favorite:', error)
         this.$message.error('更新失败，请稍后再试！')
+      }
+    },
+    async refreshActorData() {
+      const { name } = this.$route.params
+      try {
+        const response = await axios.get(`/api/actor/${name}`)
+        this.actor = response.data
+      } catch (error) {
+        console.error('请求失败:', error)
       }
     },
   },

@@ -390,6 +390,22 @@ export default {
     } catch (error) {
       console.error('Error:', error)
     }
+
+    // 监听影片创建事件
+    this.$eventBus.on('movie-created', () => {
+      this.fetchMovies()
+      this.fetchActors()
+    })
+
+    // 监听演员创建事件
+    this.$eventBus.on('actor-created', () => {
+      this.fetchActors()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('movie-created')
+    this.$eventBus.off('actor-created')
   },
 }
 </script>

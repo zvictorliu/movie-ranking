@@ -44,6 +44,15 @@ export default {
   async created() {
     this.tagName = this.$route.params.tagName // 获取路由参数中的标签名称
     await this.fetchMoviesByTag()
+
+    // 监听影片创建事件，因为可能会添加包含当前标签的新影片
+    this.$eventBus.on('movie-created', () => {
+      this.fetchMoviesByTag()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('movie-created')
   },
   methods: {
     async fetchMoviesByTag() {

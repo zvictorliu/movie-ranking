@@ -320,6 +320,15 @@ export default {
   mounted() {
     console.log('PostsDetail mounted, route params:', this.$route.params)
     this.fetchPost()
+
+    // 监听博客创建事件，因为可能会影响相关文章
+    this.$eventBus.on('post-created', () => {
+      this.fetchRelatedPosts()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('post-created')
   },
   watch: {
     '$route.params.slug'(newSlug, oldSlug) {

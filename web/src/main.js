@@ -14,6 +14,30 @@ const app = createApp(App)
 // 创建 Pinia 实例
 const pinia = createPinia()
 
+// 创建全局事件总线
+const eventBus = {
+  events: {},
+  emit(event, data) {
+    if (this.events[event]) {
+      this.events[event].forEach((callback) => callback(data))
+    }
+  },
+  on(event, callback) {
+    if (!this.events[event]) {
+      this.events[event] = []
+    }
+    this.events[event].push(callback)
+  },
+  off(event, callback) {
+    if (this.events[event]) {
+      this.events[event] = this.events[event].filter((cb) => cb !== callback)
+    }
+  },
+}
+
+// 将事件总线挂载到全局
+app.config.globalProperties.$eventBus = eventBus
+
 app.use(ElementPlus)
 app.use(router)
 app.use(pinia)

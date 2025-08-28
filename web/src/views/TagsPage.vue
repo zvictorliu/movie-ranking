@@ -26,6 +26,20 @@ export default {
   },
   async created() {
     await this.fetchTags()
+
+    // 监听影片和博客创建事件，因为可能会添加新标签
+    this.$eventBus.on('movie-created', () => {
+      this.fetchTags()
+    })
+
+    this.$eventBus.on('post-created', () => {
+      this.fetchTags()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('movie-created')
+    this.$eventBus.off('post-created')
   },
   methods: {
     async fetchTags() {

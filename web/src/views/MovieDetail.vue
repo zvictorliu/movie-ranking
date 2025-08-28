@@ -139,6 +139,15 @@ export default {
       this.prevMovie = currentIndex > 0 ? allMovies[currentIndex - 1] : null
       this.nextMovie = currentIndex < allMovies.length - 1 ? allMovies[currentIndex + 1] : null
     }
+
+    // 监听影片创建事件，因为可能会影响相邻影片
+    this.$eventBus.on('movie-created', () => {
+      this.refreshMovieData()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('movie-created')
   },
   methods: {
     async fetchMovies() {
@@ -208,6 +217,17 @@ export default {
         hash = str.charCodeAt(i) + ((hash << 5) - hash)
       }
       return hash
+    },
+    async refreshMovieData() {
+      const { id } = this.$route.params
+      const allMovies = await this.fetchMovies()
+      const currentIndex = allMovies.findIndex((m) => m.id === id)
+
+      if (currentIndex !== -1) {
+        this.movie = allMovies[currentIndex]
+        this.prevMovie = currentIndex > 0 ? allMovies[currentIndex - 1] : null
+        this.nextMovie = currentIndex < allMovies.length - 1 ? allMovies[currentIndex + 1] : null
+      }
     },
   },
 }

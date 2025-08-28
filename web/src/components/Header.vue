@@ -323,14 +323,6 @@
             placeholder="请输入博客摘要"
           ></el-input>
         </el-form-item>
-        <el-form-item label="内容">
-          <el-input
-            v-model="postFormData.content"
-            type="textarea"
-            :rows="10"
-            placeholder="请输入博客内容"
-          ></el-input>
-        </el-form-item>
         <el-form-item label="发布日期">
           <el-date-picker
             v-model="postFormData.date"
@@ -402,7 +394,6 @@ export default {
         author: '',
         tags: '',
         excerpt: '',
-        content: '',
         date: '',
       },
       isCreateMenuOpen: false, // 控制新建操作下拉菜单的显示状态
@@ -536,7 +527,6 @@ export default {
         author: '',
         tags: '',
         excerpt: '',
-        content: '',
         date: new Date().toISOString().split('T')[0], // 默认设置为今天
       }
     },
@@ -575,6 +565,8 @@ export default {
           this.$message.success('影片已成功创建！')
           this.movieDialogVisible = false
           this.resetMovieForm()
+          // 触发页面刷新事件
+          this.$eventBus.emit('movie-created')
         } else {
           this.$message.error('创建失败，请稍后再试！')
         }
@@ -604,6 +596,8 @@ export default {
           this.$message.success('演员已成功创建！')
           this.actorDialogVisible = false
           this.resetActorForm()
+          // 触发页面刷新事件
+          this.$eventBus.emit('actor-created')
         } else {
           this.$message.error('创建失败，请稍后再试！')
         }
@@ -642,6 +636,8 @@ export default {
           this.$message.success('图片上传成功！')
           this.imageDialogVisible = false
           this.resetImageForm()
+          // 触发页面刷新事件
+          this.$eventBus.emit('image-uploaded', { type: this.imageFormData.type })
         } else {
           this.$message.error('上传失败，请稍后再试！')
         }
@@ -659,10 +655,6 @@ export default {
         }
         if (!this.postFormData.author.trim()) {
           this.$message.error('请输入作者姓名！')
-          return
-        }
-        if (!this.postFormData.content.trim()) {
-          this.$message.error('请输入博客内容！')
           return
         }
 
@@ -686,7 +678,7 @@ export default {
             ? this.postFormData.tags.split(',').map((tag) => tag.trim())
             : [],
           excerpt: this.postFormData.excerpt,
-          content: this.postFormData.content,
+          content: `# ${this.postFormData.title}`,
           date: this.postFormData.date || new Date().toISOString().split('T')[0],
         }
 
@@ -696,6 +688,8 @@ export default {
           this.$message.success('博客已成功创建！')
           this.postDialogVisible = false
           this.resetPostForm()
+          // 触发页面刷新事件
+          this.$eventBus.emit('post-created')
           // 可以选择跳转到博客列表页面
           this.$router.push({ name: 'PostsPage' })
         } else {

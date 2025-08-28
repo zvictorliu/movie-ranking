@@ -279,6 +279,15 @@ export default {
     if (this.currentView === 'favorite') {
       this.autoExpandSearchResults()
     }
+
+    // 监听演员创建事件
+    this.$eventBus.on('actor-created', () => {
+      this.fetchActors()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('actor-created')
   },
 }
 </script>

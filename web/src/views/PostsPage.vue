@@ -240,6 +240,15 @@ export default {
   },
   mounted() {
     this.fetchPosts()
+
+    // 监听博客创建事件
+    this.$eventBus.on('post-created', () => {
+      this.fetchPosts()
+    })
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    this.$eventBus.off('post-created')
   },
 }
 </script>
