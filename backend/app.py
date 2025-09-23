@@ -4,10 +4,18 @@ import os
 import frontmatter
 import markdown
 from pypinyin import lazy_pinyin
-
+import hashlib
 
 app = Flask(__name__)
 CORS(app)  # 启用 CORS 支持 [[2]]
+
+def hash_password(password):
+    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
+# 简单的用户认证配置（实际项目中应该使用数据库）
+USERS = {
+    'hector': hash_password('hector0805'),
+}
 
 # 定义存放 Markdown 文件和图片的文件夹路径
 CONTENT_FOLDER = os.path.join(os.getcwd(), '../content')
@@ -954,6 +962,55 @@ def get_post(slug):
     except Exception as e:
         print(f"获取博客文章错误: {str(e)}")
         return jsonify({"success": False, "message": f"获取失败: {str(e)}"}), 500
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """
+    API 接口：用户登录验证。
+    """
+    try:
+        data = request.get_json()
+        username = data.get('username', '').strip()
+        password = data.get('password', '').strip()
+        
+        # 验证输入
+        if not username or not password:
+            return jsonify({
+                "success": False,
+                "message": "用户名和密码不能为空"
+            }), 400
+        
+        # 验证用户凭据
+        if username in USERS:
+            # 对输入的密码进行哈希处理
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+            if USERS[username] == password_hash:
+                return jsonify({
+                    "success": True,
+                    "message": "登录成功",
+                    "user": {
+                        "username": username,
+                        "role": "admin" if username == "admin" else "user"
+                    }
+                }), 200
+            else:
+                return jsonify({
+                    "success": False,
+                    "message": "密码错误"
+                }), 401
+        else:
+            return jsonify({
+                "success": False,
+                "message": "用户不存在"
+            }), 401
+            
+    except Exception as e:
+        print(f"登录错误: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"登录失败: {str(e)}"
+        }), 500
 
 
 if __name__ == '__main__':
