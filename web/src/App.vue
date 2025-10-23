@@ -47,7 +47,6 @@ body {
 
 .app-main {
   flex: 1;
-  padding: 20px;
 }
 
 /* 夜间模式 */

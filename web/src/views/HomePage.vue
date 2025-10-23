@@ -1,28 +1,91 @@
 <template>
   <div class="home-page">
-    <!-- 背景容器 -->
-    <div class="welcome-container">
-      <h1 class="welcome-title">欢迎来到影片排行榜网站</h1>
-      <p class="welcome-description">这里为你提供最新的影片排行和演员信息，快来探索吧！</p>
+    <!-- 动态背景 -->
+    <div class="background-animation">
+      <div class="gradient-orb orb-1"></div>
+      <div class="gradient-orb orb-2"></div>
+      <div class="gradient-orb orb-3"></div>
+    </div>
 
-      <!-- 已登录状态显示 -->
-      <div v-if="userStore.isLoggedIn" class="user-info">
-        <h2 class="welcome-user">欢迎回来，{{ userStore.username }}！</h2>
-        <p class="user-role">角色：{{ userStore.isAdmin ? '管理员' : '普通用户' }}</p>
-        <p class="access-info">您现在可以访问所有页面内容</p>
-        <button class="logout-button" @click="handleLogout">退出登录</button>
+    <!-- 主要内容 -->
+    <div class="content-wrapper">
+      <!-- Hero 区域 -->
+      <div class="hero-section">
+        <div class="hero-icon">
+          <span class="material-icons">movie</span>
+        </div>
+        <h1 class="hero-title">影片排行榜</h1>
+        <p class="hero-subtitle">铭记美丽的瞬间</p>
       </div>
 
-      <!-- 未登录状态显示 -->
-      <div v-else class="guest-info">
-        <h2 class="guest-title">请先登录</h2>
-        <p class="guest-description">登录后即可访问影片排行、演员信息等精彩内容</p>
-        <button class="login-redirect-button" @click="goToLogin">立即登录</button>
+      <!-- 状态卡片 -->
+      <div class="status-card">
+        <div v-if="userStore.isLoggedIn" class="user-section">
+          <div class="user-avatar">
+            <span class="material-icons">account_circle</span>
+          </div>
+          <div class="user-details">
+            <h2 class="user-name">{{ userStore.username }}</h2>
+            <p class="user-role">
+              <span class="role-badge" :class="userStore.isAdmin ? 'admin' : 'user'">
+                {{ userStore.isAdmin ? '管理员' : '用户' }}
+              </span>
+            </p>
+          </div>
+          <button class="logout-btn" @click="handleLogout" title="退出登录">
+            <span class="material-icons">logout</span>
+          </button>
+        </div>
+
+        <div v-else class="guest-section">
+          <div class="guest-icon">
+            <span class="material-icons">lock</span>
+          </div>
+          <h2 class="guest-title">请先登录</h2>
+          <p class="guest-description">登录后即可访问影片排行、演员信息等精彩内容</p>
+          <button class="login-btn" @click="goToLogin">
+            <span class="material-icons">login</span>
+            立即登录
+          </button>
+        </div>
       </div>
 
-      <div class="welcome-buttons">
-        <button class="welcome-button" @click="goToMovies">查看影片排行</button>
-        <button class="welcome-button" @click="goToActors">查看演员列表</button>
+      <!-- 快捷入口 -->
+      <div class="quick-access">
+        <h3 class="section-title">快捷入口</h3>
+        <div class="access-grid">
+          <div class="access-card" @click="goToMovies">
+            <div class="card-icon movies">
+              <span class="material-icons">movie</span>
+            </div>
+            <h4 class="card-title">影片排行</h4>
+            <p class="card-description">查看和管理影片评分</p>
+          </div>
+
+          <div class="access-card" @click="goToActors">
+            <div class="card-icon actors">
+              <span class="material-icons">people</span>
+            </div>
+            <h4 class="card-title">演员列表</h4>
+            <p class="card-description">浏览演员信息资料</p>
+          </div>
+
+          <div class="access-card" @click="goToTags">
+            <div class="card-icon tags">
+              <span class="material-icons">local_offer</span>
+            </div>
+            <h4 class="card-title">标签分类</h4>
+            <p class="card-description">按标签筛选影片</p>
+          </div>
+
+          <div class="access-card" @click="goToPosts">
+            <div class="card-icon posts">
+              <span class="material-icons">article</span>
+            </div>
+            <h4 class="card-title">博客文章</h4>
+            <p class="card-description">阅读影评和随笔</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -38,23 +101,27 @@ export default {
     return { userStore }
   },
   mounted() {
-    // 页面加载时恢复登录状态
     this.userStore.restoreLoginState()
   },
   methods: {
     handleLogout() {
       this.userStore.logout()
+      this.$message.success('已退出登录')
     },
-
     goToLogin() {
-      this.$router.push('/login') // 跳转到登录页面
+      this.$router.push('/login')
     },
-
     goToMovies() {
-      this.$router.push('/movies') // 跳转到影片排行榜页面
+      this.$router.push('/movies')
     },
     goToActors() {
-      this.$router.push('/actors') // 跳转到演员列表页面
+      this.$router.push('/actors')
+    },
+    goToTags() {
+      this.$router.push('/tags')
+    },
+    goToPosts() {
+      this.$router.push('/posts')
     },
   },
 }
@@ -62,182 +129,601 @@ export default {
 
 <style scoped>
 .home-page {
-  display: flex;
-  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 动态背景 */
+.background-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: float 20s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  bottom: -50px;
+  right: -50px;
+  animation-delay: 7s;
+}
+
+.orb-3 {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 14s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* 内容区域 */
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+/* Hero 区域 */
+.hero-section {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-icon {
+  display: inline-flex;
   align-items: center;
-  height: 100vh; /* 占满整个屏幕高度 */
-  background: url('/background.jpg') no-repeat center center/cover; /* 背景图片 */
-  text-align: center;
-  color: white;
-}
-
-.welcome-container {
-  padding: 20px;
-  max-width: 600px; /* 限制内容宽度 */
-  background-color: rgba(0, 0, 0, 0.7); /* 半透明背景 */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.welcome-title {
-  font-size: 36px;
-  margin-bottom: 20px;
-}
-
-.welcome-description {
-  font-size: 18px;
-  margin-bottom: 30px;
-}
-
-.welcome-buttons {
-  display: flex;
-  gap: 20px; /* 按钮之间的间距 */
   justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.welcome-button {
-  padding: 10px 20px;
-  background-color: #42b983;
+.hero-icon .material-icons {
+  font-size: 48px;
   color: white;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 300;
+}
+
+/* 状态卡片 */
+.status-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+/* 用户区域 */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-avatar .material-icons {
+  font-size: 36px;
+  color: white;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.user-role {
+  margin: 0;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.role-badge.admin {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.role-badge.user {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.logout-btn {
+  width: 44px;
+  height: 44px;
+  background: #ff6b6b;
   border: none;
+  border-radius: 12px;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: background-color 0.3s ease; /* 添加过渡效果 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
-.welcome-button:hover {
-  background-color: #33a07c; /* 鼠标悬停时改变颜色 */
+.logout-btn .material-icons {
+  font-size: 20px;
+  color: white;
 }
 
-body.dark-mode .home-page {
-  color: #a9a9b3;
+.logout-btn:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
-body.dark-mode .welcome-button {
-  background-color: #3a3a3a; /* 夜间模式按钮颜色 */
-  color: #a9a9b3;
-}
-
-/* 访客信息样式 */
-.guest-info {
-  margin: 30px 0;
-  padding: 20px;
-  background-color: rgba(255, 193, 7, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 193, 7, 0.3);
+/* 访客区域 */
+.guest-section {
   text-align: center;
+}
+
+.guest-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.guest-icon .material-icons {
+  font-size: 32px;
+  color: white;
 }
 
 .guest-title {
   font-size: 24px;
+  font-weight: 600;
+  color: #333;
   margin-bottom: 10px;
-  color: #ffc107;
 }
 
 .guest-description {
   font-size: 16px;
+  color: #666;
   margin-bottom: 20px;
-  color: rgba(255, 255, 255, 0.8);
 }
 
-.login-redirect-button {
-  padding: 12px 24px;
-  background-color: #ffc107;
-  color: #333;
+.login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
-.login-redirect-button:hover {
-  background-color: #ffb300;
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
 }
 
-/* 用户信息样式 */
-.user-info {
-  margin: 30px 0;
-  padding: 20px;
-  background-color: rgba(66, 185, 131, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(66, 185, 131, 0.3);
+.login-btn .material-icons {
+  font-size: 20px;
+}
+
+/* 快捷入口 */
+.quick-access {
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.access-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.access-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
-.welcome-user {
-  font-size: 24px;
-  margin-bottom: 10px;
-  color: #42b983;
+.access-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
-.user-role {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.access-info {
-  font-size: 14px;
+.card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 15px;
-  color: rgba(66, 185, 131, 0.8);
-  font-style: italic;
+  transition: all 0.3s ease;
 }
 
-.logout-button {
-  padding: 8px 16px;
-  background-color: #ff6b6b;
+.card-icon .material-icons {
+  font-size: 32px;
   color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.logout-button:hover {
-  background-color: #ff5252;
+.card-icon.movies {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* 夜间模式样式 */
-body.dark-mode .guest-info {
-  background-color: rgba(255, 193, 7, 0.15);
-  border-color: rgba(255, 193, 7, 0.4);
+.card-icon.actors {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-body.dark-mode .guest-title {
-  color: #ffc107;
+.card-icon.tags {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-body.dark-mode .guest-description {
-  color: rgba(169, 169, 179, 0.8);
+.card-icon.posts {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 
-body.dark-mode .login-redirect-button {
-  background-color: #ffc107;
+.access-card:hover .card-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
   color: #333;
+  margin-bottom: 8px;
 }
 
-body.dark-mode .login-redirect-button:hover {
-  background-color: #ffb300;
+.card-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
 }
 
-body.dark-mode .user-info {
-  background-color: rgba(58, 58, 58, 0.3);
-  border-color: rgba(58, 58, 58, 0.5);
+/* 动画 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body.dark-mode .welcome-user {
-  color: #a9a9b3;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body.dark-mode .user-role {
-  color: rgba(169, 169, 179, 0.8);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-body.dark-mode .access-info {
-  color: rgba(169, 169, 179, 0.6);
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .home-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-orb {
+    display: none; /* 移动端隐藏动态背景以提升性能 */
+  }
+
+  .content-wrapper {
+    padding: 30px 15px;
+  }
+
+  .hero-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+  }
+
+  .hero-icon .material-icons {
+    font-size: 36px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .hero-section {
+    margin-bottom: 30px;
+  }
+
+  .status-card {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+  }
+
+  .user-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .user-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .user-avatar .material-icons {
+    font-size: 32px;
+  }
+
+  .user-name {
+    font-size: 20px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .guest-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+  }
+
+  .guest-icon .material-icons {
+    font-size: 28px;
+  }
+
+  .guest-title {
+    font-size: 20px;
+  }
+
+  .guest-description {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 12px 24px;
+    border-radius: 10px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .access-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .access-card {
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+
+  .access-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  .card-icon .material-icons {
+    font-size: 24px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .card-description {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .footer {
+    margin-top: 20px;
+  }
+
+  .footer-text {
+    font-size: 14px;
+  }
+
+  .footer-text .material-icons {
+    font-size: 16px;
+  }
+}
+
+/* 小屏幕手机优化 */
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 20px 12px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+  }
+
+  .access-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .access-card {
+    padding: 20px;
+  }
+
+  .card-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .card-icon .material-icons {
+    font-size: 28px;
+  }
+
+  .card-title {
+    font-size: 17px;
+  }
+
+  .card-description {
+    font-size: 13px;
+  }
+}
+
+/* 暗色模式 */
+body.dark-mode .status-card {
+  background: rgba(44, 44, 44, 0.95);
+}
+
+body.dark-mode .user-name,
+body.dark-mode .guest-title,
+body.dark-mode .card-title {
+  color: #e0e0e0;
+}
+
+body.dark-mode .guest-description,
+body.dark-mode .card-description {
+  color: #b0b0b0;
+}
+
+body.dark-mode .access-card {
+  background: rgba(44, 44, 44, 0.95);
+}
+
+body.dark-mode .access-card:hover {
+  background: rgba(54, 54, 54, 0.95);
 }
 </style>
