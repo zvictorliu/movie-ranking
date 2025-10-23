@@ -319,22 +319,23 @@ export default {
   align-items: center;
   gap: 5px;
   padding: 8px 16px;
-  border: 2px solid #ddd;
+  border: 2px solid rgba(102, 126, 234, 0.3);
   border-radius: 8px;
   background: white;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
+  color: #667eea;
 }
 
 .view-btn:hover {
-  border-color: #007bff;
-  background: #f8f9fa;
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .view-btn.active {
-  border-color: #007bff;
-  background: #007bff;
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
@@ -352,7 +353,7 @@ export default {
   width: 80%;
   max-width: 400px;
   padding: 12px 16px;
-  border: 2px solid #ddd;
+  border: 2px solid rgba(102, 126, 234, 0.3);
   border-radius: 8px;
   font-size: 16px;
   outline: none;
@@ -360,8 +361,8 @@ export default {
 }
 
 .search-input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
 .search-input::placeholder {
@@ -381,10 +382,18 @@ export default {
   align-items: center; /* 居中对齐 */
   text-align: center;
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  transition: all 0.3s ease;
+  background: white;
   /* 不设置固定高度，让内容决定高度 */
+}
+
+.actor-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
 }
 
 .actor-cover {
@@ -415,7 +424,7 @@ export default {
 }
 
 .actor-name:hover {
-  color: #007bff;
+  color: #667eea;
 }
 
 /* 悬浮的喜爱度控件 */
@@ -507,23 +516,23 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
   border-radius: 12px;
-  border: 2px dashed #dee2e6;
-  color: #6c757d;
+  border: 2px dashed rgba(102, 126, 234, 0.3);
+  color: #667eea;
 }
 
 .loading .material-icons {
   font-size: 48px;
   margin-bottom: 16px;
-  color: #007bff;
+  color: #667eea;
   animation: spin 2s linear infinite;
 }
 
 .no-results .material-icons {
   font-size: 48px;
   margin-bottom: 16px;
-  color: #adb5bd;
+  color: #764ba2;
 }
 
 .loading p,
@@ -543,10 +552,11 @@ export default {
 }
 
 .favorite-level {
-  border: 1px solid #e0e0e0;
+  border: 2px solid rgba(102, 126, 234, 0.2);
   border-radius: 12px;
   padding: 20px;
-  background: #fafafa;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 .level-header {
@@ -555,7 +565,7 @@ export default {
   align-items: center;
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
   flex-wrap: nowrap;
   gap: 10px;
 }
@@ -565,9 +575,10 @@ export default {
   align-items: center;
   gap: 8px;
   margin: 0;
-  color: #333;
+  color: #667eea;
   font-size: 18px;
   flex-shrink: 0;
+  font-weight: 600;
 }
 
 .favorite-level-indicator {
@@ -607,12 +618,12 @@ export default {
 }
 
 .collapse-btn:hover {
-  background: #f0f0f0;
+  background: rgba(102, 126, 234, 0.1);
   transform: scale(1.1);
 }
 
 .collapse-btn .material-icons {
-  color: #666;
+  color: #667eea;
   font-size: 20px;
   transition: transform 0.3s ease;
 }

@@ -267,13 +267,16 @@ export default {
 
 .posts-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #667eea;
   margin-bottom: 10px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
 }
 
 .posts-header p {
   font-size: 1.1rem;
-  color: #666;
+  color: #764ba2;
+  font-weight: 500;
 }
 
 .filter-container {
@@ -282,6 +285,10 @@ export default {
   margin-bottom: 30px;
   align-items: center;
   flex-wrap: wrap;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.15);
 }
 
 .search-box {
@@ -304,15 +311,16 @@ export default {
   background: white;
   border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 1px solid #e8e8e8;
+  border: 2px solid rgba(102, 126, 234, 0.15);
 }
 
 .post-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
 }
 
 .post-header {
@@ -321,7 +329,7 @@ export default {
 
 .post-title {
   font-size: 1.4rem;
-  color: #333;
+  color: #667eea;
   margin-bottom: 10px;
   line-height: 1.4;
   font-weight: 600;
@@ -331,7 +339,7 @@ export default {
   display: flex;
   gap: 20px;
   font-size: 0.9rem;
-  color: #666;
+  color: #764ba2;
   align-items: center;
 }
 
@@ -418,25 +426,35 @@ body.dark-mode .posts-container {
 }
 
 body.dark-mode .posts-header h1 {
-  color: #e0e0e0;
+  color: #a8b5f0;
 }
 
 body.dark-mode .posts-header p {
-  color: #b0b0b0;
+  color: #c8a5d8;
+}
+
+body.dark-mode .filter-container {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.3);
 }
 
 body.dark-mode .post-card {
   background-color: #2d2d2d;
-  border-color: #404040;
+  border-color: rgba(168, 181, 240, 0.3);
   color: #e0e0e0;
+}
+
+body.dark-mode .post-card:hover {
+  border-color: #a8b5f0;
+  box-shadow: 0 8px 25px rgba(168, 181, 240, 0.2);
 }
 
 body.dark-mode .post-title {
-  color: #e0e0e0;
+  color: #a8b5f0;
 }
 
 body.dark-mode .post-meta {
-  color: #b0b0b0;
+  color: #c8a5d8;
 }
 
 body.dark-mode .post-excerpt {

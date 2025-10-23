@@ -256,12 +256,15 @@ export default {
 .imgbed-header h1 {
   font-size: 32px;
   margin-bottom: 10px;
-  color: #333;
+  color: #667eea;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
 }
 
 .imgbed-header p {
   font-size: 16px;
-  color: #666;
+  color: #764ba2;
+  font-weight: 500;
 }
 
 .toolbar {
@@ -271,6 +274,10 @@ export default {
   margin-bottom: 30px;
   gap: 20px;
   flex-wrap: wrap;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.15);
 }
 
 .search-box {
@@ -286,8 +293,9 @@ export default {
 }
 
 .image-count {
-  color: #666;
+  color: #764ba2;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .images-grid {
@@ -299,15 +307,17 @@ export default {
 
 .image-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
   transition: all 0.3s ease;
+  border: 2px solid rgba(102, 126, 234, 0.15);
 }
 
 .image-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
   transform: translateY(-2px);
+  border-color: #667eea;
 }
 
 .image-preview {
@@ -430,16 +440,17 @@ export default {
 .preview-info {
   width: 100%;
   max-width: 100%;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
   padding: 20px;
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden;
+  border: 2px solid rgba(102, 126, 234, 0.15);
 }
 
 .preview-info p {
   margin: 8px 0;
-  color: #666;
+  color: #764ba2;
   word-break: break-all;
   overflow-wrap: break-word;
   font-size: 14px;
@@ -447,9 +458,10 @@ export default {
 }
 
 .preview-info strong {
-  color: #333;
+  color: #667eea;
   margin-right: 8px;
   white-space: nowrap;
+  font-weight: 600;
 }
 
 /* 响应式设计 */
@@ -499,24 +511,31 @@ export default {
 
 /* 暗色主题 */
 body.dark-mode .imgbed-header h1 {
-  color: #e0e0e0;
+  color: #a8b5f0;
 }
 
 body.dark-mode .imgbed-header p {
-  color: #b0b0b0;
+  color: #c8a5d8;
+}
+
+body.dark-mode .toolbar {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.3);
 }
 
 body.dark-mode .image-count {
-  color: #b0b0b0;
+  color: #c8a5d8;
 }
 
 body.dark-mode .image-card {
   background: #2c2c2c;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  border-color: rgba(168, 181, 240, 0.3);
 }
 
 body.dark-mode .image-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  border-color: #a8b5f0;
 }
 
 body.dark-mode .image-preview {
@@ -524,26 +543,27 @@ body.dark-mode .image-preview {
 }
 
 body.dark-mode .image-filename {
-  color: #e0e0e0;
+  color: #a8b5f0;
 }
 
 body.dark-mode .image-meta {
-  color: #888;
+  color: #c8a5d8;
 }
 
 body.dark-mode .preview-info {
-  background: #2c2c2c;
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.3);
 }
 
 body.dark-mode .preview-info p {
-  color: #b0b0b0;
+  color: #c8a5d8;
 }
 
 body.dark-mode .preview-info strong {
-  color: #e0e0e0;
+  color: #a8b5f0;
 }
 
 body.dark-mode .copy-button:hover {
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(168, 181, 240, 0.4);
 }
 </style>
