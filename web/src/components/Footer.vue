@@ -28,11 +28,11 @@
 
 <style scoped>
 .app-footer {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   color: white;
   padding: 30px 20px;
   margin-top: auto;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .footer-content {
@@ -133,16 +133,5 @@
   }
 }
 
-/* 暗色模式 */
-body.dark-mode .app-footer {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-}
-
-body.dark-mode .footer-link {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-body.dark-mode .footer-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
+/* Dark mode styles are now handled by CSS variables */
 </style>

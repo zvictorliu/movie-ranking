@@ -59,8 +59,11 @@
             </div>
           </div>
 
-          <!-- 主题切换 -->
-          <button class="theme-toggle" @click="toggleTheme">
+          <!-- 主题样式切换器 -->
+          <ThemeSwitcher />
+
+          <!-- 暗色模式切换 -->
+          <button class="theme-toggle" @click="toggleTheme" title="切换暗色/亮色模式">
             <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
           </button>
         </div>
@@ -365,18 +368,22 @@
 
 <script>
 import { useViewStore } from '../store/view'
+import { useThemeStore } from '../store/theme'
 import axios from 'axios'
 import { UploadFilled } from '@element-plus/icons-vue'
+import ThemeSwitcher from './ThemeSwitcher.vue'
+
 export default {
   name: 'AppHeader',
   components: {
+    ThemeSwitcher,
     UploadFilled,
   },
   data() {
     return {
       isMobile: false, // 是否显示菜单按钮
       isMenuOpen: false, // 菜单是否展开
-      isDarkMode: false, // 是否启用夜间模式
+      isDarkMode: false, // 是否启用夜间模式（从 themeStore 同步）
       movieDialogVisible: false, // 控制浮动窗口的显示状态
       movieFormData: {
         title: '',
@@ -420,7 +427,8 @@ export default {
   },
   setup() {
     const viewStore = useViewStore()
-    return { viewStore }
+    const themeStore = useThemeStore()
+    return { viewStore, themeStore }
   },
   methods: {
     goToHome() {
@@ -453,8 +461,8 @@ export default {
       this.isMenuOpen = !this.isMenuOpen // 切换菜单状态
     },
     toggleTheme() {
-      this.isDarkMode = !this.isDarkMode // 切换夜间模式
-      document.body.classList.toggle('dark-mode', this.isDarkMode) // 动态切换 body 的主题类 [[7]]
+      this.themeStore.toggleDarkMode() // 使用 themeStore 切换暗色模式
+      this.isDarkMode = this.themeStore.darkMode // 同步本地状态
     },
     toggleCreateMenu() {
       this.isCreateMenuOpen = !this.isCreateMenuOpen
@@ -763,6 +771,8 @@ export default {
     window.addEventListener('resize', this.checkScreenWidth) // 监听窗口大小变化
     // 添加点击外部关闭下拉菜单的监听器
     document.addEventListener('click', this.handleClickOutside)
+    // 从 themeStore 同步暗色模式状态
+    this.isDarkMode = this.themeStore.darkMode
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.checkScreenWidth) // 移除监听器
@@ -773,11 +783,11 @@ export default {
 
 <style scoped>
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   padding: 10px 0 0 0;
   align-items: center;
   display: flex;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -946,9 +956,9 @@ export default {
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   min-width: 160px;
   z-index: 1000;
   overflow: hidden;
@@ -961,16 +971,16 @@ export default {
   padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .create-menu-item:hover {
-  background-color: #f5f5f5;
+  background-color: var(--bg-secondary);
 }
 
 .create-menu-item .material-icons {
   font-size: 20px;
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 /* 移动端样式 */
@@ -990,14 +1000,14 @@ export default {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #333;
+  color: var(--text-primary);
   width: 100%;
   box-sizing: border-box;
   height: 48px;
 }
 
 .nav-icons-mobile .nav-icon:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-secondary);
   transform: translateY(-2px);
 }
 
@@ -1016,8 +1026,8 @@ export default {
   gap: 15px;
   align-items: center;
   padding-top: 15px;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
   width: 100%;
 }
 
@@ -1064,7 +1074,7 @@ export default {
   display: flex; /* 展开时显示 */
   flex-direction: column; /* 垂直排列 */
   align-items: center; /* 居中对齐 */
-  border-top: 2px solid #f0f0f0; /* 上边框颜色 */
+  border-top: 2px solid var(--border-light); /* 上边框颜色 */
   gap: 10px; /* 设置下拉菜单项之间的间距 */
 }
 
@@ -1084,111 +1094,23 @@ export default {
   color: #42b983; /* 鼠标悬停时改变颜色 */
 }
 
-body.dark-mode .title {
-  color: white;
-}
-
-body.dark-mode .app-header {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-}
-
-body.dark-mode .header-nav .nav-link,
-body.dark-mode .header-nav .new-button,
-body.dark-mode .theme-toggle,
-body.dark-mode .menu-button {
-  color: white;
-}
-
-body.dark-mode .dropdown-menu .nav-link,
-body.dark-mode .dropdown-menu .new-button {
-  color: #e0e0e0;
-}
-body.dark-mode .dropdown-menu {
-  border-top: 2px solid #3a3b3d; /* 夜间模式下的上边框颜色 */
-}
-
-/* 夜间模式下的新样式 */
-body.dark-mode .nav-icon {
-  color: white;
-}
-
-body.dark-mode .nav-icon:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-body.dark-mode .create-menu {
-  background-color: #2c2c2c;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .create-menu-item {
-  color: #a9a9b3;
-}
-
-body.dark-mode .create-menu-item:hover {
-  background-color: #3a3a3a;
-}
-
-body.dark-mode .create-menu-item .material-icons {
-  color: #888;
-}
-
-body.dark-mode .nav-icons-mobile .nav-icon {
-  color: #a9a9b3;
-}
-
-body.dark-mode .nav-icons-mobile .nav-icon:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-body.dark-mode .nav-text {
-  color: #a9a9b3;
-}
-
-body.dark-mode .action-area-mobile {
-  border-top: 1px solid #3a3b3d;
-  border-bottom: 1px solid #3a3b3d;
-}
-
-body.dark-mode .action-area-mobile .new-button {
-  background-color: #42b983;
-}
-
-body.dark-mode .action-area-mobile .new-button:hover {
-  background-color: #3aa876;
-}
-
-body.dark-mode .button-text {
-  color: white;
-}
+/* Dark mode styles are now handled by CSS variables */
 
 .slug-preview {
   margin-top: 5px;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 12px;
-}
-
-body.dark-mode .slug-preview {
-  color: #b0b0b0;
 }
 
 .selected-actors {
   margin-top: 5px;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 12px;
-}
-
-body.dark-mode .selected-actors {
-  color: #b0b0b0;
 }
 
 .filename-preview {
   margin-top: 5px;
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 12px;
-}
-
-body.dark-mode .filename-preview {
-  color: #b0b0b0;
 }
 </style>

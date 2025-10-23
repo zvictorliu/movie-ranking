@@ -7,6 +7,8 @@ import { createPinia } from 'pinia'
 
 // 导入共享样式
 import './styles/article-title.scss'
+// 导入主题样式
+import './assets/themes.css'
 
 // 创建 Vue 应用实例
 const app = createApp(App)
@@ -41,6 +43,11 @@ app.config.globalProperties.$eventBus = eventBus
 app.use(ElementPlus)
 app.use(router)
 app.use(pinia)
+
+// 初始化主题
+import { useThemeStore } from './store/theme'
+const themeStore = useThemeStore()
+themeStore.initTheme()
 
 // 挂载应用
 app.mount('#app')

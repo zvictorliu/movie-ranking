@@ -1,0 +1,241 @@
+/* ========================================
+   主题变量定义
+   ======================================== */
+
+/* 渐变紫色主题 (默认) */
+.theme-gradient {
+  /* 主色调 */
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* 背景 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-gradient-light: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.05) 0%,
+    rgba(118, 75, 162, 0.05) 100%
+  );
+  --bg-gradient-medium: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
+
+  /* 文字颜色 */
+  --text-primary: #333333;
+  --text-secondary: #555555;
+  --text-tertiary: #666666;
+  --text-muted: #999999;
+  --text-accent: #667eea;
+
+  /* 边框 */
+  --border-light: rgba(102, 126, 234, 0.15);
+  --border-medium: rgba(102, 126, 234, 0.3);
+  --border-strong: rgba(102, 126, 234, 0.5);
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(102, 126, 234, 0.1);
+  --shadow-md: 0 4px 12px rgba(102, 126, 234, 0.15);
+  --shadow-lg: 0 6px 20px rgba(102, 126, 234, 0.25);
+  --shadow-hover: 0 8px 25px rgba(102, 126, 234, 0.3);
+
+  /* 按钮 */
+  --btn-primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --btn-primary-hover: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  --btn-primary-text: #ffffff;
+
+  /* 卡片 */
+  --card-bg: #ffffff;
+  --card-border: rgba(102, 126, 234, 0.2);
+  --card-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  --card-hover-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+
+  /* 输入框 */
+  --input-border: rgba(102, 126, 234, 0.3);
+  --input-focus-border: #667eea;
+  --input-focus-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* 简洁黑白主题 */
+.theme-minimal {
+  /* 主色调 */
+  --primary-color: #000000;
+  --secondary-color: #333333;
+  --primary-gradient: linear-gradient(135deg, #000000 0%, #333333 100%);
+
+  /* 背景 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f8;
+  --bg-gradient-light: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.02) 0%,
+    rgba(0, 0, 0, 0.03) 100%
+  );
+  --bg-gradient-medium: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+
+  /* 文字颜色 */
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
+  --text-muted: #999999;
+  --text-accent: #000000;
+
+  /* 边框 */
+  --border-light: rgba(0, 0, 0, 0.1);
+  --border-medium: rgba(0, 0, 0, 0.2);
+  --border-strong: rgba(0, 0, 0, 0.4);
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+  /* 按钮 */
+  --btn-primary-bg: #000000;
+  --btn-primary-hover: #333333;
+  --btn-primary-text: #ffffff;
+
+  /* 卡片 */
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.15);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --card-hover-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+  /* 输入框 */
+  --input-border: rgba(0, 0, 0, 0.2);
+  --input-focus-border: #000000;
+  --input-focus-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   暗色模式变量
+   ======================================== */
+
+/* 渐变紫色主题 - 暗色模式 */
+.theme-gradient.dark-mode {
+  /* 主色调 */
+  --primary-color: #a8b5f0;
+  --secondary-color: #c8a5d8;
+  --primary-gradient: linear-gradient(135deg, #5a6db8 0%, #6d5a8e 100%);
+
+  /* 背景 */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-gradient-light: linear-gradient(
+    135deg,
+    rgba(168, 181, 240, 0.05) 0%,
+    rgba(200, 165, 216, 0.05) 100%
+  );
+  --bg-gradient-medium: linear-gradient(
+    135deg,
+    rgba(168, 181, 240, 0.1) 0%,
+    rgba(200, 165, 216, 0.1) 100%
+  );
+
+  /* 文字颜色 */
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #999999;
+  --text-muted: #666666;
+  --text-accent: #a8b5f0;
+
+  /* 边框 */
+  --border-light: rgba(168, 181, 240, 0.15);
+  --border-medium: rgba(168, 181, 240, 0.3);
+  --border-strong: rgba(168, 181, 240, 0.5);
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.6);
+
+  /* 按钮 */
+  --btn-primary-bg: linear-gradient(135deg, #5a6db8 0%, #6d5a8e 100%);
+  --btn-primary-hover: linear-gradient(135deg, #6d5a8e 0%, #5a6db8 100%);
+  --btn-primary-text: #ffffff;
+
+  /* 卡片 */
+  --card-bg: #2d2d2d;
+  --card-border: rgba(168, 181, 240, 0.3);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --card-hover-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+
+  /* 输入框 */
+  --input-border: rgba(168, 181, 240, 0.3);
+  --input-focus-border: #a8b5f0;
+  --input-focus-shadow: 0 0 0 3px rgba(168, 181, 240, 0.2);
+}
+
+/* 简洁黑白主题 - 暗色模式 */
+.theme-minimal.dark-mode {
+  /* 主色调 */
+  --primary-color: #ffffff;
+  --secondary-color: #e0e0e0;
+  --primary-gradient: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+
+  /* 背景 */
+  --bg-primary: #000000;
+  --bg-secondary: #1a1a1a;
+  --bg-gradient-light: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  --bg-gradient-medium: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+
+  /* 文字颜色 */
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #b0b0b0;
+  --text-muted: #666666;
+  --text-accent: #ffffff;
+
+  /* 边框 */
+  --border-light: rgba(255, 255, 255, 0.1);
+  --border-medium: rgba(255, 255, 255, 0.2);
+  --border-strong: rgba(255, 255, 255, 0.4);
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(255, 255, 255, 0.05);
+  --shadow-md: 0 4px 12px rgba(255, 255, 255, 0.08);
+  --shadow-lg: 0 6px 20px rgba(255, 255, 255, 0.1);
+  --shadow-hover: 0 8px 25px rgba(255, 255, 255, 0.12);
+
+  /* 按钮 */
+  --btn-primary-bg: #ffffff;
+  --btn-primary-hover: #e0e0e0;
+  --btn-primary-text: #000000;
+
+  /* 卡片 */
+  --card-bg: #1a1a1a;
+  --card-border: rgba(255, 255, 255, 0.15);
+  --card-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  --card-hover-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+
+  /* 输入框 */
+  --input-border: rgba(255, 255, 255, 0.2);
+  --input-focus-border: #ffffff;
+  --input-focus-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   全局样式应用
+   ======================================== */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
