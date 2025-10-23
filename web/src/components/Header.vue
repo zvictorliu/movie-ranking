@@ -773,10 +773,14 @@ export default {
 
 <style scoped>
 .app-header {
-  background-color: #f8f8f8;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 10px 0 0 0;
   align-items: center;
   display: flex;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .header-wrapper {
@@ -791,26 +795,43 @@ export default {
 }
 
 .title {
-  color: black;
+  color: white;
   font-size: 24px;
   margin: 10px 20px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .menu-button {
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.2);
   border: none;
-  color: black;
+  color: white;
   font-size: 18px;
   cursor: pointer;
-  margin-left: auto; /* 将菜单按钮推到右侧 */
+  margin-left: auto;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .theme-toggle {
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.2);
   border: none;
-  color: black;
+  color: white;
   font-size: 24px;
   cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: rotate(15deg);
 }
 
 .material-icons {
@@ -865,11 +886,11 @@ export default {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #333;
+  color: white;
 }
 
 .nav-icon:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
@@ -894,18 +915,21 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #42b983;
+  background-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .create-button:hover {
-  background-color: #3aa876;
+  background-color: rgba(255, 255, 255, 0.35);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .create-text {
@@ -1061,23 +1085,23 @@ export default {
 }
 
 body.dark-mode .title {
-  color: #a9a9b3;
+  color: white;
 }
 
 body.dark-mode .app-header {
-  background-color: #252627;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
 }
 
 body.dark-mode .header-nav .nav-link,
 body.dark-mode .header-nav .new-button,
-body.dark-mode .theme-toggle {
-  color: #a9a9b3;
+body.dark-mode .theme-toggle,
+body.dark-mode .menu-button {
+  color: white;
 }
 
 body.dark-mode .dropdown-menu .nav-link,
-body.dark-mode .dropdown-menu .new-button,
-body.dark-mode .menu-button {
-  color: #a9a9b3;
+body.dark-mode .dropdown-menu .new-button {
+  color: #e0e0e0;
 }
 body.dark-mode .dropdown-menu {
   border-top: 2px solid #3a3b3d; /* 夜间模式下的上边框颜色 */
@@ -1085,11 +1109,11 @@ body.dark-mode .dropdown-menu {
 
 /* 夜间模式下的新样式 */
 body.dark-mode .nav-icon {
-  color: #a9a9b3;
+  color: white;
 }
 
 body.dark-mode .nav-icon:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 body.dark-mode .create-menu {
