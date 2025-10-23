@@ -444,7 +444,9 @@ export default {
       this.isMenuOpen = false // 关闭菜单
     },
     goToImgbed() {
-      this.$router.push({ name: 'ImgbedPage' }) // 跳转到图床管理页面
+      // 在新窗口打开图床管理页面
+      const route = this.$router.resolve({ name: 'ImgbedPage' })
+      window.open(route.href, '_blank')
       this.isMenuOpen = false // 关闭菜单
     },
     toggleMenu() {
