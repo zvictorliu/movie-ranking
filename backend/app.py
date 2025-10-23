@@ -25,6 +25,7 @@ COVER_FOLDER = 'covers'
 MOVIE_COVER_FOLDER = os.path.join(COVER_FOLDER, 'movie-cover')
 ACTOR_COVER_FOLDER = os.path.join(COVER_FOLDER, 'actor-cover')
 POST_COVER_FOLDER = os.path.join(COVER_FOLDER, 'post-cover')
+IMGBED_FOLDER = os.path.join(CONTENT_FOLDER, 'imgbed')
 
 def parse_movie_files():
     """
@@ -869,62 +870,74 @@ def upload_image():
         # 检查是否有文件上传
         if 'image' not in request.files:
             return jsonify({"success": False, "message": "没有选择图片文件"}), 400
-        
+
         file = request.files['image']
         name = request.form.get('name', '')
         image_type = request.form.get('type', '')
-        
+
         # 验证文件
         if file.filename == '':
             return jsonify({"success": False, "message": "没有选择文件"}), 400
-        
-        if not name.strip():
-            return jsonify({"success": False, "message": "请输入图片名称"}), 400
-        
-        if not image_type or image_type not in ['actor', 'movie', 'post']:
+
+        if not image_type or image_type not in ['actor', 'movie', 'post', 'imgbed']:
             return jsonify({"success": False, "message": "请选择正确的图片类型"}), 400
-        
+
         # 检查文件类型
         allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
         if not file.filename.lower().endswith(tuple('.' + ext for ext in allowed_extensions)):
             return jsonify({"success": False, "message": "不支持的文件类型"}), 400
-        
-        # 生成文件名，保持原始文件的后缀，如果存在同名文件则覆盖
+
+        # 生成文件名
         file_extension = os.path.splitext(file.filename)[1].lower()
-        filename = name + file_extension
-        
+
+        # 对于 imgbed 类型，如果没有提供名称则使用原始文件名（不含扩展名）
+        if image_type == 'imgbed':
+            if not name.strip():
+                # 使用原始文件名（不含扩展名）
+                name = os.path.splitext(file.filename)[0]
+            filename = name + file_extension
+        else:
+            # 其他类型必须提供名称
+            if not name.strip():
+                return jsonify({"success": False, "message": "请输入图片名称"}), 400
+            filename = name + file_extension
+
         # 根据类型确定保存路径
         if image_type == 'actor':
             save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
         elif image_type == 'post':
             save_folder = os.path.join(CONTENT_FOLDER, POST_COVER_FOLDER)
+        elif image_type == 'imgbed':
+            save_folder = IMGBED_FOLDER
         else:  # movie
             save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
-        
+
         # 确保文件夹存在
         os.makedirs(save_folder, exist_ok=True)
-        
+
         # 保存文件（如果存在同名文件则覆盖）
         file_path = os.path.join(save_folder, filename)
         file.save(file_path)
-        
+
         print(f"图片上传成功: {file_path}")
-        
+
         # 确定返回的路径
         if image_type == 'actor':
             return_path = f"/imgs/{ACTOR_COVER_FOLDER}/{filename}"
         elif image_type == 'post':
             return_path = f"/imgs/{POST_COVER_FOLDER}/{filename}"
+        elif image_type == 'imgbed':
+            return_path = f"/imgs/imgbed/{filename}"
         else:  # movie
             return_path = f"/imgs/{MOVIE_COVER_FOLDER}/{filename}"
-        
+
         return jsonify({
-            "success": True, 
+            "success": True,
             "message": "图片上传成功",
             "filename": filename,
             "path": return_path
         }), 200
-        
+
     except Exception as e:
         print(f"图片上传错误: {str(e)}")
         return jsonify({"success": False, "message": f"上传失败: {str(e)}"}), 500

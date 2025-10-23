@@ -23,6 +23,9 @@
           <span @click="goToPosts" class="nav-icon" title="博客列表页面">
             <span class="material-icons">article</span>
           </span>
+          <span @click="goToImgbed" class="nav-icon" title="图床管理页面">
+            <span class="material-icons">collections</span>
+          </span>
         </div>
 
         <!-- 操作区域 -->
@@ -51,7 +54,7 @@
               </div>
               <div @click="openImageDialog" class="create-menu-item">
                 <span class="material-icons">image</span>
-                <span>上传封面</span>
+                <span>上传图片</span>
               </div>
             </div>
           </div>
@@ -95,6 +98,10 @@
             <span class="material-icons">article</span>
             <span class="nav-text">博客列表</span>
           </span>
+          <span @click="goToImgbed" class="nav-icon" title="图床管理页面">
+            <span class="material-icons">collections</span>
+            <span class="nav-text">图床管理</span>
+          </span>
         </div>
 
         <!-- 操作区域 -->
@@ -111,9 +118,9 @@
             <span class="material-icons">post_add</span>
             <span class="button-text">新建博客</span>
           </button>
-          <button class="new-button" @click="openImageDialog" title="上传封面">
+          <button class="new-button" @click="openImageDialog" title="上传图片">
             <span class="material-icons">image</span>
-            <span class="button-text">上传封面</span>
+            <span class="button-text">上传图片</span>
           </button>
         </div>
         <div class="theme-toggle-mobile">
@@ -127,17 +134,17 @@
     <!-- 上传图片浮动窗口 -->
     <el-dialog v-model="imageDialogVisible" title="上传图片" width="80%">
       <el-form :model="imageFormData" label-width="80px">
-        <el-form-item label="图片名称">
-          <el-input
-            v-model="imageFormData.name"
-            placeholder="请输入图片名称（不需要包含文件后缀）"
-          ></el-input>
-        </el-form-item>
         <el-form-item label="图片类型">
-          <el-select v-model="imageFormData.type" placeholder="请选择图片类型" style="width: 100%">
+          <el-select
+            v-model="imageFormData.type"
+            placeholder="请选择图片类型"
+            style="width: 100%"
+            @change="handleImageTypeChange"
+          >
             <el-option label="演员" value="actor"></el-option>
             <el-option label="影片" value="movie"></el-option>
             <el-option label="博客" value="post"></el-option>
+            <el-option label="图床" value="imgbed"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="选择图片">
@@ -156,6 +163,18 @@
               <div class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
             </template>
           </el-upload>
+        </el-form-item>
+        <el-form-item label="图片名称">
+          <el-input
+            v-model="imageFormData.name"
+            :placeholder="getImageNamePlaceholder()"
+          ></el-input>
+          <div v-if="imageFormData.type === 'imgbed' && selectedImageFile" class="filename-preview">
+            <small
+              >{{ imageFormData.name ? '文件名: ' + imageFormData.name : '文件名: ' + getOriginalFileName()
+              }}{{ getFileExtension() }}</small
+            >
+          </div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -424,6 +443,10 @@ export default {
       this.$router.push({ name: 'PostsPage' }) // 跳转到博客列表页面
       this.isMenuOpen = false // 关闭菜单
     },
+    goToImgbed() {
+      this.$router.push({ name: 'ImgbedPage' }) // 跳转到图床管理页面
+      this.isMenuOpen = false // 关闭菜单
+    },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen // 切换菜单状态
     },
@@ -541,6 +564,37 @@ export default {
     handleImageChange(file) {
       this.selectedImageFile = file.raw
       this.imageFileList = [file]
+      // 如果是图床类型且名称为空，自动填充原始文件名
+      if (this.imageFormData.type === 'imgbed' && !this.imageFormData.name.trim()) {
+        this.imageFormData.name = this.getOriginalFileName()
+      }
+    },
+    handleImageTypeChange() {
+      // 当切换到图床类型时，如果已选择文件且名称为空，自动填充原始文件名
+      if (
+        this.imageFormData.type === 'imgbed' &&
+        this.selectedImageFile &&
+        !this.imageFormData.name.trim()
+      ) {
+        this.imageFormData.name = this.getOriginalFileName()
+      }
+    },
+    getImageNamePlaceholder() {
+      if (this.imageFormData.type === 'imgbed') {
+        return '请输入图片名称（不含扩展名，留空使用原文件名）'
+      }
+      return '请输入图片名称（不需要包含文件后缀）'
+    },
+    getOriginalFileName() {
+      if (!this.selectedImageFile) return ''
+      const filename = this.selectedImageFile.name
+      return filename.substring(0, filename.lastIndexOf('.')) || filename
+    },
+    getFileExtension() {
+      if (!this.selectedImageFile) return ''
+      const filename = this.selectedImageFile.name
+      const lastDot = filename.lastIndexOf('.')
+      return lastDot !== -1 ? filename.substring(lastDot) : ''
     },
     async saveMovie() {
       try {
@@ -611,12 +665,13 @@ export default {
         this.$message.error('请选择要上传的图片！')
         return
       }
-      if (!this.imageFormData.name.trim()) {
-        this.$message.error('请输入图片名称！')
-        return
-      }
       if (!this.imageFormData.type) {
         this.$message.error('请选择图片类型！')
+        return
+      }
+      // 对于非图床类型，必须输入名称
+      if (this.imageFormData.type !== 'imgbed' && !this.imageFormData.name.trim()) {
+        this.$message.error('请输入图片名称！')
         return
       }
 
@@ -633,7 +688,7 @@ export default {
         })
 
         if (response.data.success) {
-          this.$message.success('图片上传成功！')
+          this.$message.success(`图片上传成功！路径: ${response.data.path}`)
           this.imageDialogVisible = false
           this.resetImageForm()
           // 触发页面刷新事件
@@ -1098,6 +1153,16 @@ body.dark-mode .slug-preview {
 }
 
 body.dark-mode .selected-actors {
+  color: #b0b0b0;
+}
+
+.filename-preview {
+  margin-top: 5px;
+  color: #666;
+  font-size: 12px;
+}
+
+body.dark-mode .filename-preview {
   color: #b0b0b0;
 }
 </style>
