@@ -345,9 +345,12 @@ export default {
 
 <style scoped>
 .post-detail-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
 .loading-container {
@@ -358,9 +361,31 @@ export default {
   margin-bottom: 30px;
 }
 
+.back-button :deep(.el-button) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.back-button :deep(.el-button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
 .post-header {
   margin-bottom: 40px;
   text-align: center;
+}
+
+.post-header h1 {
+  color: #667eea;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* title-container 基础样式已移至 article-title.scss */
@@ -381,16 +406,25 @@ export default {
   display: flex;
   justify-content: center;
   gap: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   flex-wrap: wrap;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
 }
 
 .meta-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
+  color: #667eea;
   font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.meta-item span {
+  color: #555;
 }
 
 .post-tags {
@@ -402,6 +436,14 @@ export default {
 
 .tag-item {
   font-size: 0.9rem;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.tag-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
 }
 
 .post-excerpt {
@@ -409,23 +451,31 @@ export default {
 }
 
 .post-excerpt blockquote {
-  background: #f8f9fa;
-  border-left: 4px solid #007bff;
-  padding: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  border-left: 4px solid #667eea;
+  padding: 25px;
   margin: 0;
   font-style: italic;
   color: #555;
   font-size: 1.1rem;
-  line-height: 1.6;
+  line-height: 1.8;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
 .post-body {
   margin-bottom: 60px;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 .post-footer {
-  border-top: 1px solid #eee;
+  border-top: 2px solid rgba(102, 126, 234, 0.2);
   padding-top: 40px;
+  margin-top: 40px;
 }
 
 .share-section {
@@ -433,19 +483,38 @@ export default {
 }
 
 .share-section h3 {
-  margin-bottom: 15px;
-  color: #333;
+  margin-bottom: 20px;
+  color: #667eea;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .share-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
+.share-buttons :deep(.el-button) {
+  transition: all 0.3s ease;
+}
+
+.share-buttons :deep(.el-button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .related-posts h3 {
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 25px;
+  color: #667eea;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .related-posts-list {
@@ -454,35 +523,40 @@ export default {
 }
 
 .related-post-item {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  padding: 25px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
 .related-post-item:hover {
-  background: #e9ecef;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
 }
 
 .related-post-item h4 {
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 1.1rem;
+  color: #667eea;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .related-post-item p {
-  color: #666;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  color: #555;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .related-post-date {
   color: #999;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  font-style: italic;
 }
 
 .error-container {
@@ -493,10 +567,10 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .post-detail-container {
-    padding: 15px;
+    padding: 20px;
   }
 
-  .post-title {
+  .post-header h1 {
     font-size: 2rem;
   }
 
@@ -517,35 +591,81 @@ export default {
 
 /* 暗色模式支持 */
 body.dark-mode .post-detail-container {
-  background-color: #1a1a1a;
-  color: #e0e0e0;
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-body.dark-mode .post-title {
-  color: #e0e0e0;
+body.dark-mode .post-header h1 {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .back-button :deep(.el-button) {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+}
+
+body.dark-mode .post-meta {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.2);
 }
 
 body.dark-mode .meta-item {
+  color: #a8b5f0;
+}
+
+body.dark-mode .meta-item span {
   color: #b0b0b0;
 }
 
+body.dark-mode .tag-item {
+  border-color: rgba(168, 181, 240, 0.3);
+}
+
+body.dark-mode .tag-item:hover {
+  border-color: #a8b5f0;
+}
+
 body.dark-mode .post-excerpt blockquote {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-left-color: #a8b5f0;
+  color: #b0b0b0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .post-body {
   background: #2d2d2d;
-  color: #c0c0c0;
+  border-color: rgba(168, 181, 240, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .post-footer {
+  border-top-color: rgba(168, 181, 240, 0.3);
+}
+
+body.dark-mode .share-section h3,
+body.dark-mode .related-posts h3 {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 body.dark-mode .related-post-item {
-  background: #2d2d2d;
-  border-color: #404040;
-  color: #e0e0e0;
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 body.dark-mode .related-post-item:hover {
-  background: #404040;
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.15) 0%, rgba(200, 165, 216, 0.15) 100%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border-color: #a8b5f0;
 }
 
 body.dark-mode .related-post-item h4 {
-  color: #e0e0e0;
+  color: #a8b5f0;
 }
 
 body.dark-mode .related-post-item p {

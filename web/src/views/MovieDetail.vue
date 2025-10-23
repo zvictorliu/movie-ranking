@@ -242,23 +242,62 @@ export default {
 /* title-container 样式已移至 article-title.scss */
 
 .movie-detail {
-  padding: 0 10px;
-  max-width: 600px;
+  padding: 20px;
+  max-width: 800px;
   margin: auto;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.movie-detail h1 {
+  color: #667eea;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.movie-detail p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.movie-detail strong {
+  color: #667eea;
+  font-weight: 600;
 }
 
 .actor-tag {
-  margin-right: 5px;
+  margin-right: 8px;
+  margin-bottom: 5px;
   cursor: pointer;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.actor-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
 }
 
 .tag-item {
-  margin-right: 5px;
+  margin-right: 8px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
 }
 
 .tag-item:hover {
   cursor: pointer;
-  background-color: #f0f0f0; /* 鼠标悬停时的背景色 */
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
 }
 
 .cover {
@@ -266,40 +305,77 @@ export default {
   aspect-ratio: 16 / 9;
   object-fit: cover;
   margin-top: 20px;
+  border-radius: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transition: all 0.3s ease;
 }
+
+.cover:hover {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  transform: translateY(-2px);
+}
+
 .navigation {
-  margin-top: 20px;
+  margin-top: 30px;
   display: flex;
-  gap: 10px;
+  gap: 15px;
   justify-content: center;
 }
+
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   cursor: pointer;
   position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
 button:disabled {
-  background-color: #ccc;
+  background: #ccc;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+button:disabled:hover {
+  transform: none;
 }
 
 .content {
-  margin-top: 20px;
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 .rating {
   display: flex;
   align-items: center;
-  gap: 2px; /* 星星之间的间距 */
+  gap: 5px;
+  margin-bottom: 15px;
 }
 
 .star {
-  font-size: 20px; /* 星星图标的大小 */
-  color: #ccc; /* 默认颜色为灰色 */
+  font-size: 24px;
+  color: #ddd;
+  transition: all 0.2s ease;
 }
 
 .star .material-icons.filled {
-  color: #ffca28; /* 填充的星星颜色为黄色 */
+  color: #ffca28;
+  text-shadow: 0 2px 4px rgba(255, 202, 40, 0.3);
 }
 
 /* 编辑按钮样式已移至 article-title.scss */
@@ -314,5 +390,52 @@ button:disabled {
 :deep(.body-editor-dialog .el-dialog__body) {
   height: calc(90vh - 120px);
   padding: 0;
+}
+
+/* 暗色模式 */
+body.dark-mode .movie-detail {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .movie-detail h1 {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .movie-detail p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .movie-detail strong {
+  color: #a8b5f0;
+}
+
+body.dark-mode .cover {
+  border-color: rgba(168, 181, 240, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .content {
+  background: #2d2d2d;
+  border-color: rgba(168, 181, 240, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode button {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+}
+
+body.dark-mode .actor-tag,
+body.dark-mode .tag-item {
+  border-color: rgba(168, 181, 240, 0.3);
+}
+
+body.dark-mode .actor-tag:hover,
+body.dark-mode .tag-item:hover {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.15) 0%, rgba(200, 165, 216, 0.15) 100%);
+  border-color: #a8b5f0;
 }
 </style>

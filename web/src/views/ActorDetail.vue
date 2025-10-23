@@ -171,12 +171,34 @@ export default {
 <style scoped>
 .actor-detail {
   text-align: left;
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.actor-detail h1 {
+  color: #667eea;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.actor-detail p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.actor-detail strong {
+  color: #667eea;
+  font-weight: 600;
 }
 
 /* title-container 样式已移至 article-title.scss */
@@ -185,16 +207,43 @@ export default {
   max-width: 100%;
   height: auto;
   margin-top: 20px;
+  border-radius: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transition: all 0.3s ease;
+}
+
+.cover:hover {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  transform: translateY(-2px);
 }
 
 .content {
-  margin-top: 20px;
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   cursor: pointer;
   position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  margin-top: 20px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
 }
 
 /* 编辑按钮样式已移至 article-title.scss */
@@ -203,38 +252,47 @@ button {
 .favorite-section {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 15px 0;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.favorite-section strong {
+  color: #667eea;
 }
 
 .favorite-hearts {
   display: flex;
-  gap: 2px;
+  gap: 5px;
 }
 
 .heart {
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .heart .material-icons {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .heart.filled .material-icons {
-  color: #e91e63; /* 粉色爱心 */
+  color: #e91e63;
+  text-shadow: 0 2px 4px rgba(233, 30, 99, 0.3);
 }
 
 .heart.empty .material-icons {
-  color: #ddd; /* 灰色爱心 */
+  color: #ddd;
 }
 
 .heart:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 .heart:hover .material-icons {
-  color: #e91e63; /* 悬停时显示粉色 */
+  color: #e91e63;
 }
 
 /* 编辑正文对话框样式 */
@@ -245,5 +303,51 @@ button {
 :deep(.body-editor-dialog .el-dialog__body) {
   height: calc(90vh - 120px);
   padding: 0;
+}
+
+/* 暗色模式 */
+body.dark-mode .actor-detail {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .actor-detail h1 {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark-mode .actor-detail p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .actor-detail strong {
+  color: #a8b5f0;
+}
+
+body.dark-mode .cover {
+  border-color: rgba(168, 181, 240, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .content {
+  background: #2d2d2d;
+  border-color: rgba(168, 181, 240, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode button {
+  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
+}
+
+body.dark-mode .favorite-section {
+  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
+  border-color: rgba(168, 181, 240, 0.2);
+}
+
+body.dark-mode .favorite-section strong {
+  color: #a8b5f0;
 }
 </style>
