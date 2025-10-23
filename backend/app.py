@@ -943,6 +943,63 @@ def upload_image():
         return jsonify({"success": False, "message": f"上传失败: {str(e)}"}), 500
 
 
+@app.route('/api/imgbed', methods=['GET'])
+def get_imgbed_images():
+    """
+    API 接口：获取图床中的所有图片列表。
+    """
+    try:
+        images = []
+
+        # 确保图床文件夹存在
+        if not os.path.exists(IMGBED_FOLDER):
+            os.makedirs(IMGBED_FOLDER, exist_ok=True)
+            return jsonify({
+                "success": True,
+                "images": []
+            }), 200
+
+        # 支持的图片扩展名
+        allowed_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+
+        # 遍历图床文件夹中的所有文件
+        for filename in os.listdir(IMGBED_FOLDER):
+            file_path = os.path.join(IMGBED_FOLDER, filename)
+
+            # 只处理文件，跳过目录
+            if not os.path.isfile(file_path):
+                continue
+
+            # 检查文件扩展名
+            _, ext = os.path.splitext(filename)
+            if ext.lower() not in allowed_extensions:
+                continue
+
+            # 获取文件信息
+            file_stat = os.stat(file_path)
+            file_size = file_stat.st_size
+            modified_time = file_stat.st_mtime
+
+            images.append({
+                "filename": filename,
+                "path": f"/imgs/imgbed/{filename}",
+                "size": file_size,
+                "modified_time": modified_time
+            })
+
+        # 按修改时间降序排序（最新的在前面）
+        images.sort(key=lambda x: x['modified_time'], reverse=True)
+
+        return jsonify({
+            "success": True,
+            "images": images
+        }), 200
+
+    except Exception as e:
+        print(f"获取图床图片列表错误: {str(e)}")
+        return jsonify({"success": False, "message": f"获取失败: {str(e)}"}), 500
+
+
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
     """

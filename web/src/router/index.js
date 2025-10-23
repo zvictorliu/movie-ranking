@@ -10,6 +10,7 @@ import TagsPage from '../views/TagsPage.vue' // 引入标签页面
 import TagDetail from '../views/TagDetail.vue' // 引入标签详情页面
 import PostsPage from '../views/PostsPage.vue' // 引入博客列表页面
 import PostsDetail from '../views/PostsDetail.vue' // 引入博客详情页面
+import ImgbedPage from '../views/ImgbedPage.vue' // 引入图床页面
 
 const routes = [
   {
@@ -70,6 +71,12 @@ const routes = [
     path: '/posts/:slug',
     name: 'PostsDetail',
     component: PostsDetail, // 博客详情页面路由
+    meta: { requiresAuth: true }, // 需要认证
+  },
+  {
+    path: '/imgbed',
+    name: 'ImgbedPage',
+    component: ImgbedPage, // 图床页面路由
     meta: { requiresAuth: true }, // 需要认证
   },
 ]
