@@ -2,7 +2,6 @@ from flask import Flask, jsonify, send_from_directory, request  # 导入 Flask �
 from flask_cors import CORS  # 导入 CORS [[2]]
 import os
 import frontmatter
-import markdown
 from pypinyin import lazy_pinyin
 import hashlib
 
@@ -176,21 +175,26 @@ def append_mainwork(actor, movie):
         print(f"Updated {actor}'s main works with {movie}")
 
 
-# 静态资源路由：提供 imgs 文件夹中的图片
 @app.route('/imgs/<path:filename>')
 def serve_image(filename):
     """
     提供对 imgs 文件夹中图片的访问。
     """
     print(f"Serving image: {filename}")
-    imgs_fd = CONTENT_FOLDER
-    if not os.path.exists(os.path.join(imgs_fd, filename)):
-        imgs_fd = f'{MOVIES_FOLDER}/imgs'
-    if not os.path.exists(os.path.join(imgs_fd, filename)):
-        imgs_fd = f'{ACTORS_FOLDER}/imgs'
-    if not os.path.exists(os.path.join(imgs_fd, filename)):
-        imgs_fd = f'{POSTS_FOLDER}/imgs'
-    return send_from_directory(imgs_fd, filename)
+    search_roots = [
+        CONTENT_FOLDER,
+        os.path.join(CONTENT_FOLDER, 'imgbed'),
+        f'{MOVIES_FOLDER}/imgs',
+        f'{ACTORS_FOLDER}/imgs',
+        f'{POSTS_FOLDER}/imgs',
+    ]
+
+    for root in search_roots:
+        if root and os.path.exists(os.path.join(root, filename)):
+            return send_from_directory(root, filename)
+
+    # 默认回退到 CONTENT_FOLDER，即使文件不存在也保持原有逻辑
+    return send_from_directory(CONTENT_FOLDER, filename)
 
 
 @app.route('/api/movies', methods=['GET'])

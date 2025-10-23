@@ -3,6 +3,13 @@
     <template v-for="(item, index) in parsedContent" :key="index">
       <!-- 如果是 MoviePreview 组件 -->
       <MoviePreview v-if="item.type === 'movie-preview'" :title="item.movieTitle" />
+      <!-- 如果是图片 -->
+      <img
+        v-else-if="item.type === 'image'"
+        :src="getImageSrc(item.imageTitle)"
+        :alt="item.imageTitle"
+        class="markdown-inline-image"
+      />
       <!-- 如果是普通 HTML 内容 -->
       <div v-else v-html="item.content" class="markdown-content"></div>
     </template>
@@ -34,14 +41,14 @@ export default {
       // 替换图片路径为绝对路径（全局替换）
       renderedHtml = renderedHtml.replace(/src="\.\/imgs/g, 'src="/imgs')
 
-      // 解析 HTML 内容，分离 MoviePreview 组件和普通内容
+      // 解析 HTML 内容，分离自定义组件和普通内容
       const contentItems = []
-      const moviePreviewRegex = /<movie\s+title=["']([^"']+)["']\s*\/?>/g
+      const customShortcutRegex = /<(movie|img)\s+title=["']([^"']+)["']\s*\/?>/g
       let lastIndex = 0
       let match
 
-      while ((match = moviePreviewRegex.exec(renderedHtml)) !== null) {
-        // 添加 MoviePreview 之前的普通内容
+      while ((match = customShortcutRegex.exec(renderedHtml)) !== null) {
+        // 添加自定义标签之前的普通内容
         if (match.index > lastIndex) {
           const htmlContent = renderedHtml.substring(lastIndex, match.index)
           if (htmlContent.trim()) {
@@ -52,12 +59,20 @@ export default {
           }
         }
 
-        // 添加 MoviePreview 组件
-        const movieTitle = match[1] // 直接获取引号内的内容
-        contentItems.push({
-          type: 'movie-preview',
-          movieTitle: movieTitle,
-        })
+        const tagType = match[1]
+        const tagTitle = match[2]
+
+        if (tagType === 'movie') {
+          contentItems.push({
+            type: 'movie-preview',
+            movieTitle: tagTitle,
+          })
+        } else if (tagType === 'img') {
+          contentItems.push({
+            type: 'image',
+            imageTitle: tagTitle,
+          })
+        }
 
         lastIndex = match.index + match[0].length
       }
@@ -76,6 +91,11 @@ export default {
       return contentItems
     },
   },
+  methods: {
+    getImageSrc(title) {
+      return `/imgs/imgbed/${encodeURIComponent(title)}`
+    },
+  },
 }
 </script>
 
@@ -88,6 +108,13 @@ export default {
   line-height: 1.8;
   font-size: 1.05rem;
   color: #333;
+}
+
+.markdown-inline-image {
+  max-width: 100%;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px;
 }
 
 /* 标题样式 */
