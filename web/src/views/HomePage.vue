@@ -133,7 +133,7 @@ export default {
   width: 100%;
   position: relative;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
 }
 
 /* 动态背景 */
@@ -158,7 +158,7 @@ export default {
 .orb-1 {
   width: 400px;
   height: 400px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   top: -100px;
   left: -100px;
   animation-delay: 0s;
@@ -246,12 +246,12 @@ export default {
 
 /* 状态卡片 */
 .status-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
@@ -265,7 +265,7 @@ export default {
 .user-avatar {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -285,7 +285,7 @@ export default {
 .user-name {
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 5px;
 }
 
@@ -360,13 +360,13 @@ export default {
 .guest-title {
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .guest-description {
   font-size: 16px;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 20px;
 }
 
@@ -375,7 +375,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   color: white;
   border: none;
   border-radius: 12px;
@@ -383,12 +383,12 @@ export default {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  box-shadow: var(--shadow-lg);
 }
 
 .login-btn .material-icons {
@@ -417,13 +417,13 @@ export default {
 }
 
 .access-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   text-align: center;
 }
 
@@ -449,7 +449,7 @@ export default {
 }
 
 .card-icon.movies {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
 }
 
 .card-icon.actors {
@@ -471,13 +471,13 @@ export default {
 .card-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .card-description {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary);
   line-height: 1.5;
 }
 
@@ -516,7 +516,7 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .home-page {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-gradient);
   }
 
   .gradient-orb {
@@ -703,27 +703,4 @@ export default {
   }
 }
 
-/* 暗色模式 */
-body.dark-mode .status-card {
-  background: rgba(44, 44, 44, 0.95);
-}
-
-body.dark-mode .user-name,
-body.dark-mode .guest-title,
-body.dark-mode .card-title {
-  color: #e0e0e0;
-}
-
-body.dark-mode .guest-description,
-body.dark-mode .card-description {
-  color: #b0b0b0;
-}
-
-body.dark-mode .access-card {
-  background: rgba(44, 44, 44, 0.95);
-}
-
-body.dark-mode .access-card:hover {
-  background: rgba(54, 54, 54, 0.95);
-}
 </style>

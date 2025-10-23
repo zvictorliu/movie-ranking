@@ -86,11 +86,11 @@ export default {
 }
 
 .tag-detail-page h1 {
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 2.5rem;
   margin-bottom: 30px;
   text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -110,7 +110,7 @@ export default {
 }
 
 .rating strong {
-  color: #667eea;
+  color: var(--primary-color);
   margin-right: 5px;
 }
 
@@ -129,19 +129,19 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: var(--bg-gradient-light);
+  border: 1px solid var(--border-light);
   padding: 15px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .movie-item:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-3px);
-  border-color: #667eea;
+  border-color: var(--primary-color);
 }
 
 .cover-wrapper {
@@ -155,27 +155,27 @@ export default {
 
 .movie-cover {
   border-radius: 8px;
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .details h2 {
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 1.5rem;
   margin-bottom: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .details p {
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
 .details strong {
-  color: #667eea;
+  color: var(--primary-color);
 }
 
 /* 宽屏设备：横向排列 */
@@ -218,59 +218,11 @@ export default {
 .no-movies {
   text-align: center;
   font-size: 18px;
-  color: #999;
+  color: var(--text-muted);
   margin-top: 40px;
   padding: 30px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.15);
-}
-
-/* 暗色模式 */
-body.dark-mode .tag-detail-page h1 {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark-mode .movie-item {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .movie-item:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  border-color: #a8b5f0;
-}
-
-body.dark-mode .movie-cover {
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .details h2 {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark-mode .details p {
-  color: #b0b0b0;
-}
-
-body.dark-mode .details strong {
-  color: #a8b5f0;
-}
-
-body.dark-mode .rating strong {
-  color: #a8b5f0;
-}
-
-body.dark-mode .no-movies {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.2);
-  color: #b0b0b0;
+  border: 1px solid var(--border-light);
 }
 </style>

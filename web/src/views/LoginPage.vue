@@ -113,7 +113,7 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   padding: 20px;
 }
 
@@ -135,13 +135,13 @@ export default {
 .login-title {
   font-size: 28px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .login-subtitle {
   font-size: 14px;
-  color: #666;
+  color: var(--text-tertiary);
   margin: 0;
 }
 
@@ -159,7 +159,7 @@ export default {
 .form-label {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
@@ -176,17 +176,17 @@ export default {
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
 .form-input::placeholder {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .login-button {
   padding: 14px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--btn-primary-bg);
   color: white;
   border: none;
   border-radius: 8px;
@@ -201,7 +201,7 @@ export default {
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .login-button:disabled {
@@ -231,78 +231,16 @@ export default {
 
 .demo-info {
   font-size: 12px;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 8px;
   font-weight: 500;
 }
 
 .demo-account {
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted);
   margin: 2px 0;
   font-family: monospace;
-}
-
-/* 夜间模式样式 */
-body.dark-mode .login-page {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-}
-
-body.dark-mode .login-container {
-  background: rgba(44, 62, 80, 0.95);
-  color: #ecf0f1;
-}
-
-body.dark-mode .login-title {
-  color: #ecf0f1;
-}
-
-body.dark-mode .login-subtitle {
-  color: #bdc3c7;
-}
-
-body.dark-mode .form-label {
-  color: #ecf0f1;
-}
-
-body.dark-mode .form-input {
-  background-color: #34495e;
-  border-color: #4a5f7a;
-  color: #ecf0f1;
-}
-
-body.dark-mode .form-input:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-body.dark-mode .form-input::placeholder {
-  color: #95a5a6;
-}
-
-body.dark-mode .login-button {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-}
-
-body.dark-mode .login-button:hover:not(:disabled) {
-  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
-}
-
-body.dark-mode .error-message {
-  background-color: rgba(231, 76, 60, 0.2);
-  border-color: rgba(231, 76, 60, 0.3);
-}
-
-body.dark-mode .login-footer {
-  border-color: #4a5f7a;
-}
-
-body.dark-mode .demo-info {
-  color: #bdc3c7;
-}
-
-body.dark-mode .demo-account {
-  color: #95a5a6;
 }
 
 /* 响应式设计 */

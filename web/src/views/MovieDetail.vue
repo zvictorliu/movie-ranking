@@ -245,29 +245,29 @@ export default {
   padding: 20px;
   max-width: 800px;
   margin: auto;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--card-shadow);
 }
 
 .movie-detail h1 {
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 2rem;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .movie-detail p {
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 15px;
 }
 
 .movie-detail strong {
-  color: #667eea;
+  color: var(--primary-color);
   font-weight: 600;
 }
 
@@ -275,29 +275,29 @@ export default {
   margin-right: 8px;
   margin-bottom: 5px;
   cursor: pointer;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  border: 1px solid var(--border-medium);
   transition: all 0.3s ease;
 }
 
 .actor-tag:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
-  border-color: #667eea;
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
 }
 
 .tag-item {
   margin-right: 8px;
   margin-bottom: 5px;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  border: 1px solid var(--border-medium);
   transition: all 0.3s ease;
 }
 
 .tag-item:hover {
   cursor: pointer;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: var(--bg-gradient-medium);
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
-  border-color: #667eea;
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
 }
 
 .cover {
@@ -306,13 +306,13 @@ export default {
   object-fit: cover;
   margin-top: 20px;
   border-radius: 12px;
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--border-light);
+  box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
 }
 
 .cover:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
@@ -327,18 +327,18 @@ button {
   padding: 12px 24px;
   cursor: pointer;
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--btn-primary-bg);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-hover);
 }
 
 button:disabled {
@@ -354,10 +354,10 @@ button:disabled:hover {
 .content {
   margin-top: 30px;
   padding: 20px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.15);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .rating {
@@ -392,50 +392,4 @@ button:disabled:hover {
   padding: 0;
 }
 
-/* 暗色模式 */
-body.dark-mode .movie-detail {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .movie-detail h1 {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark-mode .movie-detail p {
-  color: #b0b0b0;
-}
-
-body.dark-mode .movie-detail strong {
-  color: #a8b5f0;
-}
-
-body.dark-mode .cover {
-  border-color: rgba(168, 181, 240, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .content {
-  background: #2d2d2d;
-  border-color: rgba(168, 181, 240, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-body.dark-mode button {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-}
-
-body.dark-mode .actor-tag,
-body.dark-mode .tag-item {
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .actor-tag:hover,
-body.dark-mode .tag-item:hover {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.15) 0%, rgba(200, 165, 216, 0.15) 100%);
-  border-color: #a8b5f0;
-}
 </style>

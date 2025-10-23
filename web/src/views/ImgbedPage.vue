@@ -256,14 +256,14 @@ export default {
 .imgbed-header h1 {
   font-size: 32px;
   margin-bottom: 10px;
-  color: #667eea;
+  color: var(--primary-color);
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+  text-shadow: var(--shadow-sm);
 }
 
 .imgbed-header p {
   font-size: 16px;
-  color: #764ba2;
+  color: var(--secondary-color);
   font-weight: 500;
 }
 
@@ -275,9 +275,9 @@ export default {
   gap: 20px;
   flex-wrap: wrap;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
-  border: 2px solid rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--border-light);
 }
 
 .search-box {
@@ -293,7 +293,7 @@ export default {
 }
 
 .image-count {
-  color: #764ba2;
+  color: var(--secondary-color);
   font-size: 14px;
   font-weight: 500;
 }
@@ -306,18 +306,18 @@ export default {
 }
 
 .image-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
-  border: 2px solid rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--card-border);
 }
 
 .image-card:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
-  border-color: #667eea;
+  border-color: var(--primary-color);
 }
 
 .image-preview {
@@ -339,7 +339,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .image-error .el-icon {
@@ -354,7 +354,7 @@ export default {
 .image-filename {
   font-weight: 500;
   margin-bottom: 8px;
-  color: #333;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -364,7 +364,7 @@ export default {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
   margin-bottom: 12px;
 }
 
@@ -395,7 +395,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .loading-state .el-icon {
@@ -429,7 +429,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 60px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .image-error-large .el-icon {
@@ -440,17 +440,17 @@ export default {
 .preview-info {
   width: 100%;
   max-width: 100%;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   padding: 20px;
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden;
-  border: 2px solid rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--border-light);
 }
 
 .preview-info p {
   margin: 8px 0;
-  color: #764ba2;
+  color: var(--secondary-color);
   word-break: break-all;
   overflow-wrap: break-word;
   font-size: 14px;
@@ -458,7 +458,7 @@ export default {
 }
 
 .preview-info strong {
-  color: #667eea;
+  color: var(--primary-color);
   margin-right: 8px;
   white-space: nowrap;
   font-weight: 600;
@@ -509,61 +509,4 @@ export default {
   }
 }
 
-/* 暗色主题 */
-body.dark-mode .imgbed-header h1 {
-  color: #a8b5f0;
-}
-
-body.dark-mode .imgbed-header p {
-  color: #c8a5d8;
-}
-
-body.dark-mode .toolbar {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .image-count {
-  color: #c8a5d8;
-}
-
-body.dark-mode .image-card {
-  background: #2c2c2c;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .image-card:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-  border-color: #a8b5f0;
-}
-
-body.dark-mode .image-preview {
-  background: #1a1a1a;
-}
-
-body.dark-mode .image-filename {
-  color: #a8b5f0;
-}
-
-body.dark-mode .image-meta {
-  color: #c8a5d8;
-}
-
-body.dark-mode .preview-info {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .preview-info p {
-  color: #c8a5d8;
-}
-
-body.dark-mode .preview-info strong {
-  color: #a8b5f0;
-}
-
-body.dark-mode .copy-button:hover {
-  box-shadow: 0 2px 8px rgba(168, 181, 240, 0.4);
-}
 </style>

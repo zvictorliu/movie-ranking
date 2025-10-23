@@ -2,6 +2,7 @@
   <div class="actors-container">
     <!-- 演员视图 -->
     <div class="actor-view">
+      <!-- 顶部操作栏 -->
       <div class="view-header">
         <h1>演员列表</h1>
 
@@ -215,7 +216,7 @@ export default {
     toggleLevel(level) {
       const index = this.collapsedLevels.indexOf(level)
       if (index > -1) {
-        // 如果已折叠，则展开
+        // 如果已折叠,则展开
         this.collapsedLevels.splice(index, 1)
       } else {
         // 如果已展开，则折叠
@@ -319,23 +320,23 @@ export default {
   align-items: center;
   gap: 5px;
   padding: 8px 16px;
-  border: 2px solid rgba(102, 126, 234, 0.3);
+  border: 2px solid var(--border-medium);
   border-radius: 8px;
-  background: white;
+  background: var(--bg-primary);
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
-  color: #667eea;
+  color: var(--primary-color);
 }
 
 .view-btn:hover {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
+  border-color: var(--primary-color);
+  background: var(--bg-gradient-light);
 }
 
 .view-btn.active {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: var(--primary-color);
+  background: var(--primary-gradient);
   color: white;
 }
 
@@ -353,7 +354,7 @@ export default {
   width: 80%;
   max-width: 400px;
   padding: 12px 16px;
-  border: 2px solid rgba(102, 126, 234, 0.3);
+  border: 2px solid var(--border-medium);
   border-radius: 8px;
   font-size: 16px;
   outline: none;
@@ -361,12 +362,12 @@ export default {
 }
 
 .search-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--bg-gradient-light);
 }
 
 .search-input::placeholder {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .actor-grid {
@@ -382,17 +383,17 @@ export default {
   align-items: center; /* 居中对齐 */
   text-align: center;
   padding: 10px;
-  border: 2px solid rgba(102, 126, 234, 0.2);
+  border: 2px solid var(--border-light);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
-  background: white;
+  background: var(--card-bg);
   /* 不设置固定高度，让内容决定高度 */
 }
 
 .actor-item:hover {
-  border-color: #667eea;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
@@ -424,7 +425,7 @@ export default {
 }
 
 .actor-name:hover {
-  color: #667eea;
+  color: var(--primary-color);
 }
 
 /* 悬浮的喜爱度控件 */
@@ -472,9 +473,9 @@ export default {
   display: flex;
   align-items: center;
   cursor: pointer;
+  transition: all 0.2s ease;
   padding: 3px;
   border-radius: 4px;
-  transition: all 0.2s ease;
   min-width: 24px;
   min-height: 24px;
   justify-content: center;
@@ -516,23 +517,23 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
-  border: 2px dashed rgba(102, 126, 234, 0.3);
-  color: #667eea;
+  border: 2px dashed var(--border-medium);
+  color: var(--primary-color);
 }
 
 .loading .material-icons {
   font-size: 48px;
   margin-bottom: 16px;
-  color: #667eea;
+  color: var(--primary-color);
   animation: spin 2s linear infinite;
 }
 
 .no-results .material-icons {
   font-size: 48px;
   margin-bottom: 16px;
-  color: #764ba2;
+  color: var(--secondary-color);
 }
 
 .loading p,
@@ -552,11 +553,11 @@ export default {
 }
 
 .favorite-level {
-  border: 2px solid rgba(102, 126, 234, 0.2);
+  border: 2px solid var(--border-light);
   border-radius: 12px;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  background: var(--bg-gradient-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .level-header {
@@ -565,7 +566,7 @@ export default {
   align-items: center;
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  border-bottom: 2px solid var(--border-light);
   flex-wrap: nowrap;
   gap: 10px;
 }
@@ -575,7 +576,7 @@ export default {
   align-items: center;
   gap: 8px;
   margin: 0;
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 18px;
   flex-shrink: 0;
   font-weight: 600;
@@ -618,12 +619,12 @@ export default {
 }
 
 .collapse-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: var(--bg-gradient-medium);
   transform: scale(1.1);
 }
 
 .collapse-btn .material-icons {
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 20px;
   transition: transform 0.3s ease;
 }

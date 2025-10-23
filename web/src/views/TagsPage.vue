@@ -66,12 +66,12 @@ export default {
 }
 
 .tags-page h1 {
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 32px;
   font-weight: 600;
   text-align: center;
   margin-bottom: 30px;
-  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+  text-shadow: var(--shadow-sm);
 }
 
 .tag-list {
@@ -85,58 +85,34 @@ export default {
   display: inline-flex;
   align-items: center;
   padding: 10px 18px;
-  border: 2px solid rgba(102, 126, 234, 0.3);
+  border: 2px solid var(--border-medium);
   border-radius: 20px;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  background: var(--bg-gradient-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .tag-item:hover {
   transform: translateY(-2px) scale(1.05);
-  border-color: #667eea;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+  border-color: var(--primary-color);
+  background: var(--bg-gradient-medium);
+  box-shadow: var(--shadow-hover);
 }
 
 .tag-name {
   margin-right: 8px;
-  color: #667eea;
+  color: var(--primary-color);
   font-weight: 500;
 }
 
 .tag-count {
-  color: #764ba2;
+  color: var(--secondary-color);
   font-size: 12px;
   font-weight: 600;
-  background: rgba(118, 75, 162, 0.1);
+  background: var(--bg-gradient-light);
   padding: 2px 8px;
   border-radius: 10px;
-}
-
-/* 暗色模式 */
-body.dark-mode .tags-page h1 {
-  color: #a8b5f0;
-}
-
-body.dark-mode .tag-item {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .tag-item:hover {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.15) 0%, rgba(200, 165, 216, 0.15) 100%);
-  border-color: #a8b5f0;
-}
-
-body.dark-mode .tag-name {
-  color: #a8b5f0;
-}
-
-body.dark-mode .tag-count {
-  color: #c8a5d8;
-  background: rgba(200, 165, 216, 0.15);
 }
 </style>

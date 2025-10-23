@@ -267,15 +267,15 @@ export default {
 
 .posts-header h1 {
   font-size: 2.5rem;
-  color: #667eea;
+  color: var(--primary-color);
   margin-bottom: 10px;
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+  text-shadow: var(--shadow-sm);
 }
 
 .posts-header p {
   font-size: 1.1rem;
-  color: #764ba2;
+  color: var(--secondary-color);
   font-weight: 500;
 }
 
@@ -286,9 +286,9 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
-  border: 2px solid rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--border-light);
 }
 
 .search-box {
@@ -308,19 +308,19 @@ export default {
 }
 
 .post-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 2px solid rgba(102, 126, 234, 0.15);
+  border: 2px solid var(--card-border);
 }
 
 .post-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
-  border-color: #667eea;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
 }
 
 .post-header {
@@ -329,7 +329,7 @@ export default {
 
 .post-title {
   font-size: 1.4rem;
-  color: #667eea;
+  color: var(--primary-color);
   margin-bottom: 10px;
   line-height: 1.4;
   font-weight: 600;
@@ -339,7 +339,7 @@ export default {
   display: flex;
   gap: 20px;
   font-size: 0.9rem;
-  color: #764ba2;
+  color: var(--secondary-color);
   align-items: center;
 }
 
@@ -351,7 +351,7 @@ export default {
 }
 
 .post-excerpt {
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 15px;
   font-size: 0.95rem;
@@ -419,45 +419,4 @@ export default {
   }
 }
 
-/* 暗色模式支持 */
-body.dark-mode .posts-container {
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-}
-
-body.dark-mode .posts-header h1 {
-  color: #a8b5f0;
-}
-
-body.dark-mode .posts-header p {
-  color: #c8a5d8;
-}
-
-body.dark-mode .filter-container {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .post-card {
-  background-color: #2d2d2d;
-  border-color: rgba(168, 181, 240, 0.3);
-  color: #e0e0e0;
-}
-
-body.dark-mode .post-card:hover {
-  border-color: #a8b5f0;
-  box-shadow: 0 8px 25px rgba(168, 181, 240, 0.2);
-}
-
-body.dark-mode .post-title {
-  color: #a8b5f0;
-}
-
-body.dark-mode .post-meta {
-  color: #c8a5d8;
-}
-
-body.dark-mode .post-excerpt {
-  color: #c0c0c0;
-}
 </style>

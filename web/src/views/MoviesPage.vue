@@ -428,7 +428,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 30px 0;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  border-bottom: 2px solid var(--border-medium);
   margin-bottom: 30px;
 }
 
@@ -436,13 +436,13 @@ export default {
   margin: 0 0 8px 0;
   font-size: 28px;
   font-weight: 600;
-  color: #667eea;
-  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+  color: var(--primary-color);
+  text-shadow: var(--shadow-sm);
 }
 
 .subtitle {
   margin: 0;
-  color: #764ba2;
+  color: var(--secondary-color);
   font-size: 14px;
   font-weight: 500;
 }
@@ -501,14 +501,14 @@ export default {
   border: none;
   cursor: pointer;
   font-size: 20px;
-  color: #667eea;
+  color: var(--primary-color);
   padding: 8px;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .edit-movie-button:hover {
-  background-color: rgba(102, 126, 234, 0.15);
+  background-color: var(--bg-gradient-medium);
   transform: scale(1.05);
 }
 
@@ -517,14 +517,14 @@ export default {
   border: none;
   cursor: pointer;
   font-size: 20px;
-  color: #667eea;
+  color: var(--primary-color);
   padding: 8px;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .up-down-button:hover {
-  background-color: rgba(102, 126, 234, 0.15);
+  background-color: var(--bg-gradient-medium);
   transform: scale(1.05);
 }
 
@@ -545,14 +545,14 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--btn-primary-bg);
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
 }
 
@@ -581,12 +581,12 @@ export default {
 
 /* 筛选器面板 */
 .filter-panel {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 30px;
-  border: 2px solid rgba(102, 126, 234, 0.15);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.08);
+  border: 2px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .filter-header {
@@ -600,7 +600,7 @@ export default {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #667eea;
+  color: var(--primary-color);
 }
 
 /* 搜索区域 */
@@ -628,7 +628,7 @@ export default {
 
 .filter-label {
   font-weight: 500;
-  color: #606266;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -640,7 +640,7 @@ export default {
 
 .rating-display {
   font-weight: 500;
-  color: #606266;
+  color: var(--text-secondary);
   font-size: 14px;
   min-width: 60px;
 }
@@ -654,14 +654,14 @@ export default {
 }
 
 .save-button:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  background: var(--btn-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-lg);
 }
 
 .save-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .save-button .material-icons {
@@ -742,55 +742,6 @@ export default {
   }
 }
 
-/* 深色模式支持 */
-body.dark-mode .page-title h1 {
-  color: #a8b5f0;
-}
-
-body.dark-mode .subtitle {
-  color: #c8a5d8;
-}
-
-body.dark-mode .top-bar {
-  border-bottom-color: rgba(102, 126, 234, 0.3);
-}
-
-body.dark-mode .filter-panel {
-  background: linear-gradient(135deg, rgba(44, 62, 80, 0.6) 0%, rgba(52, 73, 94, 0.6) 100%);
-  border-color: rgba(102, 126, 234, 0.3);
-}
-
-body.dark-mode .filter-header h3 {
-  color: #a8b5f0;
-}
-
-body.dark-mode .filter-label {
-  color: #a8abb2;
-}
-
-body.dark-mode .rating-display {
-  color: #a8abb2;
-}
-
-body.dark-mode .edit-movie-button,
-body.dark-mode .up-down-button {
-  color: #a8b5f0;
-}
-
-body.dark-mode .edit-movie-button:hover,
-body.dark-mode .up-down-button:hover {
-  background-color: rgba(168, 181, 240, 0.15);
-}
-
-body.dark-mode .save-button {
-  background: linear-gradient(135deg, #5a6db8 0%, #6d5a8e 100%);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-body.dark-mode .save-button:hover {
-  background: linear-gradient(135deg, #6d5a8e 0%, #5a6db8 100%);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
 
 /* 响应式设计 */
 @media (max-width: 768px) {

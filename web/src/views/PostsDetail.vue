@@ -348,9 +348,9 @@ export default {
   max-width: 900px;
   margin: 0 auto;
   padding: 30px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--card-shadow);
 }
 
 .loading-container {
@@ -362,7 +362,7 @@ export default {
 }
 
 .back-button :deep(.el-button) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--btn-primary-bg);
   border: none;
   color: white;
   transition: all 0.3s ease;
@@ -370,7 +370,7 @@ export default {
 
 .back-button :deep(.el-button:hover) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .post-header {
@@ -379,10 +379,10 @@ export default {
 }
 
 .post-header h1 {
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 2.5rem;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -409,22 +409,22 @@ export default {
   margin-bottom: 25px;
   flex-wrap: wrap;
   padding: 15px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   border-radius: 8px;
-  border: 1px solid rgba(102, 126, 234, 0.15);
+  border: 1px solid var(--border-light);
 }
 
 .meta-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .meta-item span {
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .post-tags {
@@ -436,14 +436,14 @@ export default {
 
 .tag-item {
   font-size: 0.9rem;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  border: 1px solid var(--border-medium);
   transition: all 0.3s ease;
 }
 
 .tag-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
-  border-color: #667eea;
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
 }
 
 .post-excerpt {
@@ -451,29 +451,29 @@ export default {
 }
 
 .post-excerpt blockquote {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
-  border-left: 4px solid #667eea;
+  background: var(--bg-gradient-light);
+  border-left: 4px solid var(--primary-color);
   padding: 25px;
   margin: 0;
   font-style: italic;
-  color: #555;
+  color: var(--text-secondary);
   font-size: 1.1rem;
   line-height: 1.8;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .post-body {
   margin-bottom: 60px;
   padding: 25px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid rgba(102, 126, 234, 0.15);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .post-footer {
-  border-top: 2px solid rgba(102, 126, 234, 0.2);
+  border-top: 2px solid var(--border-light);
   padding-top: 40px;
   margin-top: 40px;
 }
@@ -484,9 +484,9 @@ export default {
 
 .share-section h3 {
   margin-bottom: 20px;
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -509,9 +509,9 @@ export default {
 
 .related-posts h3 {
   margin-bottom: 25px;
-  color: #667eea;
+  color: var(--primary-color);
   font-size: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -523,38 +523,38 @@ export default {
 }
 
 .related-post-item {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: var(--bg-gradient-light);
   padding: 25px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .related-post-item:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: var(--bg-gradient-medium);
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-  border-color: #667eea;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
 }
 
 .related-post-item h4 {
-  color: #667eea;
+  color: var(--primary-color);
   margin-bottom: 12px;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
 .related-post-item p {
-  color: #555;
+  color: var(--text-secondary);
   margin-bottom: 12px;
   font-size: 0.95rem;
   line-height: 1.6;
 }
 
 .related-post-date {
-  color: #999;
+  color: var(--text-muted);
   font-size: 0.85rem;
   font-style: italic;
 }
@@ -589,92 +589,6 @@ export default {
   }
 }
 
-/* 暗色模式支持 */
-body.dark-mode .post-detail-container {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .post-header h1 {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark-mode .back-button :deep(.el-button) {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-}
-
-body.dark-mode .post-meta {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.2);
-}
-
-body.dark-mode .meta-item {
-  color: #a8b5f0;
-}
-
-body.dark-mode .meta-item span {
-  color: #b0b0b0;
-}
-
-body.dark-mode .tag-item {
-  border-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .tag-item:hover {
-  border-color: #a8b5f0;
-}
-
-body.dark-mode .post-excerpt blockquote {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-left-color: #a8b5f0;
-  color: #b0b0b0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-body.dark-mode .post-body {
-  background: #2d2d2d;
-  border-color: rgba(168, 181, 240, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-body.dark-mode .post-footer {
-  border-top-color: rgba(168, 181, 240, 0.3);
-}
-
-body.dark-mode .share-section h3,
-body.dark-mode .related-posts h3 {
-  background: linear-gradient(135deg, #a8b5f0 0%, #c8a5d8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark-mode .related-post-item {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.1) 0%, rgba(200, 165, 216, 0.1) 100%);
-  border-color: rgba(168, 181, 240, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-body.dark-mode .related-post-item:hover {
-  background: linear-gradient(135deg, rgba(168, 181, 240, 0.15) 0%, rgba(200, 165, 216, 0.15) 100%);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  border-color: #a8b5f0;
-}
-
-body.dark-mode .related-post-item h4 {
-  color: #a8b5f0;
-}
-
-body.dark-mode .related-post-item p {
-  color: #b0b0b0;
-}
-
-body.dark-mode .related-post-date {
-  color: #808080;
-}
 
 /* 电影卡片shortcode样式 - 与ActorDetail保持一致 */
 .movie-card-shortcode {
@@ -715,7 +629,7 @@ body.dark-mode .related-post-date {
 .movie-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin: 0 0 10px 0;
 }
 
@@ -727,7 +641,7 @@ body.dark-mode .related-post-date {
 }
 
 .rating strong {
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 0.9rem;
   margin-right: 5px;
 }
@@ -748,27 +662,27 @@ body.dark-mode .related-post-date {
 }
 
 .movie-description {
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin: 0 0 10px 0;
   font-size: 0.9rem;
 }
 
 .movie-actors {
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 0.9rem;
 }
 
 .movie-actors strong {
-  color: #333;
+  color: var(--text-primary);
 }
 
 .movie-not-found {
   padding: 20px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 8px;
-  color: #666;
+  color: var(--text-tertiary);
   text-align: center;
   font-style: italic;
 }
@@ -807,35 +721,4 @@ body.dark-mode .related-post-date {
   }
 }
 
-/* 暗色模式支持 */
-body.dark-mode .movie-card-content {
-  border-color: #404040;
-  background-color: #2d2d2d;
-}
-
-body.dark-mode .movie-title {
-  color: #e0e0e0;
-}
-
-body.dark-mode .rating strong {
-  color: #b0b0b0;
-}
-
-body.dark-mode .movie-description {
-  color: #c0c0c0;
-}
-
-body.dark-mode .movie-actors {
-  color: #b0b0b0;
-}
-
-body.dark-mode .movie-actors strong {
-  color: #e0e0e0;
-}
-
-body.dark-mode .movie-not-found {
-  background-color: #2d2d2d;
-  border-color: #404040;
-  color: #b0b0b0;
-}
 </style>
