@@ -48,16 +48,12 @@
           </el-image>
         </div>
         <div class="image-info">
-          <div class="image-filename" :title="image.filename">{{ image.filename }}</div>
+          <div class="image-filename" :title="image.filename" @click="copyShortcut(image)">
+            {{ image.filename }}
+          </div>
           <div class="image-meta">
             <span class="image-size">{{ formatSize(image.size) }}</span>
             <span class="image-date">{{ formatDate(image.modified_time) }}</span>
-          </div>
-          <div class="image-actions">
-            <el-button type="primary" size="small" class="copy-button" @click="copyShortcut(image)">
-              <el-icon><CopyDocument /></el-icon>
-              复制引用
-            </el-button>
           </div>
         </div>
       </div>
@@ -109,7 +105,7 @@
 
 <script>
 import axios from 'axios'
-import { Search, Refresh, Picture, CopyDocument, Document, Loading } from '@element-plus/icons-vue'
+import { Search, Refresh, Picture, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 export default {
@@ -118,8 +114,6 @@ export default {
     Search,
     Refresh,
     Picture,
-    CopyDocument,
-    Document,
     Loading,
   },
   data() {
@@ -358,6 +352,8 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .image-meta {
@@ -366,26 +362,6 @@ export default {
   font-size: 12px;
   color: var(--text-muted);
   margin-bottom: 12px;
-}
-
-.image-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.copy-button {
-  width: 100%;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.copy-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
-}
-
-.copy-button .el-icon {
-  margin-right: 4px;
 }
 
 .empty-state,

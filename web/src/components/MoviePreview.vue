@@ -7,7 +7,7 @@
       </div>
       <!-- 详细信息 -->
       <div class="details">
-        <h2>{{ movie.title }}</h2>
+        <h2 class="movie-title" @click="copyMovieShortcut">{{ movie.title }}</h2>
         <!-- 评分 -->
         <div class="rating">
           <strong>评分：</strong>
@@ -176,6 +176,27 @@ export default {
     goToActor(name) {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
     },
+    copyMovieShortcut() {
+      if (!this.movie || !this.movie.title) return
+
+      const shortcut = `<movie title="${this.movie.title}" />`
+      this.copyToClipboard(shortcut)
+      this.$message.success('影片引用已复制到剪贴板')
+    },
+    copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+    },
     // 新增：处理评分点击
     async handleRatingClick(rating) {
       if (this.allowRating && !this.ratingUpdating) {
@@ -272,6 +293,10 @@ export default {
   margin: 0 0 10px 0;
   color: #333;
   font-size: 1.5em;
+}
+
+.movie-title {
+  cursor: pointer;
 }
 
 /* 宽屏设备：横向排列 */
