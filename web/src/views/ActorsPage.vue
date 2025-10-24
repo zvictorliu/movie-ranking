@@ -298,6 +298,7 @@ export default {
   max-width: 1200px;
   justify-content: center; /* 水平居中 */
   margin: auto;
+  padding: 20px;
 }
 
 /* 视图头部样式 */
@@ -635,7 +636,7 @@ export default {
 
 .level-actors {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 300px));
   gap: 20px;
   transition: all 0.3s ease;
 }
@@ -660,7 +661,6 @@ export default {
   }
 
   .level-actors {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
   }
 
