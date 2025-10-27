@@ -704,3 +704,32 @@ export default {
 }
 
 </style>
+
+<style>
+/* 简洁主题特定样式（非 scoped） */
+body.theme-minimal .home-page {
+  background: #ffffff !important;
+}
+
+body.theme-minimal .background-animation {
+  display: none;
+}
+
+body.theme-minimal .hero-icon {
+  background: var(--primary-gradient);
+}
+
+body.theme-minimal .hero-title {
+  color: var(--text-primary);
+  text-shadow: none;
+}
+
+body.theme-minimal .hero-subtitle {
+  color: var(--text-secondary);
+}
+
+body.theme-minimal .section-title {
+  color: var(--text-primary);
+  text-shadow: none;
+}
+</style>

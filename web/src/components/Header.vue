@@ -784,7 +784,7 @@ export default {
 <style scoped>
 .app-header {
   background: var(--primary-gradient);
-  padding: 10px 0 0 0;
+  padding: 10px 0 0 15px;
   align-items: center;
   display: flex;
   box-shadow: var(--shadow-sm);
@@ -1112,5 +1112,69 @@ export default {
   margin-top: 5px;
   color: var(--text-tertiary);
   font-size: 12px;
+}
+</style>
+
+<style>
+/* 简洁主题下的 Header 样式（非 scoped） */
+body.theme-minimal .app-header {
+  background: #f8f8f8 !important;
+}
+
+body.theme-minimal .title {
+  color: #000000;
+  text-shadow: none;
+}
+
+/* 桌面端导航图标 */
+body.theme-minimal .nav-icon {
+  color: #333333;
+}
+
+body.theme-minimal .nav-icon:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* 移动端菜单按钮 */
+body.theme-minimal .menu-button {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #333333;
+}
+
+body.theme-minimal .menu-button:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+/* 主题切换按钮 */
+body.theme-minimal .theme-toggle {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #333333;
+}
+
+body.theme-minimal .theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+/* 新建按钮 */
+body.theme-minimal .create-button {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #333333;
+}
+
+body.theme-minimal .create-button:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+/* 移动端下拉菜单 */
+body.theme-minimal .dropdown-menu {
+  background-color: #f8f8f8;
+}
+
+body.theme-minimal .nav-icons-mobile .nav-icon {
+  color: #333333;
+}
+
+body.theme-minimal .nav-icons-mobile .nav-icon:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 </style>
