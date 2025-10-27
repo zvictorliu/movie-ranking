@@ -707,7 +707,8 @@ export default {
 
 <style>
 /* 简洁主题特定样式（非 scoped） */
-body.theme-minimal .home-page {
+/* 亮色模式 */
+body.theme-minimal:not(.dark-mode) .home-page {
   background: #ffffff !important;
 }
 
@@ -729,6 +730,29 @@ body.theme-minimal .hero-subtitle {
 }
 
 body.theme-minimal .section-title {
+  color: var(--text-primary);
+  text-shadow: none;
+}
+
+/* 简洁主题暗色模式 */
+body.theme-minimal.dark-mode .home-page {
+  background: #000000 !important;
+}
+
+body.theme-minimal.dark-mode .hero-icon {
+  background: var(--primary-gradient);
+}
+
+body.theme-minimal.dark-mode .hero-title {
+  color: var(--text-primary);
+  text-shadow: none;
+}
+
+body.theme-minimal.dark-mode .hero-subtitle {
+  color: var(--text-secondary);
+}
+
+body.theme-minimal.dark-mode .section-title {
   color: var(--text-primary);
   text-shadow: none;
 }

@@ -291,7 +291,7 @@ export default {
 
 .details h2 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.5em;
 }
 

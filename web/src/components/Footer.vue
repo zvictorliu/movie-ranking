@@ -135,3 +135,44 @@
 
 /* Dark mode styles are now handled by CSS variables */
 </style>
+
+<style>
+/* 简洁主题下的 Footer 样式（非 scoped） */
+/* 亮色模式 */
+body.theme-minimal:not(.dark-mode) .app-footer {
+  background: #f8f8f8 !important;
+  color: #000000;
+}
+
+body.theme-minimal:not(.dark-mode) .footer-title {
+  text-shadow: none;
+}
+
+body.theme-minimal:not(.dark-mode) .footer-link {
+  color: #333333;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.theme-minimal:not(.dark-mode) .footer-link:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 暗色模式 */
+body.theme-minimal.dark-mode .app-footer {
+  background: #1a1a1a !important;
+  color: #ffffff;
+}
+
+body.theme-minimal.dark-mode .footer-title {
+  text-shadow: none;
+}
+
+body.theme-minimal.dark-mode .footer-link {
+  color: #e0e0e0;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+body.theme-minimal.dark-mode .footer-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+</style>

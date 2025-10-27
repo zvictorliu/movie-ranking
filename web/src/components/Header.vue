@@ -1117,64 +1117,127 @@ export default {
 
 <style>
 /* 简洁主题下的 Header 样式（非 scoped） */
-body.theme-minimal .app-header {
+/* 亮色模式 */
+body.theme-minimal:not(.dark-mode) .app-header {
   background: #f8f8f8 !important;
 }
 
-body.theme-minimal .title {
+body.theme-minimal:not(.dark-mode) .title {
   color: #000000;
   text-shadow: none;
 }
 
 /* 桌面端导航图标 */
-body.theme-minimal .nav-icon {
+body.theme-minimal:not(.dark-mode) .nav-icon {
   color: #333333;
 }
 
-body.theme-minimal .nav-icon:hover {
+body.theme-minimal:not(.dark-mode) .nav-icon:hover {
   background-color: rgba(0, 0, 0, 0.08);
 }
 
 /* 移动端菜单按钮 */
-body.theme-minimal .menu-button {
+body.theme-minimal:not(.dark-mode) .menu-button {
   background-color: rgba(0, 0, 0, 0.08);
   color: #333333;
 }
 
-body.theme-minimal .menu-button:hover {
+body.theme-minimal:not(.dark-mode) .menu-button:hover {
   background-color: rgba(0, 0, 0, 0.12);
 }
 
 /* 主题切换按钮 */
-body.theme-minimal .theme-toggle {
+body.theme-minimal:not(.dark-mode) .theme-toggle {
   background-color: rgba(0, 0, 0, 0.08);
   color: #333333;
 }
 
-body.theme-minimal .theme-toggle:hover {
+body.theme-minimal:not(.dark-mode) .theme-toggle:hover {
   background-color: rgba(0, 0, 0, 0.12);
 }
 
 /* 新建按钮 */
-body.theme-minimal .create-button {
+body.theme-minimal:not(.dark-mode) .create-button {
   background-color: rgba(0, 0, 0, 0.08);
   color: #333333;
 }
 
-body.theme-minimal .create-button:hover {
+body.theme-minimal:not(.dark-mode) .create-button:hover {
   background-color: rgba(0, 0, 0, 0.12);
 }
 
 /* 移动端下拉菜单 */
-body.theme-minimal .dropdown-menu {
+body.theme-minimal:not(.dark-mode) .dropdown-menu {
   background-color: #f8f8f8;
 }
 
-body.theme-minimal .nav-icons-mobile .nav-icon {
+body.theme-minimal:not(.dark-mode) .nav-icons-mobile .nav-icon {
   color: #333333;
 }
 
-body.theme-minimal .nav-icons-mobile .nav-icon:hover {
+body.theme-minimal:not(.dark-mode) .nav-icons-mobile .nav-icon:hover {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 简洁主题暗色模式 */
+body.theme-minimal.dark-mode .app-header {
+  background: #1a1a1a !important;
+}
+
+body.theme-minimal.dark-mode .title {
+  color: #ffffff;
+  text-shadow: none;
+}
+
+/* 桌面端导航图标 */
+body.theme-minimal.dark-mode .nav-icon {
+  color: #e0e0e0;
+}
+
+body.theme-minimal.dark-mode .nav-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 移动端菜单按钮 */
+body.theme-minimal.dark-mode .menu-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+
+body.theme-minimal.dark-mode .menu-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 主题切换按钮 */
+body.theme-minimal.dark-mode .theme-toggle {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+
+body.theme-minimal.dark-mode .theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 新建按钮 */
+body.theme-minimal.dark-mode .create-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+
+body.theme-minimal.dark-mode .create-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 移动端下拉菜单 */
+body.theme-minimal.dark-mode .dropdown-menu {
+  background-color: #1a1a1a;
+}
+
+body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon {
+  color: #e0e0e0;
+}
+
+body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon:hover {
+  background-color: rgba(255, 255, 255, 0.08);
 }
 </style>

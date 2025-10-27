@@ -100,37 +100,41 @@ export default {
   }
 }
 
-/* 简洁主题下的样式调整 */
-.theme-minimal .theme-selector {
-  background: rgba(0, 0, 0, 0.1);
-}
+</style>
 
-.theme-minimal .theme-button {
-  color: var(--text-primary);
-}
-
-.theme-minimal .theme-button:hover {
+<style>
+/* 简洁主题下的样式调整（非 scoped） */
+/* 亮色模式 */
+body.theme-minimal:not(.dark-mode) .theme-selector {
   background: rgba(0, 0, 0, 0.08);
 }
 
-.theme-minimal .theme-button.active {
+body.theme-minimal:not(.dark-mode) .theme-button {
+  color: #333333;
+}
+
+body.theme-minimal:not(.dark-mode) .theme-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-minimal:not(.dark-mode) .theme-button.active {
   background: rgba(0, 0, 0, 0.15);
 }
 
 /* 暗色模式 */
-body.dark-mode.theme-minimal .theme-button {
-  color: var(--text-primary);
+body.theme-minimal.dark-mode .theme-selector {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-body.dark-mode.theme-minimal .theme-selector {
-  background: rgba(255, 255, 255, 0.05);
+body.theme-minimal.dark-mode .theme-button {
+  color: #e0e0e0;
 }
 
-body.dark-mode.theme-minimal .theme-button:hover {
+body.theme-minimal.dark-mode .theme-button:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-body.dark-mode.theme-minimal .theme-button.active {
+body.theme-minimal.dark-mode .theme-button.active {
   background: rgba(255, 255, 255, 0.15);
 }
 </style>
