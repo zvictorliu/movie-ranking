@@ -9,17 +9,11 @@
         <p class="footer-copyright">&copy; 2025 Movie Ranking App. All rights reserved.</p>
       </div>
       <div class="footer-links">
-        <a href="#" class="footer-link">
-          <span class="material-icons">info</span>
-          关于
+        <a href="https://github.com/zvictorliu/movie-ranking" target="_blank" rel="noopener noreferrer" class="footer-link" title="GitHub 项目">
+          <i class="fa-brands fa-github"></i>
         </a>
-        <a href="#" class="footer-link">
-          <span class="material-icons">mail</span>
-          联系
-        </a>
-        <a href="#" class="footer-link">
-          <span class="material-icons">help</span>
-          帮助
+        <a href="mailto:zvictorliu@outlook.com" class="footer-link" title="邮件联系">
+          <i class="fa-solid fa-envelope"></i>
         </a>
       </div>
     </div>
@@ -80,23 +74,22 @@
 .footer-link {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   color: white;
   text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
-  font-size: 14px;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
 }
 
 .footer-link:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+  opacity: 0.7;
+  transform: scale(1.1);
 }
 
-.footer-link .material-icons {
-  font-size: 18px;
+.footer-link i {
+  font-size: 24px;
 }
 
 /* 响应式设计 */
@@ -120,8 +113,12 @@
   }
 
   .footer-link {
-    font-size: 13px;
-    padding: 6px 10px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .footer-link i {
+    font-size: 20px;
   }
 
   .footer-title {
@@ -150,11 +147,6 @@ body.theme-minimal:not(.dark-mode) .footer-title {
 
 body.theme-minimal:not(.dark-mode) .footer-link {
   color: #333333;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-body.theme-minimal:not(.dark-mode) .footer-link:hover {
-  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* 暗色模式 */
@@ -169,10 +161,5 @@ body.theme-minimal.dark-mode .footer-title {
 
 body.theme-minimal.dark-mode .footer-link {
   color: #e0e0e0;
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-body.theme-minimal.dark-mode .footer-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
 }
 </style>
