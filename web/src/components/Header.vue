@@ -776,10 +776,22 @@ export default {
     document.addEventListener('click', this.handleClickOutside)
     // 从 themeStore 同步暗色模式状态
     this.isDarkMode = this.themeStore.darkMode
+
+    // 监听来自 CreateMenu 的事件
+    this.$eventBus.on('open-movie-dialog', this.openMovieDialog)
+    this.$eventBus.on('open-actor-dialog', this.openActorDialog)
+    this.$eventBus.on('open-post-dialog', this.openPostDialog)
+    this.$eventBus.on('open-image-dialog', this.openImageDialog)
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.checkScreenWidth) // 移除监听器
     document.removeEventListener('click', this.handleClickOutside) // 移除点击外部监听器
+
+    // 移除 CreateMenu 事件监听
+    this.$eventBus.off('open-movie-dialog', this.openMovieDialog)
+    this.$eventBus.off('open-actor-dialog', this.openActorDialog)
+    this.$eventBus.off('open-post-dialog', this.openPostDialog)
+    this.$eventBus.off('open-image-dialog', this.openImageDialog)
   },
 }
 </script>
@@ -816,19 +828,18 @@ export default {
 }
 
 .menu-button {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: transparent;
   border: none;
   color: white;
   font-size: 18px;
   cursor: pointer;
   margin-left: auto;
   padding: 8px;
-  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  opacity: 0.7;
 }
 
 .theme-toggle {
@@ -1000,7 +1011,6 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   color: var(--text-primary);
@@ -1010,8 +1020,7 @@ export default {
 }
 
 .nav-icons-mobile .nav-icon:hover {
-  background-color: var(--bg-secondary);
-  transform: translateY(-2px);
+  opacity: 0.7;
 }
 
 .nav-icons-mobile .nav-icon .material-icons {
@@ -1024,13 +1033,7 @@ export default {
 }
 
 .action-area-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  align-items: center;
-  padding-top: 15px;
-  border-top: 1px solid var(--border-light);
-  width: 100%;
+  display: none; /* 隐藏移动端新建按钮，改用 CreateMenu 悬浮按钮 */
 }
 
 .action-area-mobile .new-button {
@@ -1145,12 +1148,12 @@ body.theme-minimal:not(.dark-mode) .nav-icon:hover {
 
 /* 移动端菜单按钮 */
 body.theme-minimal:not(.dark-mode) .menu-button {
-  background-color: rgba(0, 0, 0, 0.08);
+  background: transparent;
   color: #333333;
 }
 
 body.theme-minimal:not(.dark-mode) .menu-button:hover {
-  background-color: rgba(0, 0, 0, 0.12);
+  opacity: 0.7;
 }
 
 /* 主题切换按钮 */
@@ -1183,7 +1186,7 @@ body.theme-minimal:not(.dark-mode) .nav-icons-mobile .nav-icon {
 }
 
 body.theme-minimal:not(.dark-mode) .nav-icons-mobile .nav-icon:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  opacity: 0.7;
 }
 
 /* 简洁主题暗色模式 */
@@ -1207,12 +1210,12 @@ body.theme-minimal.dark-mode .nav-icon:hover {
 
 /* 移动端菜单按钮 */
 body.theme-minimal.dark-mode .menu-button {
-  background-color: rgba(255, 255, 255, 0.1);
+  background: transparent;
   color: #e0e0e0;
 }
 
 body.theme-minimal.dark-mode .menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  opacity: 0.7;
 }
 
 /* 主题切换按钮 */
@@ -1245,7 +1248,7 @@ body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon {
 }
 
 body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  opacity: 0.7;
 }
 
 /* 所有主题的暗色模式下拉菜单背景 */

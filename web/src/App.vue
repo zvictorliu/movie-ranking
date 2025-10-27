@@ -14,6 +14,9 @@
 
     <!-- 图片侧边栏 -->
     <ImageSidebar />
+
+    <!-- 新建菜单（仅移动端） -->
+    <CreateMenu />
   </div>
 </template>
 
@@ -21,6 +24,7 @@
 import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
 import ImageSidebar from './components/ImageSidebar.vue'
+import CreateMenu from './components/CreateMenu.vue'
 import { useViewStore } from './store/view'
 import './assets/material-icons.scss'
 export default {
@@ -29,6 +33,7 @@ export default {
     Header,
     Footer,
     ImageSidebar,
+    CreateMenu,
   },
   setup() {
     const viewStore = useViewStore()
