@@ -162,7 +162,7 @@ export default {
   box-shadow: var(--shadow-lg);
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 999;
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,7 +182,7 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 3001;
   animation: fadeIn 0.3s ease;
 }
 
@@ -203,7 +203,7 @@ export default {
   height: 100vh;
   background: var(--card-bg);
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
-  z-index: 1001;
+  z-index: 3002;
   transition: right 0.3s ease;
   display: flex;
   flex-direction: column;

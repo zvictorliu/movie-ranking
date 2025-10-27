@@ -59,7 +59,7 @@ export default {
     return {
       content: this.modelValue,
       saving: false,
-      preview: true,
+      preview: false,
       codeTheme: 'github',
       theme: 'light',
       toolbars: [
