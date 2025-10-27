@@ -11,12 +11,16 @@
 
     <!-- 全局底部 -->
     <Footer />
+
+    <!-- 图片侧边栏 -->
+    <ImageSidebar />
   </div>
 </template>
 
 <script>
 import Footer from './components/Footer.vue'
 import Header from './components/Header.vue'
+import ImageSidebar from './components/ImageSidebar.vue'
 import { useViewStore } from './store/view'
 import './assets/material-icons.scss'
 export default {
@@ -24,6 +28,7 @@ export default {
   components: {
     Header,
     Footer,
+    ImageSidebar,
   },
   setup() {
     const viewStore = useViewStore()
