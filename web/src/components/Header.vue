@@ -126,7 +126,10 @@
             <span class="button-text">上传图片</span>
           </button>
         </div>
-        <div class="theme-toggle-mobile">
+        <div class="theme-controls-mobile">
+          <!-- 主题样式切换器 -->
+          <ThemeSwitcher />
+          <!-- 暗色模式切换 -->
           <button class="theme-toggle" @click="toggleTheme">
             <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
           </button>
@@ -784,13 +787,14 @@ export default {
 <style scoped>
 .app-header {
   background: var(--primary-gradient);
-  padding: 10px 0 0 15px;
+  padding: 10px 15px 0 15px;
   align-items: center;
   display: flex;
   box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1000;
+  box-sizing: border-box;
 }
 
 .header-wrapper {
@@ -801,7 +805,6 @@ export default {
 .logo img {
   width: 50px;
   cursor: pointer;
-  margin-left: 10px;
 }
 
 .title {
@@ -836,12 +839,12 @@ export default {
   cursor: pointer;
   padding: 8px;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease;
+  outline: none;
 }
 
 .theme-toggle:hover {
   background-color: rgba(255, 255, 255, 0.3);
-  transform: rotate(15deg);
 }
 
 .material-icons {
@@ -854,10 +857,10 @@ export default {
   align-items: center;
   width: 100%; /* 占满整个 Header 宽度 */
   justify-content: space-between; /* 左右两侧对齐 */
+  box-sizing: border-box;
 }
 
 .header-nav {
-  margin-right: 20px; /* 设置右侧间距 */
   gap: 20px; /* 设置导航链接之间的间距 */
   display: flex; /* 水平排列 */
   align-items: center; /* 垂直居中 */
@@ -1027,12 +1030,11 @@ export default {
   align-items: center;
   padding-top: 15px;
   border-top: 1px solid var(--border-light);
-  border-bottom: 1px solid var(--border-light);
   width: 100%;
 }
 
 .action-area-mobile .new-button {
-  background-color: #42b983;
+  background-color: var(--bg-secondary);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1043,14 +1045,14 @@ export default {
   transition: all 0.3s ease;
   width: 100%;
   box-sizing: border-box;
-  color: white;
-  border: none;
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
   font-size: 14px;
   height: 48px;
 }
 
 .action-area-mobile .new-button:hover {
-  background-color: #3aa876;
+  background-color: var(--bg-gradient-light);
   transform: translateY(-2px);
 }
 
@@ -1063,8 +1065,25 @@ export default {
   font-size: 14px;
 }
 
+.theme-controls-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+  border-top: 1px solid var(--border-light);
+  width: 100%;
+}
+
+.theme-controls-mobile .theme-toggle {
+  min-width: 44px;
+  min-height: 44px;
+}
+
 .mobile-header-content {
   width: 100%; /* 占满整个 Header 宽度 */
+  box-sizing: border-box;
 }
 
 /* 下拉菜单样式 */
@@ -1076,23 +1095,11 @@ export default {
   align-items: center; /* 居中对齐 */
   border-top: 2px solid var(--border-light); /* 上边框颜色 */
   gap: 10px; /* 设置下拉菜单项之间的间距 */
+  box-sizing: border-box;
+  padding-bottom: 10px;
 }
 
-.dropdown-menu .nav-link,
-.dropdown-menu .new-button {
-  padding: 10px;
-  color: black;
-  text-align: center;
-  background-color: transparent; /* 设置背景颜色为透明 */
-  border: none; /* 去掉边框 */
-  padding: 0;
-  font-size: medium;
-}
-
-.dropdown-menu .nav-link:hover,
-.dropdown-menu .new-button:hover {
-  color: #42b983; /* 鼠标悬停时改变颜色 */
-}
+/* 这些样式已移至特定选择器中，不再需要通用的 dropdown-menu 样式 */
 
 /* Dark mode styles are now handled by CSS variables */
 
@@ -1239,5 +1246,10 @@ body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon {
 
 body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon:hover {
   background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 所有主题的暗色模式下拉菜单背景 */
+body.dark-mode .dropdown-menu {
+  background: var(--bg-primary);
 }
 </style>
