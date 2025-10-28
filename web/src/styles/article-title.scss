@@ -121,7 +121,17 @@
 
 /* 深色模式支持 */
 body.dark-mode .title-container h1 {
-  color: #e4e7ed;
+  color: #ffffff;
+}
+
+body.theme-minimal.dark-mode .title-container h1,
+body.theme-minimal.dark-mode .movie-detail h1,
+body.theme-minimal.dark-mode .actor-detail h1,
+body.theme-minimal.dark-mode .post-header h1 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-clip: border-box !important;
 }
 
 body.dark-mode .edit-meta-button,

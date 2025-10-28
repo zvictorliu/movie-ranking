@@ -101,13 +101,13 @@ export default {
 
 <style scoped>
 .markdown-render {
-  color: #333;
+  color: var(--text-primary);
 }
 
 .markdown-content {
   line-height: 1.8;
   font-size: 1.05rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .markdown-inline-image {
@@ -126,7 +126,7 @@ export default {
 .markdown-content :deep(h6) {
   margin-top: 2rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
   line-height: 1.3;
 }
@@ -164,12 +164,12 @@ export default {
 
 .markdown-content :deep(strong) {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--text-accent);
 }
 
 .markdown-content :deep(em) {
   font-style: italic;
-  color: #34495e;
+  color: var(--text-secondary);
 }
 
 /* 列表样式 */
@@ -304,7 +304,7 @@ export default {
 
 /* 暗色模式支持 */
 body.dark-mode .markdown-content {
-  color: #e0e0e0;
+  color: var(--text-primary);
 }
 
 body.dark-mode .markdown-content :deep(h1),
@@ -313,15 +313,15 @@ body.dark-mode .markdown-content :deep(h3),
 body.dark-mode .markdown-content :deep(h4),
 body.dark-mode .markdown-content :deep(h5),
 body.dark-mode .markdown-content :deep(h6) {
-  color: #e0e0e0;
+  color: var(--text-primary);
 }
 
 body.dark-mode .markdown-content :deep(strong) {
-  color: #f8f9fa;
+  color: var(--text-accent);
 }
 
 body.dark-mode .markdown-content :deep(em) {
-  color: #dee2e6;
+  color: var(--text-secondary);
 }
 
 body.dark-mode .markdown-content :deep(blockquote) {

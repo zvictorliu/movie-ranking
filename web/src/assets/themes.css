@@ -179,7 +179,7 @@
   /* 主色调 */
   --primary-color: #ffffff;
   --secondary-color: #e0e0e0;
-  --primary-gradient: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  --primary-gradient: linear-gradient(135deg, #2d2d2d 0%, #4b4b4b 100%);
 
   /* 背景 */
   --bg-primary: #000000;
@@ -214,9 +214,9 @@
   --shadow-hover: 0 8px 25px rgba(255, 255, 255, 0.12);
 
   /* 按钮 */
-  --btn-primary-bg: #ffffff;
-  --btn-primary-hover: #e0e0e0;
-  --btn-primary-text: #000000;
+  --btn-primary-bg: linear-gradient(135deg, #2d2d2d 0%, #4b4b4b 100%);
+  --btn-primary-hover: linear-gradient(135deg, #3a3a3a 0%, #5c5c5c 100%);
+  --btn-primary-text: #ffffff;
 
   /* 卡片 */
   --card-bg: #1a1a1a;

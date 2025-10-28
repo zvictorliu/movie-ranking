@@ -447,6 +447,32 @@ body.dark-mode .star-icon {
   color: #555;
 }
 
+body.theme-minimal.dark-mode .star-icon {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+body.theme-minimal.dark-mode .star-icon.filled {
+  color: #ffca28;
+}
+
+body.theme-minimal.dark-mode .star-wrapper.clickable:hover .star-icon,
+body.theme-minimal.dark-mode .star-icon.hover {
+  color: #ffd54f;
+}
+
+body.theme-gradient.dark-mode .star-icon {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+body.theme-gradient.dark-mode .star-icon.filled {
+  color: #ffca28;
+}
+
+body.theme-gradient.dark-mode .star-wrapper.clickable:hover .star-icon,
+body.theme-gradient.dark-mode .star-icon.hover {
+  color: #ffd54f;
+}
+
 /* 动画定义 */
 @keyframes pulse {
   0% {
