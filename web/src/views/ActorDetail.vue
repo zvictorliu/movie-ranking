@@ -60,7 +60,10 @@
           :title="link.title"
           :aria-label="link.ariaLabel"
         >
-          <span class="social-icon" :class="`social-icon--${link.type}`">{{ link.iconText }}</span>
+          <i
+            :class="['social-icon', `social-icon--${link.type}`, 'fa-brands', link.iconClass]"
+            aria-hidden="true"
+          ></i>
         </a>
       </div>
     </div>
@@ -133,21 +136,21 @@ export default {
         {
           type: 'x',
           value: this.actor?.x,
-          iconText: 'X',
+          iconClass: 'fa-x-twitter',
           title: '前往 X',
           ariaLabel: '打开 X 链接',
         },
         {
           type: 'instagram',
           value: this.actor?.instagram,
-          iconText: 'IG',
+          iconClass: 'fa-instagram',
           title: '前往 Instagram',
           ariaLabel: '打开 Instagram 链接',
         },
         {
           type: 'wiki',
           value: this.actor?.wiki,
-          iconText: 'W',
+          iconClass: 'fa-wikipedia-w',
           title: '查看 Wiki',
           ariaLabel: '打开 Wiki 链接',
         },
@@ -484,12 +487,11 @@ button:hover {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  letter-spacing: 0.5px;
+  font-size: 18px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: var(--shadow-sm);
 }
