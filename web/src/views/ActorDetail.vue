@@ -474,47 +474,55 @@ button:hover {
 
 .social-link {
   display: inline-flex;
+  align-items: center;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .social-link:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 3px;
-  border-radius: 50%;
+  border-radius: 6px;
 }
 
 .social-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: var(--shadow-sm);
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.2s ease;
 }
 
 .social-link:hover .social-icon,
 .social-link:focus-visible .social-icon {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
 }
 
 .social-icon--x {
-  background: #000;
-  font-size: 16px;
+  color: #000;
+}
+
+.social-link:hover .social-icon--x,
+.social-link:focus-visible .social-icon--x {
+  color: #222;
 }
 
 .social-icon--instagram {
   background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf);
-  font-size: 14px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.social-link:hover .social-icon--instagram,
+.social-link:focus-visible .social-icon--instagram {
+  filter: brightness(1.1);
 }
 
 .social-icon--wiki {
-  background: #3366cc;
-  font-size: 16px;
+  color: #3366cc;
+}
+
+.social-link:hover .social-icon--wiki,
+.social-link:focus-visible .social-icon--wiki {
+  color: #1f4d99;
 }
 
 /* 编辑正文对话框样式 */
