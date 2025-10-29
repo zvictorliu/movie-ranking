@@ -61,6 +61,8 @@
     </p>
     <p><strong>简介：</strong>{{ movie.description }}</p>
 
+    <div class="section-divider" aria-hidden="true"></div>
+
     <!-- 显示 Markdown 正文 -->
     <div class="content" v-if="!editBodyDialogVisible">
       <MarkdownRender :content="movie.body" />
@@ -353,11 +355,13 @@ button:disabled:hover {
 
 .content {
   margin-top: 30px;
-  padding: 20px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  box-shadow: var(--shadow-sm);
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 24px 0;
+  width: 100%;
 }
 
 .rating {

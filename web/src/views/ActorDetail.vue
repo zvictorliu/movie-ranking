@@ -45,28 +45,31 @@
           </span>
         </span>
       </div>
-    </div>
-
-    <div v-if="socialLinks.length" class="social-links">
-      <strong>社媒链接：</strong>
-      <div class="social-links-list">
-        <a
-          v-for="link in socialLinks"
-          :key="link.type"
-          class="social-link"
-          :href="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          :title="link.title"
-          :aria-label="link.ariaLabel"
-        >
-          <i
-            :class="['social-icon', `social-icon--${link.type}`, 'fa-brands', link.iconClass]"
-            aria-hidden="true"
-          ></i>
-        </a>
+      <div v-if="socialLinks.length" class="meta-item meta-item--social">
+        <span class="meta-label">社媒链接：</span>
+        <span class="meta-value">
+          <span class="social-links-list">
+            <a
+              v-for="link in socialLinks"
+              :key="link.type"
+              class="social-link"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              :title="link.title"
+              :aria-label="link.ariaLabel"
+            >
+              <i
+                :class="['social-icon', `social-icon--${link.type}`, 'fa-brands', link.iconClass]"
+                aria-hidden="true"
+              ></i>
+            </a>
+          </span>
+        </span>
       </div>
     </div>
+
+    <div class="section-divider" aria-hidden="true"></div>
 
     <!-- 渲染正文内容 -->
     <div class="content" v-if="!editBodyDialogVisible">
@@ -199,7 +202,11 @@ export default {
       )
     },
     hasMetaSection() {
-      return this.metaInfoItems.length > 0 || this.shouldShowFavorite
+      return (
+        this.metaInfoItems.length > 0 ||
+        this.shouldShowFavorite ||
+        this.socialLinks.length > 0
+      )
     },
   },
   async created() {
@@ -358,11 +365,7 @@ export default {
 
 .meta-section {
   margin-top: 24px;
-  padding: 20px 24px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  box-shadow: var(--shadow-sm);
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -396,11 +399,13 @@ export default {
 
 .content {
   margin-top: 30px;
-  padding: 20px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  box-shadow: var(--shadow-sm);
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 24px 0;
+  width: 100%;
 }
 
 button {
@@ -455,21 +460,16 @@ button:hover {
   color: #e91e63;
 }
 
-.social-links {
+.meta-item--social .meta-value {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin: 20px 0;
-  padding: 12px 16px;
-  background: var(--bg-gradient-light);
-  border-radius: 8px;
-  border: 1px solid var(--border-light);
 }
 
 .social-links-list {
-  display: flex;
+  display: inline-flex;
   gap: 12px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .social-link {
