@@ -6,6 +6,7 @@ import MovieDetailPage from '../views/MovieDetail.vue' // 引入影片详情页�
 import ActorDetailPage from '../views/ActorDetail.vue' // 引入演员详情页组件
 import ActorsPage from '../views/ActorsPage.vue' // 引入演员页面
 import MoviesPage from '../views/MoviesPage.vue' // 引入影片页面
+import DashboardPage from '../views/DashboardPage.vue' // 引入数据总览页面
 import TagsPage from '../views/TagsPage.vue' // 引入标签页面
 import TagDetail from '../views/TagDetail.vue' // 引入标签详情页面
 import PostsPage from '../views/PostsPage.vue' // 引入博客列表页面
@@ -18,6 +19,12 @@ const routes = [
     name: 'HomePage',
     component: HomePage,
     meta: { requiresAuth: false }, // 首页不需要认证
+  },
+  {
+    path: '/dashboard',
+    name: 'DashboardPage',
+    component: DashboardPage,
+    meta: { requiresAuth: true }, // 需要认证
   },
   {
     path: '/login',

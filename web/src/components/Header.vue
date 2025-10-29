@@ -11,6 +11,9 @@
       <div class="header-nav">
         <!-- 导航图标区域 -->
         <div class="nav-icons">
+          <span @click="goToDashboard" class="nav-icon" title="数据总览">
+            <span class="material-icons">dashboard</span>
+          </span>
           <span @click="goToMovies" class="nav-icon" title="影片排行页面">
             <span class="material-icons">movie</span>
           </span>
@@ -85,6 +88,10 @@
       <div v-if="isMenuOpen" class="dropdown-menu">
         <!-- 导航图标区域 -->
         <div class="nav-icons-mobile">
+          <span @click="goToDashboard" class="nav-icon" title="数据总览页面">
+            <span class="material-icons">dashboard</span>
+            <span class="nav-text">数据总览</span>
+          </span>
           <span @click="goToMovies" class="nav-icon" title="影片排行页面">
             <span class="material-icons">movie</span>
             <span class="nav-text">影片排行</span>
@@ -436,6 +443,11 @@ export default {
   methods: {
     goToHome() {
       this.$router.push({ name: 'HomePage' }) // 返回主页 [[6]]
+      this.isMenuOpen = false // 关闭菜单
+    },
+    goToDashboard() {
+      const route = this.$router.resolve({ name: 'DashboardPage' })
+      window.open(route.href, '_blank') // 在新窗口打开 Dashboard 页面
       this.isMenuOpen = false // 关闭菜单
     },
     goToMovies() {
