@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- 全局头部 -->
-    <Header />
+    <AppHeader />
 
     <!-- 路由视图：显示当前路由对应的页面 -->
     <main class="app-main">
@@ -10,7 +10,7 @@
     </main>
 
     <!-- 全局底部 -->
-    <Footer />
+    <AppFooter />
 
     <!-- 图片侧边栏 -->
     <ImageSidebar />
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import Footer from './components/Footer.vue'
-import Header from './components/Header.vue'
+import AppFooter from './components/AppFooter.vue'
+import AppHeader from './components/AppHeader.vue'
 import ImageSidebar from './components/ImageSidebar.vue'
 import CreateMenu from './components/CreateMenu.vue'
 import { useViewStore } from './store/view'
@@ -30,8 +30,8 @@ import './assets/material-icons.scss'
 export default {
   name: 'App',
   components: {
-    Header,
-    Footer,
+    AppHeader,
+    AppFooter,
     ImageSidebar,
     CreateMenu,
   },

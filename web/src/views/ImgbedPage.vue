@@ -15,7 +15,7 @@
           @input="filterImages"
         >
           <template #prefix>
-            <el-icon><Search /></el-icon>
+            <el-icon><SearchIcon /></el-icon>
           </template>
         </el-input>
       </div>
@@ -41,7 +41,7 @@
           >
             <template #error>
               <div class="image-error">
-                <el-icon><Picture /></el-icon>
+                <el-icon><PictureIcon /></el-icon>
                 <span>加载失败</span>
               </div>
             </template>
@@ -87,7 +87,7 @@
         <el-image :src="currentPreviewImage.path" :alt="currentPreviewImage.filename" fit="contain">
           <template #error>
             <div class="image-error-large">
-              <el-icon><Picture /></el-icon>
+              <el-icon><PictureIcon /></el-icon>
               <span>图片加载失败</span>
             </div>
           </template>
@@ -105,15 +105,15 @@
 
 <script>
 import axios from 'axios'
-import { Search, Refresh, Picture, Loading } from '@element-plus/icons-vue'
+import { Search as SearchIcon, Refresh, Picture as PictureIcon, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 export default {
   name: 'ImgbedPage',
   components: {
-    Search,
+    SearchIcon,
     Refresh,
-    Picture,
+    PictureIcon,
     Loading,
   },
   data() {
