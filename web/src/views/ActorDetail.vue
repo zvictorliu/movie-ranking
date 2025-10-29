@@ -18,23 +18,33 @@
       </div>
     </div>
     <img :src="actor.cover" alt="演员封面" class="cover" @error="setDefaultCover($event)" />
-    <p><strong>出生日期：</strong>{{ actor.birth }}</p>
-    <p><strong>出道日期：</strong>{{ actor.debut }}</p>
-    <div class="favorite-section">
-      <strong>喜爱度：</strong>
-      <span class="favorite-hearts">
-        <span
-          v-for="i in 5"
-          :key="i"
-          class="heart"
-          :class="{ filled: i <= actor.favorite, empty: i > actor.favorite }"
-          @click="updateFavorite(i)"
-        >
-          <span class="material-icons">
-            {{ i <= actor.favorite ? 'favorite' : 'favorite_border' }}
+    <div v-if="hasMetaSection" class="meta-section">
+      <div
+        v-for="item in metaInfoItems"
+        :key="item.label"
+        class="meta-item"
+      >
+        <span class="meta-label">{{ item.label }}：</span>
+        <span class="meta-value">{{ item.value }}</span>
+      </div>
+      <div v-if="shouldShowFavorite" class="meta-item meta-item--favorite">
+        <span class="meta-label">喜爱度：</span>
+        <span class="meta-value">
+          <span class="favorite-hearts">
+            <span
+              v-for="i in 5"
+              :key="i"
+              class="heart"
+              :class="{ filled: i <= actor.favorite, empty: i > actor.favorite }"
+              @click="updateFavorite(i)"
+            >
+              <span class="material-icons">
+                {{ i <= actor.favorite ? 'favorite' : 'favorite_border' }}
+              </span>
+            </span>
           </span>
         </span>
-      </span>
+      </div>
     </div>
 
     <div v-if="socialLinks.length" class="social-links">
@@ -155,6 +165,39 @@ export default {
 
       return links
     },
+    metaInfoItems() {
+      const items = []
+      if (this.actor?.birth) {
+        const formattedBirth = this.formatActorDate(this.actor.birth)
+        if (formattedBirth) {
+          items.push({
+            label: '出生日期',
+            value: formattedBirth,
+          })
+        }
+      }
+      if (this.actor?.debut) {
+        const formattedDebut = this.formatActorDate(this.actor.debut)
+        if (formattedDebut) {
+          items.push({
+            label: '出道日期',
+            value: formattedDebut,
+          })
+        }
+      }
+      return items
+    },
+    shouldShowFavorite() {
+      const favorite = Number(this.actor?.favorite)
+      return (
+        this.actor?.favorite !== undefined &&
+        this.actor?.favorite !== null &&
+        !Number.isNaN(favorite)
+      )
+    },
+    hasMetaSection() {
+      return this.metaInfoItems.length > 0 || this.shouldShowFavorite
+    },
   },
   async created() {
     const { name } = this.$route.params
@@ -187,6 +230,27 @@ export default {
         return trimmed
       }
       return `https://${trimmed}`
+    },
+    formatActorDate(value) {
+      if (value === undefined || value === null) {
+        return ''
+      }
+      const stringValue = String(value).trim()
+      if (!stringValue) {
+        return ''
+      }
+      const directMatch = stringValue.match(/(\d{4})\D(\d{1,2})\D(\d{1,2})/)
+      if (directMatch) {
+        const [, year, month, day] = directMatch
+        const paddedMonth = month.padStart(2, '0')
+        const paddedDay = day.padStart(2, '0')
+        return `${year}-${paddedMonth}-${paddedDay}`
+      }
+      const parsed = Date.parse(stringValue)
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed).toISOString().slice(0, 10)
+      }
+      return stringValue
     },
     setDefaultCover(event) {
       event.target.src = '/imgs/default_cover.jpg'
@@ -289,6 +353,44 @@ export default {
   transform: translateY(-2px);
 }
 
+.meta-section {
+  margin-top: 24px;
+  padding: 20px 24px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meta-item {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.meta-label {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.meta-value {
+  color: var(--text-secondary);
+}
+
+.meta-item--favorite {
+  align-items: flex-start;
+}
+
+.meta-item--favorite .meta-value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .content {
   margin-top: 30px;
   padding: 20px;
@@ -318,22 +420,6 @@ button:hover {
 }
 
 /* 编辑按钮样式已移至 article-title.scss */
-
-/* 喜爱度样式 */
-.favorite-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: 20px 0;
-  padding: 15px;
-  background: var(--bg-gradient-light);
-  border-radius: 8px;
-  border: 1px solid var(--border-light);
-}
-
-.favorite-section strong {
-  color: var(--primary-color);
-}
 
 .favorite-hearts {
   display: flex;
