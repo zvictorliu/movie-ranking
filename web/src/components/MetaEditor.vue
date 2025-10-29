@@ -51,6 +51,18 @@
           <el-input v-model="formData.debut" placeholder="请输入出道日期"></el-input>
         </el-form-item>
 
+        <el-form-item label="X" prop="x">
+          <el-input v-model="formData.x" placeholder="请输入 X 链接" clearable></el-input>
+        </el-form-item>
+
+        <el-form-item label="Instagram" prop="instagram">
+          <el-input v-model="formData.instagram" placeholder="请输入 Instagram 链接" clearable></el-input>
+        </el-form-item>
+
+        <el-form-item label="Wiki" prop="wiki">
+          <el-input v-model="formData.wiki" placeholder="请输入 Wiki 链接" clearable></el-input>
+        </el-form-item>
+
         <el-form-item label="喜爱度" prop="favorite">
           <el-input-number
             v-model="formData.favorite"
@@ -209,6 +221,11 @@ export default {
       if (this.type === 'actor' && !this.formData.favorite) {
         this.formData.favorite = 1
       }
+      if (this.type === 'actor') {
+        this.formData.x = this.formData.x || ''
+        this.formData.instagram = this.formData.instagram || ''
+        this.formData.wiki = this.formData.wiki || ''
+      }
 
       // 处理标签字段
       if (this.formData.tags && Array.isArray(this.formData.tags)) {
@@ -245,6 +262,9 @@ export default {
           formData.append('birth', this.formData.birth)
           formData.append('debut', this.formData.debut)
           formData.append('favorite', this.formData.favorite)
+          formData.append('x', this.formData.x)
+          formData.append('instagram', this.formData.instagram)
+          formData.append('wiki', this.formData.wiki)
         } else if (this.type === 'post') {
           formData.append('title', this.formData.title)
           formData.append('author', this.formData.author)

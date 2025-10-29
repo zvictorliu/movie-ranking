@@ -69,6 +69,9 @@ def parse_actor_files():
                     "debut": post.get('debut', '未知出道日期'),
                     "favorite": post.get('favorite', 1),  # 默认喜爱度为1
                     "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
+                    "x": post.get('x', ''),
+                    "instagram": post.get('instagram', ''),
+                    "wiki": post.get('wiki', ''),
                 }
                 actors.append(actor_data)
     return actors
@@ -264,6 +267,9 @@ def get_actor(actor_name):
             "favorite": post.get('favorite', 1),  # 默认喜爱度为1
             "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
             "body": post.content,  # 只返回原始正文内容
+            "x": post.get('x', ''),
+            "instagram": post.get('instagram', ''),
+            "wiki": post.get('wiki', ''),
         }
         return jsonify(actor_data)
     
@@ -376,6 +382,9 @@ def create_actor():
         birth = request.form.get('birth', '')
         debut = request.form.get('debut', '')
         favorite = request.form.get('favorite', '1')  # 默认值为1
+        x_link = request.form.get('x', '')
+        instagram_link = request.form.get('instagram', '')
+        wiki_link = request.form.get('wiki', '')
 
         # 确保演员文件夹存在
         if not os.path.exists(ACTORS_FOLDER):
@@ -411,6 +420,9 @@ def create_actor():
             "debut": debut,
             "favorite": int(favorite),  # 转换为整数
             "cover": cover_filename,
+            "x": x_link,
+            "instagram": instagram_link,
+            "wiki": wiki_link,
         }
 
         # 写入文件
@@ -692,6 +704,9 @@ def update_actor(actor_name):
         tags = request.form.get('tags', '')
         if type(tags) == str:
             tags = tags.split(',')
+        x_link = request.form.get('x', '')
+        instagram_link = request.form.get('instagram', '')
+        wiki_link = request.form.get('wiki', '')
         
         file_path = os.path.join(ACTORS_FOLDER, f"{actor_name}.md")
 
@@ -725,6 +740,9 @@ def update_actor(actor_name):
             post['tags'] = [tag.strip() for tag in tags if tag.strip()]
             if cover_filename:
                 post['cover'] = cover_filename
+            post['x'] = x_link
+            post['instagram'] = instagram_link
+            post['wiki'] = wiki_link
 
             f.seek(0)
             f.write(frontmatter.dumps(post))

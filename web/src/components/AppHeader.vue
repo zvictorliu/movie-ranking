@@ -291,6 +291,27 @@
             style="width: 100%"
           ></el-input>
         </el-form-item>
+        <el-form-item label="X">
+          <el-input
+            v-model="actorFormData.x"
+            placeholder="请输入 X 链接"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="Instagram">
+          <el-input
+            v-model="actorFormData.instagram"
+            placeholder="请输入 Instagram 链接"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="Wiki">
+          <el-input
+            v-model="actorFormData.wiki"
+            placeholder="请输入 Wiki 链接"
+            clearable
+          ></el-input>
+        </el-form-item>
         <el-form-item label="喜爱度">
           <el-input-number
             v-model="actorFormData.favorite"
@@ -411,6 +432,9 @@ export default {
         birth: '',
         debut: '',
         favorite: 1,
+        x: '',
+        instagram: '',
+        wiki: '',
       },
       imageDialogVisible: false, // 控制图片上传浮动窗口的显示状态
       imageFormData: {
@@ -544,6 +568,9 @@ export default {
         birth: '',
         debut: '',
         favorite: 1,
+        x: '',
+        instagram: '',
+        wiki: '',
       }
       this.actorImageFileList = []
       this.selectedActorImageFile = null
@@ -661,6 +688,9 @@ export default {
         formData.append('birth', this.actorFormData.birth)
         formData.append('debut', this.actorFormData.debut)
         formData.append('favorite', this.actorFormData.favorite)
+        formData.append('x', this.actorFormData.x)
+        formData.append('instagram', this.actorFormData.instagram)
+        formData.append('wiki', this.actorFormData.wiki)
 
         // 如果有图片，添加到表单数据中
         if (this.selectedActorImageFile) {

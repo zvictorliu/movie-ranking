@@ -37,6 +37,24 @@
       </span>
     </div>
 
+    <div v-if="socialLinks.length" class="social-links">
+      <strong>社媒链接：</strong>
+      <div class="social-links-list">
+        <a
+          v-for="link in socialLinks"
+          :key="link.type"
+          class="social-link"
+          :href="link.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          :title="link.title"
+          :aria-label="link.ariaLabel"
+        >
+          <span class="social-icon" :class="`social-icon--${link.type}`">{{ link.iconText }}</span>
+        </a>
+      </div>
+    </div>
+
     <!-- 渲染正文内容 -->
     <div class="content" v-if="!editBodyDialogVisible">
       <MarkdownRender :content="actor.body" />
@@ -98,6 +116,46 @@ export default {
       editMetaDialogVisible: false, // 控制编辑元信息对话框的显示状态
     }
   },
+  computed: {
+    socialLinks() {
+      const links = []
+      const mappings = [
+        {
+          type: 'x',
+          value: this.actor?.x,
+          iconText: 'X',
+          title: '前往 X',
+          ariaLabel: '打开 X 链接',
+        },
+        {
+          type: 'instagram',
+          value: this.actor?.instagram,
+          iconText: 'IG',
+          title: '前往 Instagram',
+          ariaLabel: '打开 Instagram 链接',
+        },
+        {
+          type: 'wiki',
+          value: this.actor?.wiki,
+          iconText: 'W',
+          title: '查看 Wiki',
+          ariaLabel: '打开 Wiki 链接',
+        },
+      ]
+
+      mappings.forEach((item) => {
+        const url = this.normalizeLink(item.value)
+        if (url) {
+          links.push({
+            ...item,
+            url,
+          })
+        }
+      })
+
+      return links
+    },
+  },
   async created() {
     const { name } = this.$route.params
     try {
@@ -117,6 +175,19 @@ export default {
     this.$eventBus.off('actor-created')
   },
   methods: {
+    normalizeLink(link) {
+      if (!link || typeof link !== 'string') {
+        return ''
+      }
+      const trimmed = link.trim()
+      if (!trimmed) {
+        return ''
+      }
+      if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed
+      }
+      return `https://${trimmed}`
+    },
     setDefaultCover(event) {
       event.target.src = '/imgs/default_cover.jpg'
     },
@@ -293,6 +364,69 @@ button:hover {
 
 .heart:hover .material-icons {
   color: #e91e63;
+}
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 12px 16px;
+  background: var(--bg-gradient-light);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+
+.social-links-list {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+.social-link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.social-link:hover .social-icon,
+.social-link:focus-visible .social-icon {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.social-icon--x {
+  background: #000;
+  font-size: 16px;
+}
+
+.social-icon--instagram {
+  background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf);
+  font-size: 14px;
+}
+
+.social-icon--wiki {
+  background: #3366cc;
+  font-size: 16px;
 }
 
 /* 编辑正文对话框样式 */
