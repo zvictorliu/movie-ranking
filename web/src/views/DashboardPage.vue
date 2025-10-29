@@ -13,7 +13,14 @@
     </div>
     <div v-else class="dashboard-content">
       <div class="stats-grid">
-        <div class="stat-card">
+        <div
+          class="stat-card stat-card--link"
+          role="button"
+          tabindex="0"
+          @click="goToPage('MoviesPage')"
+          @keydown.enter.prevent="goToPage('MoviesPage')"
+          @keydown.space.prevent="goToPage('MoviesPage')"
+        >
           <div class="stat-icon">
             <span class="material-icons">movie</span>
           </div>
@@ -22,7 +29,14 @@
             <span class="stat-value">{{ stats.movies }}</span>
           </div>
         </div>
-        <div class="stat-card">
+        <div
+          class="stat-card stat-card--link"
+          role="button"
+          tabindex="0"
+          @click="goToPage('ActorsPage')"
+          @keydown.enter.prevent="goToPage('ActorsPage')"
+          @keydown.space.prevent="goToPage('ActorsPage')"
+        >
           <div class="stat-icon">
             <span class="material-icons">people</span>
           </div>
@@ -31,7 +45,14 @@
             <span class="stat-value">{{ stats.actors }}</span>
           </div>
         </div>
-        <div class="stat-card">
+        <div
+          class="stat-card stat-card--link"
+          role="button"
+          tabindex="0"
+          @click="goToPage('TagsPage')"
+          @keydown.enter.prevent="goToPage('TagsPage')"
+          @keydown.space.prevent="goToPage('TagsPage')"
+        >
           <div class="stat-icon">
             <span class="material-icons">local_offer</span>
           </div>
@@ -40,7 +61,14 @@
             <span class="stat-value">{{ stats.tags }}</span>
           </div>
         </div>
-        <div class="stat-card">
+        <div
+          class="stat-card stat-card--link"
+          role="button"
+          tabindex="0"
+          @click="goToPage('PostsPage')"
+          @keydown.enter.prevent="goToPage('PostsPage')"
+          @keydown.space.prevent="goToPage('PostsPage')"
+        >
           <div class="stat-icon">
             <span class="material-icons">article</span>
           </div>
@@ -99,7 +127,16 @@
             <small>根据当前数据自动排序</small>
           </header>
           <ul class="panel-list" v-if="topMovies.length">
-            <li v-for="movie in topMovies" :key="movie.id || movie.title" class="panel-item">
+            <li
+              v-for="movie in topMovies"
+              :key="movie.id || movie.title"
+              class="panel-item panel-item--link"
+              role="button"
+              tabindex="0"
+              @click="goToMovieDetail(movie)"
+              @keydown.enter.prevent="goToMovieDetail(movie)"
+              @keydown.space.prevent="goToMovieDetail(movie)"
+            >
               <div class="item-title">{{ movie.title }}</div>
               <div class="item-meta">
                 <span class="material-icons">star</span>
@@ -116,7 +153,16 @@
             <small>最近发布的三篇文章</small>
           </header>
           <ul class="panel-list" v-if="latestPosts.length">
-            <li v-for="post in latestPosts" :key="post.slug || post.title" class="panel-item">
+            <li
+              v-for="post in latestPosts"
+              :key="post.slug || post.title"
+              class="panel-item panel-item--link"
+              role="button"
+              tabindex="0"
+              @click="goToPostDetail(post)"
+              @keydown.enter.prevent="goToPostDetail(post)"
+              @keydown.space.prevent="goToPostDetail(post)"
+            >
               <div class="item-title">{{ post.title }}</div>
               <div class="item-meta">
                 <span class="material-icons">event</span>
@@ -220,6 +266,26 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    goToPage(routeName) {
+      if (!routeName) {
+        return
+      }
+      this.$router.push({ name: routeName })
+    },
+    goToMovieDetail(movie) {
+      const movieId = movie?.id
+      if (!movieId) {
+        return
+      }
+      this.$router.push({ name: 'MovieDetail', params: { id: movieId } })
+    },
+    goToPostDetail(post) {
+      const slug = post?.slug
+      if (!slug) {
+        return
+      }
+      this.$router.push({ name: 'PostsDetail', params: { slug } })
     },
     buildRatingBuckets(list, field) {
       const buckets = RATING_BUCKETS.map((bucket) => ({ ...bucket, value: 0 }))
@@ -387,6 +453,22 @@ export default {
   background: var(--bg-gradient-light);
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card--link {
+  cursor: pointer;
+}
+
+.stat-card--link:hover,
+.stat-card--link:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.stat-card--link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 3px;
 }
 
 .stat-icon {
@@ -486,6 +568,17 @@ export default {
 .panel-item:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
+}
+
+.panel-item--link {
+  cursor: pointer;
+}
+
+.panel-item--link:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .item-title {
