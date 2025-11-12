@@ -83,6 +83,7 @@ export default {
   max-width: 900px;
   margin: auto;
   padding: 20px;
+  --tag-title-gradient: var(--primary-gradient);
 }
 
 .tag-detail-page h1 {
@@ -90,7 +91,7 @@ export default {
   font-size: 2.5rem;
   margin-bottom: 30px;
   text-align: center;
-  background: var(--primary-gradient);
+  background: var(--tag-title-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -163,7 +164,7 @@ export default {
   color: var(--primary-color);
   font-size: 1.5rem;
   margin-bottom: 15px;
-  background: var(--primary-gradient);
+  background: var(--tag-title-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -224,5 +225,15 @@ export default {
   background: var(--bg-gradient-light);
   border-radius: 12px;
   border: 1px solid var(--border-light);
+}
+</style>
+
+<style>
+body.theme-minimal.dark-mode .tag-detail-page {
+  --tag-title-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(224, 224, 224, 0.85) 100%
+  );
 }
 </style>
