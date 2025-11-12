@@ -23,6 +23,55 @@
         </div>
       </div>
 
+      <!-- 幻灯片模块 -->
+      <div class="slideshow-section" v-if="slideshowMovies.length">
+        <div
+          class="slideshow-track"
+          :style="slideshowTrackStyle"
+          @touchstart.passive="onSlideshowTouchStart"
+          @touchmove.passive="onSlideshowTouchMove"
+          @touchend="onSlideshowTouchEnd"
+          @touchcancel="onSlideshowTouchEnd"
+        >
+          <div
+            v-for="(movie, index) in slideshowMovies"
+            :key="movie.id || `slide-${index}`"
+            class="slideshow-slide"
+            :class="{ active: index === currentSlideIndex }"
+            :style="{ backgroundImage: `url(${movie.cover || defaultCover})` }"
+            role="button"
+            tabindex="0"
+            :aria-label="movie.title ? `查看${movie.title}详情` : '查看影片详情'"
+            @click="goToMovieDetail(movie)"
+            @keyup.enter.prevent="goToMovieDetail(movie)"
+          >
+            <div class="slide-info">
+              <h3>{{ movie.title }}</h3>
+              <p>{{ movie.description || '暂无简介' }}</p>
+              <div class="slide-meta">
+                <span>
+                  评分：{{
+                    movie.rating !== undefined && movie.rating !== null ? movie.rating : '暂无'
+                  }}
+                </span>
+                <span v-if="movie.actors">主演：{{ movie.actors }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slideshow-dots" v-if="slideshowMovies.length > 1">
+          <button
+            v-for="(movie, index) in slideshowMovies"
+            :key="`slide-dot-${movie.id || index}`"
+            class="slideshow-dot"
+            :class="{ active: index === currentSlideIndex }"
+            @click="goToSlide(index)"
+            type="button"
+            aria-label="切换幻灯片"
+          ></button>
+        </div>
+      </div>
+
       <!-- 筛选器面板 -->
       <div class="filter-panel">
         <div class="filter-header">
@@ -196,10 +245,19 @@ export default {
       selectedTags: [], // 当前选择的标签
       searchQuery: '', // 搜索查询
       ratingRange: [3, 5], // 默认评分区间
+      minRatingThreshold: 3, // 评分最低限制
       defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
       editDialogVisible: false, // 控制编辑对话框的显示状态
       editFormData: {}, // 当前正在编辑的影片数据
       savingRanking: false, // 保存排行的状态
+      slideshowMovies: [], // 用于幻灯片展示的影片
+      currentSlideIndex: 0, // 当前幻灯片索引
+      slideshowTimer: null, // 幻灯片自动播放计时器
+      touchStartX: null, // 触摸起点 X
+      touchDeltaX: 0, // 触摸移动距离
+      ignoreNextSlideClick: false, // 是否忽略下一次点击（防止滑动触发）
+      dragOffsetX: 0, // 拖拽时的位移偏移
+      isDragging: false, // 当前是否正在拖拽
     }
   },
   computed: {
@@ -222,6 +280,15 @@ export default {
         this.ratingRange[0] !== 3 ||
         this.ratingRange[1] !== 5
       )
+    },
+    slideshowTrackStyle() {
+      const basePercent = this.currentSlideIndex * 100
+      const offsetPx = this.dragOffsetX || 0
+      return {
+        transform: `translateX(calc(-${basePercent}% + ${offsetPx}px))`,
+        transition: this.isDragging ? 'none' : 'transform 0.6s ease',
+        willChange: 'transform',
+      }
     },
   },
   methods: {
@@ -316,6 +383,132 @@ export default {
 
       this.filteredMovies = filtered
     },
+    refreshSlideshow() {
+      this.updateSlideshowMovies()
+      this.startSlideshow()
+    },
+    updateSlideshowMovies() {
+      if (!this.movies.length) {
+        this.slideshowMovies = []
+        this.currentSlideIndex = 0
+        this.stopSlideshow()
+        this.resetDragState()
+        return
+      }
+      const eligibleMovies = this.movies.filter((movie) => {
+        const rating = Number(movie.rating)
+        return !Number.isNaN(rating) && rating >= this.minRatingThreshold
+      })
+      if (!eligibleMovies.length) {
+        this.slideshowMovies = []
+        this.currentSlideIndex = 0
+        this.stopSlideshow()
+        this.resetDragState()
+        return
+      }
+      const shuffled = [...eligibleMovies]
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      this.slideshowMovies = shuffled.slice(0, Math.min(10, shuffled.length))
+      this.currentSlideIndex = 0
+      this.resetDragState()
+    },
+    startSlideshow() {
+      this.stopSlideshow()
+      if (this.slideshowMovies.length <= 1) {
+        return
+      }
+      this.slideshowTimer = setInterval(() => {
+        this.nextSlide()
+      }, 10000)
+    },
+    stopSlideshow() {
+      if (this.slideshowTimer) {
+        clearInterval(this.slideshowTimer)
+        this.slideshowTimer = null
+      }
+    },
+    nextSlide() {
+      if (!this.slideshowMovies.length) {
+        return
+      }
+      this.currentSlideIndex = (this.currentSlideIndex + 1) % this.slideshowMovies.length
+      this.resetDragState()
+    },
+    prevSlide() {
+      if (!this.slideshowMovies.length) {
+        return
+      }
+      const total = this.slideshowMovies.length
+      this.currentSlideIndex = (this.currentSlideIndex - 1 + total) % total
+      this.resetDragState()
+    },
+    goToSlide(index) {
+      if (index < 0 || index >= this.slideshowMovies.length) {
+        return
+      }
+      this.currentSlideIndex = index
+      this.resetDragState()
+      this.startSlideshow()
+    },
+    goToMovieDetail(movie) {
+      if (this.ignoreNextSlideClick) {
+        this.ignoreNextSlideClick = false
+        return
+      }
+      if (!movie || !movie.id) {
+        return
+      }
+      this.$router.push({ name: 'MovieDetail', params: { id: movie.id } })
+    },
+    onSlideshowTouchStart(event) {
+      if (!event.touches || event.touches.length !== 1) {
+        return
+      }
+      this.touchStartX = event.touches[0].clientX
+      this.touchDeltaX = 0
+      this.ignoreNextSlideClick = false
+      this.dragOffsetX = 0
+      this.isDragging = true
+      this.stopSlideshow()
+    },
+    onSlideshowTouchMove(event) {
+      if (this.touchStartX === null || !event.touches || event.touches.length !== 1) {
+        return
+      }
+      this.touchDeltaX = event.touches[0].clientX - this.touchStartX
+      this.dragOffsetX = this.touchDeltaX
+    },
+    onSlideshowTouchEnd() {
+      if (this.touchStartX === null) {
+        return
+      }
+      const swipeThreshold = 50
+      const isSwipe = Math.abs(this.touchDeltaX) > swipeThreshold
+      if (isSwipe) {
+        if (this.touchDeltaX > 0) {
+          this.prevSlide()
+        } else {
+          this.nextSlide()
+        }
+      }
+      this.ignoreNextSlideClick = isSwipe
+      if (isSwipe) {
+        setTimeout(() => {
+          this.ignoreNextSlideClick = false
+        }, 120)
+      }
+      this.touchStartX = null
+      this.touchDeltaX = 0
+      this.resetDragState()
+      this.startSlideshow()
+    },
+    resetDragState() {
+      this.dragOffsetX = 0
+      this.isDragging = false
+    },
     // 清除所有筛选器
     clearAllFilters() {
       this.searchQuery = ''
@@ -370,6 +563,7 @@ export default {
         this.movies = response.data
         this.filteredMovies = response.data // 初始化筛选后的影片
         this.filterMovies() // 初始化筛选
+        this.refreshSlideshow()
       } catch (error) {
         console.error('请求失败:', error)
       }
@@ -404,6 +598,7 @@ export default {
   },
   beforeUnmount() {
     // 清理事件监听器
+    this.stopSlideshow()
     this.$eventBus.off('movie-created')
     this.$eventBus.off('actor-created')
   },
@@ -420,6 +615,139 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 5px;
+}
+
+.slideshow-section {
+  position: relative;
+  margin: 20px 0 40px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+
+.slideshow-track {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+.slideshow-slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.slideshow-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.35));
+}
+
+.slideshow-slide:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.slide-info {
+  position: absolute;
+  bottom: 72px;
+  left: 24px;
+  right: 24px;
+  color: #fff;
+  z-index: 2;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.slide-info h3 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.slide-info p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+  max-width: 720px;
+  font-size: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.slide-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.slideshow-dots {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 3;
+}
+
+.slideshow-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.slideshow-dot.active {
+  width: 32px;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .slideshow-section {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .slideshow-track {
+    height: 100%;
+  }
+
+  .slide-info {
+    left: 16px;
+    right: 16px;
+    bottom: 44px;
+  }
+
+  .slide-info h3 {
+    font-size: 20px;
+  }
+
+  .slide-info p {
+    font-size: 14px;
+  }
+
+  .slideshow-dots {
+    bottom: 10px;
+  }
 }
 
 /* 顶部操作栏 */
