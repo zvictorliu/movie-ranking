@@ -4,3 +4,8 @@ tmp/
 
 *.tar
 *.tar.gz
+
+.vscode/
+.claude/
+.cache/
+.idea/
