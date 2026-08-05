@@ -22,8 +22,8 @@
 
 <style scoped>
 .app-footer {
-  background: var(--primary-gradient);
-  color: white;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 30px 20px;
   margin-top: auto;
   box-shadow: var(--shadow-sm);
@@ -52,7 +52,6 @@
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .footer-title .material-icons {
@@ -75,7 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.3s ease;
   font-size: 24px;
@@ -131,35 +130,4 @@
 }
 
 /* Dark mode styles are now handled by CSS variables */
-</style>
-
-<style>
-/* 简洁主题下的 Footer 样式（非 scoped） */
-/* 亮色模式 */
-body.theme-minimal:not(.dark-mode) .app-footer {
-  background: #f8f8f8 !important;
-  color: #000000;
-}
-
-body.theme-minimal:not(.dark-mode) .footer-title {
-  text-shadow: none;
-}
-
-body.theme-minimal:not(.dark-mode) .footer-link {
-  color: #333333;
-}
-
-/* 暗色模式 */
-body.theme-minimal.dark-mode .app-footer {
-  background: #1a1a1a !important;
-  color: #ffffff;
-}
-
-body.theme-minimal.dark-mode .footer-title {
-  text-shadow: none;
-}
-
-body.theme-minimal.dark-mode .footer-link {
-  color: #e0e0e0;
-}
 </style>

@@ -1,12 +1,5 @@
 <template>
   <div class="home-page">
-    <!-- 动态背景 -->
-    <div class="background-animation">
-      <div class="gradient-orb orb-1"></div>
-      <div class="gradient-orb orb-2"></div>
-      <div class="gradient-orb orb-3"></div>
-    </div>
-
     <!-- 主要内容 -->
     <div class="content-wrapper">
       <!-- Hero 区域 -->
@@ -133,67 +126,7 @@ export default {
   width: 100%;
   position: relative;
   overflow-x: hidden;
-  background: var(--primary-gradient);
-}
-
-/* 动态背景 */
-.background-animation {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.5;
-  animation: float 20s ease-in-out infinite;
-}
-
-.orb-1 {
-  width: 400px;
-  height: 400px;
-  background: var(--primary-gradient);
-  top: -100px;
-  left: -100px;
-  animation-delay: 0s;
-}
-
-.orb-2 {
-  width: 300px;
-  height: 300px;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  bottom: -50px;
-  right: -50px;
-  animation-delay: 7s;
-}
-
-.orb-3 {
-  width: 250px;
-  height: 250px;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: 14s;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -30px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
+  background: var(--bg-primary);
 }
 
 /* 内容区域 */
@@ -218,11 +151,10 @@ export default {
   justify-content: center;
   width: 80px;
   height: 80px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  background: var(--primary-gradient);
   border-radius: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .hero-icon .material-icons {
@@ -233,14 +165,13 @@ export default {
 .hero-title {
   font-size: 48px;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 10px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .hero-subtitle {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-secondary);
   font-weight: 300;
 }
 
@@ -302,13 +233,14 @@ export default {
 }
 
 .role-badge.admin {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: var(--primary-gradient);
   color: white;
 }
 
 .role-badge.user {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
 }
 
 .logout-btn {
@@ -344,7 +276,7 @@ export default {
 .guest-icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  background: var(--primary-gradient);
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -403,10 +335,9 @@ export default {
 .section-title {
   font-size: 24px;
   font-weight: 600;
-  color: white;
+  color: var(--text-primary);
   text-align: center;
   margin-bottom: 30px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .access-grid {
@@ -448,20 +379,11 @@ export default {
   color: white;
 }
 
-.card-icon.movies {
-  background: var(--primary-gradient);
-}
-
-.card-icon.actors {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.card-icon.tags {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
+.card-icon.movies,
+.card-icon.actors,
+.card-icon.tags,
 .card-icon.posts {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: var(--primary-gradient);
 }
 
 .access-card:hover .card-icon {
@@ -515,14 +437,6 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .home-page {
-    background: var(--primary-gradient);
-  }
-
-  .gradient-orb {
-    display: none; /* 移动端隐藏动态背景以提升性能 */
-  }
-
   .content-wrapper {
     padding: 30px 15px;
   }
@@ -703,57 +617,4 @@ export default {
   }
 }
 
-</style>
-
-<style>
-/* 简洁主题特定样式（非 scoped） */
-/* 亮色模式 */
-body.theme-minimal:not(.dark-mode) .home-page {
-  background: #ffffff !important;
-}
-
-body.theme-minimal .background-animation {
-  display: none;
-}
-
-body.theme-minimal .hero-icon {
-  background: var(--primary-gradient);
-}
-
-body.theme-minimal .hero-title {
-  color: var(--text-primary);
-  text-shadow: none;
-}
-
-body.theme-minimal .hero-subtitle {
-  color: var(--text-secondary);
-}
-
-body.theme-minimal .section-title {
-  color: var(--text-primary);
-  text-shadow: none;
-}
-
-/* 简洁主题暗色模式 */
-body.theme-minimal.dark-mode .home-page {
-  background: #000000 !important;
-}
-
-body.theme-minimal.dark-mode .hero-icon {
-  background: var(--primary-gradient);
-}
-
-body.theme-minimal.dark-mode .hero-title {
-  color: var(--text-primary);
-  text-shadow: none;
-}
-
-body.theme-minimal.dark-mode .hero-subtitle {
-  color: var(--text-secondary);
-}
-
-body.theme-minimal.dark-mode .section-title {
-  color: var(--text-primary);
-  text-shadow: none;
-}
 </style>

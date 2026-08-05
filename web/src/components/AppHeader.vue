@@ -62,9 +62,6 @@
             </div>
           </div>
 
-          <!-- 主题样式切换器 -->
-          <ThemeSwitcher />
-
           <!-- 暗色模式切换 -->
           <button class="theme-toggle" @click="toggleTheme" title="切换暗色/亮色模式">
             <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
@@ -134,8 +131,6 @@
           </button>
         </div>
         <div class="theme-controls-mobile">
-          <!-- 主题样式切换器 -->
-          <ThemeSwitcher />
           <!-- 暗色模式切换 -->
           <button class="theme-toggle" @click="toggleTheme">
             <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
@@ -402,12 +397,10 @@ import { useViewStore } from '../store/view'
 import { useThemeStore } from '../store/theme'
 import axios from 'axios'
 import { UploadFilled } from '@element-plus/icons-vue'
-import ThemeSwitcher from './ThemeSwitcher.vue'
 
 export default {
   name: 'AppHeader',
   components: {
-    ThemeSwitcher,
     UploadFilled,
   },
   data() {
@@ -840,7 +833,7 @@ export default {
 
 <style scoped>
 .app-header {
-  background: var(--primary-gradient);
+  background: var(--bg-secondary);
   padding: 10px 15px 0 15px;
   align-items: center;
   display: flex;
@@ -862,17 +855,16 @@ export default {
 }
 
 .title {
-  color: white;
+  color: var(--text-primary);
   font-size: 24px;
   margin: 10px 20px;
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .menu-button {
   background: transparent;
   border: none;
-  color: white;
+  color: var(--text-primary);
   font-size: 18px;
   cursor: pointer;
   margin-left: auto;
@@ -885,9 +877,9 @@ export default {
 }
 
 .theme-toggle {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.08);
   border: none;
-  color: white;
+  color: var(--text-primary);
   font-size: 24px;
   cursor: pointer;
   padding: 8px;
@@ -897,7 +889,7 @@ export default {
 }
 
 .theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.12);
 }
 
 .material-icons {
@@ -952,11 +944,11 @@ export default {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: white;
+  color: var(--text-secondary);
 }
 
 .nav-icon:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
 
@@ -981,9 +973,8 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  color: white;
+  background-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -993,9 +984,9 @@ export default {
 }
 
 .create-button:hover {
-  background-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .create-text {
@@ -1138,6 +1129,7 @@ export default {
   display: flex; /* 展开时显示 */
   flex-direction: column; /* 垂直排列 */
   align-items: center; /* 居中对齐 */
+  background: var(--bg-secondary); /* 下拉菜单背景色 */
   border-top: 2px solid var(--border-light); /* 上边框颜色 */
   gap: 10px; /* 设置下拉菜单项之间的间距 */
   box-sizing: border-box;
@@ -1168,132 +1160,7 @@ export default {
 </style>
 
 <style>
-/* 简洁主题下的 Header 样式（非 scoped） */
-/* 亮色模式 */
-body.theme-minimal:not(.dark-mode) .app-header {
-  background: #f8f8f8 !important;
-}
-
-body.theme-minimal:not(.dark-mode) .title {
-  color: #000000;
-  text-shadow: none;
-}
-
-/* 桌面端导航图标 */
-body.theme-minimal:not(.dark-mode) .nav-icon {
-  color: #333333;
-}
-
-body.theme-minimal:not(.dark-mode) .nav-icon:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-}
-
-/* 移动端菜单按钮 */
-body.theme-minimal:not(.dark-mode) .menu-button {
-  background: transparent;
-  color: #333333;
-}
-
-body.theme-minimal:not(.dark-mode) .menu-button:hover {
-  opacity: 0.7;
-}
-
-/* 主题切换按钮 */
-body.theme-minimal:not(.dark-mode) .theme-toggle {
-  background-color: rgba(0, 0, 0, 0.08);
-  color: #333333;
-}
-
-body.theme-minimal:not(.dark-mode) .theme-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.12);
-}
-
-/* 新建按钮 */
-body.theme-minimal:not(.dark-mode) .create-button {
-  background-color: rgba(0, 0, 0, 0.08);
-  color: #333333;
-}
-
-body.theme-minimal:not(.dark-mode) .create-button:hover {
-  background-color: rgba(0, 0, 0, 0.12);
-}
-
-/* 移动端下拉菜单 */
-body.theme-minimal:not(.dark-mode) .dropdown-menu {
-  background-color: #f8f8f8;
-}
-
-body.theme-minimal:not(.dark-mode) .nav-icons-mobile .nav-icon {
-  color: #333333;
-}
-
-body.theme-minimal:not(.dark-mode) .nav-icons-mobile .nav-icon:hover {
-  opacity: 0.7;
-}
-
-/* 简洁主题暗色模式 */
-body.theme-minimal.dark-mode .app-header {
-  background: #1a1a1a !important;
-}
-
-body.theme-minimal.dark-mode .title {
-  color: #ffffff;
-  text-shadow: none;
-}
-
-/* 桌面端导航图标 */
-body.theme-minimal.dark-mode .nav-icon {
-  color: #e0e0e0;
-}
-
-body.theme-minimal.dark-mode .nav-icon:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* 移动端菜单按钮 */
-body.theme-minimal.dark-mode .menu-button {
-  background: transparent;
-  color: #e0e0e0;
-}
-
-body.theme-minimal.dark-mode .menu-button:hover {
-  opacity: 0.7;
-}
-
-/* 主题切换按钮 */
-body.theme-minimal.dark-mode .theme-toggle {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #e0e0e0;
-}
-
-body.theme-minimal.dark-mode .theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* 新建按钮 */
-body.theme-minimal.dark-mode .create-button {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #e0e0e0;
-}
-
-body.theme-minimal.dark-mode .create-button:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* 移动端下拉菜单 */
-body.theme-minimal.dark-mode .dropdown-menu {
-  background-color: #1a1a1a;
-}
-
-body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon {
-  color: #e0e0e0;
-}
-
-body.theme-minimal.dark-mode .nav-icons-mobile .nav-icon:hover {
-  opacity: 0.7;
-}
-
-/* 所有主题的暗色模式下拉菜单背景 */
+/* 暗色模式下拉菜单背景 */
 body.dark-mode .dropdown-menu {
   background: var(--bg-primary);
 }

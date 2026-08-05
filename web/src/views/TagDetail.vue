@@ -229,7 +229,7 @@ export default {
 </style>
 
 <style>
-body.theme-minimal.dark-mode .tag-detail-page {
+body.dark-mode .tag-detail-page {
   --tag-title-gradient: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.95) 0%,

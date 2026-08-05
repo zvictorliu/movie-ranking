@@ -120,14 +120,10 @@
 }
 
 /* 深色模式支持 */
-body.dark-mode .title-container h1 {
-  color: #ffffff;
-}
-
-body.theme-minimal.dark-mode .title-container h1,
-body.theme-minimal.dark-mode .movie-detail h1,
-body.theme-minimal.dark-mode .actor-detail h1,
-body.theme-minimal.dark-mode .post-header h1 {
+body.dark-mode .title-container h1,
+body.dark-mode .movie-detail h1,
+body.dark-mode .actor-detail h1,
+body.dark-mode .post-header h1 {
   color: #ffffff !important;
   background: none !important;
   -webkit-text-fill-color: #ffffff !important;
