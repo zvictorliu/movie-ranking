@@ -38,7 +38,6 @@
       </div>
 
       <div class="chrome-actions">
-        <span class="chrome-hint">滚轮旋转 · 点击封面</span>
         <button type="button" class="chrome-btn" @click="goToMovies" title="影片排行">
           <span class="material-icons">movie</span>
         </button>
@@ -47,6 +46,26 @@
         </button>
       </div>
     </header>
+
+    <footer class="home-footer">
+      <span class="home-footer__item home-footer__left">
+        <span class="home-footer__line">铭记美丽的瞬间</span>
+      </span>
+      <span class="home-footer__item home-footer__center">
+        <span class="home-footer__line">
+          <button type="button" class="home-footer__link" @click="goToMovies">
+            影片 {{ movieCount }}
+          </button>
+          <span class="home-footer__sep">/</span>
+          <button type="button" class="home-footer__link" @click="goToActors">
+            演员 {{ actorCount }}
+          </button>
+        </span>
+      </span>
+      <span class="home-footer__item home-footer__right">
+        <span class="home-footer__line">© {{ currentYear }}</span>
+      </span>
+    </footer>
   </div>
 </template>
 
@@ -74,9 +93,16 @@ const userStore = useUserStore()
 const projects = ref([])
 const isSpiral = ref(false)
 const error = ref('')
+const movieCount = ref(0)
+const actorCount = ref(0)
+const currentYear = new Date().getFullYear()
 
 function goToMovies() {
   router.push({ name: 'MoviesPage' })
+}
+
+function goToActors() {
+  router.push({ name: 'ActorsPage' })
 }
 
 function handleLogout() {
@@ -86,37 +112,51 @@ function handleLogout() {
 }
 
 function onOpen(project) {
-  if (!project?.id || typeof project.id !== 'string' || !project.id.endsWith('.md')) {
-    return
-  }
-  router.push({ name: 'MovieDetail', params: { id: project.id } })
+  const id = project?.id
+  if (!id || typeof id !== 'string') return
+  router.push({ name: 'MovieDetail', params: { id } })
 }
 
 onMounted(async () => {
   userStore.restoreLoginState()
-  try {
-    const { data } = await axios.get('/api/movies')
-    const list = (data || [])
-      .filter((m) => m.cover)
-      .map((m) => ({
-        id: m.id,
-        title: m.title,
-        cover: m.cover,
-        rating: m.rating,
-      }))
 
-    if (!list.length) {
-      error.value = '暂无可用影片封面'
-      projects.value = []
-      return
-    }
-
-    projects.value = pickRandomMovies(list, GALLERY_SIZE)
-  } catch (err) {
+  const moviesReq = axios.get('/api/movies').catch((err) => {
     console.error('[HomePage] Failed to load movies', err)
+    return null
+  })
+  const actorsReq = axios.get('/api/actors').catch((err) => {
+    console.error('[HomePage] Failed to load actors', err)
+    return null
+  })
+
+  const [moviesRes, actorsRes] = await Promise.all([moviesReq, actorsReq])
+
+  actorCount.value = Array.isArray(actorsRes?.data) ? actorsRes.data.length : 0
+
+  if (!moviesRes) {
     error.value = '无法加载影片列表，请确认后端服务已启动'
     projects.value = []
+    return
   }
+
+  const list = (moviesRes.data || [])
+    .filter((m) => m.cover)
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      cover: m.cover,
+      rating: m.rating,
+    }))
+
+  movieCount.value = list.length
+
+  if (!list.length) {
+    error.value = '暂无可用影片封面'
+    projects.value = []
+    return
+  }
+
+  projects.value = pickRandomMovies(list, GALLERY_SIZE)
 })
 </script>
 
@@ -125,14 +165,14 @@ onMounted(async () => {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: #0a0a1f;
+  background: #f3f5fa;
 }
 
 .home-page__loading {
   display: grid;
   place-items: center;
   height: 100%;
-  color: #c9c9ff;
+  color: #5a647c;
   font-size: 15px;
 }
 
@@ -160,12 +200,13 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #fff;
+  color: #1a1f36;
 }
 
 .chrome-brand__icon {
   font-size: 28px;
   opacity: 0.9;
+  color: #1500e1;
 }
 
 .chrome-brand__text {
@@ -183,7 +224,8 @@ onMounted(async () => {
   height: 36px;
   padding: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(26, 31, 54, 0.06);
+  border: 1px solid rgba(26, 31, 54, 0.08);
   backdrop-filter: blur(10px);
 }
 
@@ -207,7 +249,7 @@ onMounted(async () => {
   z-index: 1;
   border: 0;
   background: transparent;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(26, 31, 54, 0.55);
   font-size: 13px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -225,28 +267,81 @@ onMounted(async () => {
   gap: 12px;
 }
 
-.chrome-hint {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-}
-
 .chrome-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: 0;
+  border: 1px solid rgba(26, 31, 54, 0.08);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: rgba(26, 31, 54, 0.06);
+  color: #1a1f36;
   cursor: pointer;
   backdrop-filter: blur(8px);
 }
 
 .chrome-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(26, 31, 54, 0.1);
+}
+
+.home-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 28px 26px;
+  pointer-events: none;
+}
+
+.home-footer__item {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.home-footer__left {
+  justify-content: flex-start;
+}
+
+.home-footer__center {
+  justify-content: center;
+}
+
+.home-footer__right {
+  justify-content: flex-end;
+}
+
+.home-footer__line {
+  color: rgba(26, 31, 54, 0.55);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.home-footer__sep {
+  margin: 0 10px;
+  color: rgba(26, 31, 54, 0.28);
+}
+
+.home-footer__link {
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(26, 31, 54, 0.7);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.home-footer__link:hover {
+  color: #1500e1;
 }
 
 @media (max-width: 720px) {
@@ -270,12 +365,34 @@ onMounted(async () => {
     grid-area: switch;
   }
 
-  .chrome-hint {
-    display: none;
-  }
-
   .chrome-brand__text {
     font-size: 16px;
+  }
+
+  .home-footer {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 8px;
+    padding: 16px 20px 20px;
+    text-align: center;
+  }
+
+  .home-footer__left,
+  .home-footer__center,
+  .home-footer__right {
+    justify-content: center;
+  }
+
+  .home-footer__left {
+    order: 2;
+  }
+
+  .home-footer__center {
+    order: 1;
+  }
+
+  .home-footer__right {
+    order: 3;
   }
 }
 </style>

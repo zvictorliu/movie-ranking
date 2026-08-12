@@ -30,13 +30,13 @@ HomePage.vue                  ThreeCylinderScene.vue
 │ 随机抽 10 条有封面  │─────▶│ WebGLRenderer → canvas            │
 │ Rings/Spiral · 登录 │       │ rootGroup                        │
 └─────────────────────┘       │   ├─ rowGroups[5] × panels[12]    │
-                              │   └─ LineSegments 圆柱网格       │
+                              │   └─ BackSide 网格背景圆柱       │
                               │ Raycaster / wheel / RAF 循环     │
                               └──────────────────────────────────┘
 ```
 
 - **页面层**：调用后端影片列表，过滤有 `cover` 的条目后随机取最多 10 条；UI 含品牌、布局切换与登录入口。首页路由 `meta.hideChrome` 隐藏站点 Header/Footer。
-- **场景层**：纯 Three.js 逻辑。用 `projects` + `spiral` 两个 props 驱动；封面 URL 使用 API 原样路径（经 `/imgs` 代理到后端）。
+- **场景层**：纯 Three.js 逻辑。用 `projects` + `spiral` 两个 props 驱动；封面 URL 使用 API 原样路径（经 `/imgs` 代理到后端）。网格为 Canvas 纹理贴在独立内侧圆柱上，不是封面圆柱的 LineSegments。
 
 封面资源：由后端 `/api/movies` 返回的 `cover` 字段提供（通常为 `/imgs/covers/movie-cover/...`，经 Vite 代理到后端）。首页每次加载会**随机抽取最多 10 条**有封面的影片组成画廊；不足 10 条则用全部可用项。
 
@@ -201,14 +201,15 @@ minFilter  = LinearMipmapLinearFilter
 
 ---
 
-## 7. 圆柱网格背景
+## 7. 网格背景图
 
-用 `LineSegments` + `BufferGeometry` 手写线段，不是贴图：
+不做封面圆柱上的 `LineSegments`。背景是一张 **Canvas 绘制的网格纹理**，贴在独立的 **内侧开放圆柱**（`CylinderGeometry` + `BackSide`）上：
 
-- **竖线**：沿圆周均匀取点，从 `y=-halfH` 到 `+halfH`
-- **纬线**：多层水平圆环，每层用折线逼近圆周
+1. `createGridTexture()`：在 2048×1024 画布上铺底色 `#f3f5fa`，再画细线 / 粗线网格；
+2. `ensureBackdrop()`：半径约 32（远大于封面圆柱 ~8）的开放圆柱，`MeshBasicMaterial({ map, side: BackSide })`；
+3. 挂在 `scene` 上而非 `rootGroup`，只以 `spinAngle * 0.09` 缓慢跟转，形成轻微视差。
 
-颜色品牌蓝 `#1500e1`、半透明、`depthWrite: false`、`renderOrder = -10`，只起空间参照作用。网格自转比面板慢（`×0.09`），形成轻微视差。
+这样网格是「环境墙纸」，不是封面排布几何的一部分。
 
 ---
 
@@ -296,6 +297,6 @@ $$
 
 1. **极坐标 + Rings/Spiral 插值** —— 结构清晰、可动画；  
 2. **速度驱动的顶点弯曲** —— 运动时有物理感；  
-3. **行组环绕 + 差分自转/网格视差** —— 空间一直在「流动」。
+3. **行组环绕 + 差分自转** —— 空间一直在「流动」。
 
 在此基础上换封面纹理、改 `ROWS/COLS/radius`，就可以把同一套机制用到任意内容画廊上。

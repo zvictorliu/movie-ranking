@@ -108,7 +108,8 @@ let renderer
 let scene
 let camera
 let rootGroup
-let grid
+let backdrop
+let gridTexture
 let rowGroups = []
 let panels = []
 let sharedGeometry
@@ -195,54 +196,89 @@ function loadTexture(url) {
   return tex
 }
 
-function buildGrid(radius) {
-  if (grid) {
-    rootGroup.remove(grid)
-    grid.geometry.dispose()
-    grid.material.dispose()
-    grid = null
+/** 绘制网格背景图（Canvas → Texture），贴在内侧大圆柱上，不挂在封面圆柱几何上 */
+function createGridTexture() {
+  const width = 2048
+  const height = 1024
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  ctx.fillStyle = '#f3f5fa'
+  ctx.fillRect(0, 0, width, height)
+
+  const cell = 64
+  const majorEvery = 4
+
+  ctx.strokeStyle = 'rgba(122, 132, 168, 0.2)'
+  ctx.lineWidth = 1
+  for (let x = 0; x <= width; x += cell) {
+    ctx.beginPath()
+    ctx.moveTo(x + 0.5, 0)
+    ctx.lineTo(x + 0.5, height)
+    ctx.stroke()
+  }
+  for (let y = 0; y <= height; y += cell) {
+    ctx.beginPath()
+    ctx.moveTo(0, y + 0.5)
+    ctx.lineTo(width, y + 0.5)
+    ctx.stroke()
   }
 
-  const tall = window.innerHeight > window.innerWidth
-  const halfH = tall ? Math.max(30, 22 * Math.min(window.innerHeight / window.innerWidth, 2.2)) : 22
-  const ringSeg = 200
-  const vertCount = 80
-  const latCount = tall ? 22 : 16
-  const positions = []
-
-  for (let i = 0; i < vertCount; i += 1) {
-    const a = (i / vertCount) * Math.PI * 2
-    const x = Math.cos(a) * radius
-    const z = Math.sin(a) * radius
-    positions.push(x, -halfH, z, x, halfH, z)
+  ctx.strokeStyle = 'rgba(90, 100, 140, 0.36)'
+  ctx.lineWidth = 1.5
+  for (let x = 0; x <= width; x += cell * majorEvery) {
+    ctx.beginPath()
+    ctx.moveTo(x + 0.5, 0)
+    ctx.lineTo(x + 0.5, height)
+    ctx.stroke()
   }
-  for (let j = 0; j <= latCount; j += 1) {
-    const y = -halfH + (j / latCount) * halfH * 2
-    for (let i = 0; i < ringSeg; i += 1) {
-      const a0 = (i / ringSeg) * Math.PI * 2
-      const a1 = ((i + 1) / ringSeg) * Math.PI * 2
-      positions.push(
-        Math.cos(a0) * radius,
-        y,
-        Math.sin(a0) * radius,
-        Math.cos(a1) * radius,
-        y,
-        Math.sin(a1) * radius,
-      )
-    }
+  for (let y = 0; y <= height; y += cell * majorEvery) {
+    ctx.beginPath()
+    ctx.moveTo(0, y + 0.5)
+    ctx.lineTo(width, y + 0.5)
+    ctx.stroke()
   }
 
-  const geo = new THREE.BufferGeometry()
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
-  const mat = new THREE.LineBasicMaterial({
-    color: 0x1500e1,
-    transparent: true,
-    opacity: 0.35,
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = 8
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.ClampToEdgeWrapping
+  texture.needsUpdate = true
+  return texture
+}
+
+function ensureBackdrop() {
+  if (!scene || backdrop) return
+
+  gridTexture = createGridTexture()
+  // 开放圆柱：相机在内部看 BackSide，形成环绕网格墙纸
+  const geometry = new THREE.CylinderGeometry(32, 32, 64, 72, 1, true)
+  const material = new THREE.MeshBasicMaterial({
+    map: gridTexture,
+    side: THREE.BackSide,
     depthWrite: false,
+    toneMapped: false,
   })
-  grid = new THREE.LineSegments(geo, mat)
-  grid.renderOrder = -10
-  rootGroup.add(grid)
+  backdrop = new THREE.Mesh(geometry, material)
+  backdrop.renderOrder = -100
+  backdrop.frustumCulled = false
+  scene.add(backdrop)
+}
+
+function disposeBackdrop() {
+  if (backdrop) {
+    scene?.remove(backdrop)
+    backdrop.geometry?.dispose()
+    backdrop.material?.dispose()
+    backdrop = null
+  }
+  if (gridTexture) {
+    gridTexture.dispose()
+    gridTexture = null
+  }
 }
 
 function applyLayoutBlend(t) {
@@ -287,7 +323,7 @@ function rebuildPanels() {
 
   const depthNear = layout.cameraZ * 0.58
   const depthFar = layout.cameraZ * 1.85
-  const depthColor = new THREE.Color(0x2a2a48).convertSRGBToLinear()
+  const depthColor = new THREE.Color(0xc5cde0).convertSRGBToLinear()
 
   sharedGeometry = new THREE.PlaneGeometry(layout.panelW, layout.panelH, 12, 8)
 
@@ -343,7 +379,6 @@ function rebuildPanels() {
   spiralBlend = spiralTarget
   applyLayoutBlend(spiralBlend)
   panels.forEach((mesh) => mesh.scale.setScalar(panelScale))
-  buildGrid(radiusBase)
 }
 
 function markUiScroll() {
@@ -369,30 +404,57 @@ function onPointerMove(event) {
   pointerNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
 }
 
-function onClick(event) {
-  if (isTouch || scrollingUi || !hoveredMesh) return
+function projectPayload(mesh) {
+  if (!mesh?.userData) return null
+  const { id, title, cover, rating, image } = mesh.userData
+  if (!id) return null
+  return { id, title, cover: cover || image, rating }
+}
+
+function pickMeshAtClient(clientX, clientY) {
   const canvas = canvasRef.value
-  if (!canvas) return
+  if (!canvas || !camera || !panels.length) return null
   const rect = canvas.getBoundingClientRect()
   if (
-    event.clientX < rect.left ||
-    event.clientX > rect.right ||
-    event.clientY < rect.top ||
-    event.clientY > rect.bottom
+    clientX < rect.left ||
+    clientX > rect.right ||
+    clientY < rect.top ||
+    clientY > rect.bottom
   ) {
-    return
+    return null
   }
-  emit('open-project', { ...hoveredMesh.userData })
+  const ndc = new THREE.Vector2(
+    ((clientX - rect.left) / rect.width) * 2 - 1,
+    -((clientY - rect.top) / rect.height) * 2 + 1,
+  )
+  raycaster.setFromCamera(ndc, camera)
+  const hits = raycaster.intersectObjects(panels, false)
+  return hits[0]?.object || null
+}
+
+function onClick(event) {
+  if (isTouch || scrollingUi) return
+  const canvas = canvasRef.value
+  if (!canvas || event.target !== canvas) return
+
+  const mesh = pickMeshAtClient(event.clientX, event.clientY) || hoveredMesh
+  const payload = projectPayload(mesh)
+  if (!payload) return
+  emit('open-project', payload)
 }
 
 let touchStartY = 0
 let touchDeltaY = 0
 let touchMoved = false
+let touchLastX = 0
+let touchLastY = 0
 
 function onTouchStart(event) {
   const touch = event.touches?.[0]
   if (!touch) return
   touchStartY = touch.clientY
+  touchLastX = touch.clientX
+  touchLastY = touch.clientY
   touchDeltaY = 0
   touchMoved = false
 }
@@ -407,13 +469,20 @@ function onTouchMove(event) {
   bendRaw += dy * 0.007
   bendRaw = Math.max(-2, Math.min(2, bendRaw))
   touchStartY = touch.clientY
+  touchLastX = touch.clientX
+  touchLastY = touch.clientY
   markUiScroll()
 }
 
-function onTouchEnd() {
-  if (!touchMoved && hoveredMesh) {
-    emit('open-project', { ...hoveredMesh.userData })
-  } else if (touchMoved) {
+function onTouchEnd(event) {
+  if (!touchMoved) {
+    const touch = event.changedTouches?.[0]
+    const x = touch?.clientX ?? touchLastX
+    const y = touch?.clientY ?? touchLastY
+    const mesh = pickMeshAtClient(x, y)
+    const payload = projectPayload(mesh)
+    if (payload) emit('open-project', payload)
+  } else {
     spinTarget -= touchDeltaY * 0.008 * 3.5
     bendRaw += touchDeltaY * 0.007 * 3.5
     bendRaw = Math.max(-2, Math.min(2, bendRaw))
@@ -463,7 +532,7 @@ function tick(now) {
     if (group.position.y < -wrapSpan / 2 - rowSpacing) group.position.y += wrapSpan
     group.rotation.y = spinAngle
   }
-  if (grid) grid.rotation.y = spinAngle * 0.09
+  if (backdrop) backdrop.rotation.y = spinAngle * 0.09
 
   let hit = null
   if (!scrollingUi && !isTouch && panels.length) {
@@ -475,7 +544,10 @@ function tick(now) {
   if (hit !== hoveredMesh) {
     hoveredMesh = hit
     hoveredTitle.value = hit?.userData?.title || ''
-    emit('hover-project', hit ? { ...hit.userData } : null)
+    emit('hover-project', hit ? projectPayload(hit) : null)
+    if (canvasRef.value) {
+      canvasRef.value.style.cursor = hit ? 'pointer' : 'default'
+    }
   }
 
   const hoverLerp = 1 - Math.exp(-8 * dt)
@@ -503,7 +575,7 @@ function init() {
   const layout = layoutParams()
 
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x0a0a1f)
+  scene.background = new THREE.Color(0xf3f5fa)
 
   camera = new THREE.PerspectiveCamera(layout.fov, w / Math.max(h, 1), 0.1, 200)
   camera.position.set(0, 0, layout.cameraZ)
@@ -521,6 +593,7 @@ function init() {
   key.position.set(4, 6, 8)
   scene.add(key)
 
+  ensureBackdrop()
   rebuildPanels()
 
   window.addEventListener('wheel', onWheel, { passive: true })
@@ -548,11 +621,7 @@ function dispose() {
   window.removeEventListener('touchend', onTouchEnd)
 
   clearPanels()
-  if (grid) {
-    grid.geometry.dispose()
-    grid.material.dispose()
-    grid = null
-  }
+  disposeBackdrop()
   for (const tex of textureCache.values()) tex.dispose()
   textureCache.clear()
   renderer?.dispose()
@@ -593,7 +662,7 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #0a0a1f;
+  background: #f3f5fa;
 }
 
 .cylinder-canvas {
@@ -610,11 +679,12 @@ onBeforeUnmount(() => {
   transform: translateX(-50%);
   padding: 10px 18px;
   border-radius: 999px;
-  background: rgba(21, 0, 225, 0.85);
+  background: rgba(21, 0, 225, 0.9);
   color: #fff;
   font-size: 14px;
   letter-spacing: 0.02em;
   pointer-events: none;
   backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(21, 0, 225, 0.18);
 }
 </style>
