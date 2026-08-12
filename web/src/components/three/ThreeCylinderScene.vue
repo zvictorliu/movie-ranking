@@ -25,6 +25,7 @@ const emit = defineEmits(['hover-project', 'open-project'])
 const ROWS = 5
 const COLS = 12
 const PANEL_SCALE = 1.1
+const PANEL_ASPECT = 16 / 9
 const SPIRAL_RADIUS_FACTOR = 0.72
 const BEND_V_MAX = 0.25
 const BEND_H_MAX = 0.15
@@ -167,22 +168,29 @@ function shuffle(list, seed) {
 function layoutParams() {
   const w = window.innerWidth
   const tall = window.innerHeight > w
+  // 影片封面按横版 16:9；baseH 为面板高度，宽度 = height × 16/9
+  const size = (baseH, extras) => ({
+    ...extras,
+    panelW: baseH * PANEL_ASPECT * PANEL_SCALE,
+    panelH: baseH * PANEL_SCALE,
+  })
+
   if (w < 768 && !tall) {
-    return { fov: 50, cameraZ: 13, radius: 7.8, panelW: 1.4 * PANEL_SCALE, panelH: 1.9 * PANEL_SCALE, rowSpacing: 7 }
+    return size(1.15, { fov: 50, cameraZ: 13, radius: 7.8, rowSpacing: 4.6 })
   }
   if (w < 500) {
-    return { fov: 70, cameraZ: 7.5, radius: 4.5, panelW: 1 * PANEL_SCALE, panelH: 1.4 * PANEL_SCALE, rowSpacing: 5.5 }
+    return size(0.85, { fov: 70, cameraZ: 7.5, radius: 4.5, rowSpacing: 3.4 })
   }
   if (w < 768) {
-    return { fov: 70, cameraZ: 9.5, radius: 4.6, panelW: 1 * PANEL_SCALE, panelH: 1.4 * PANEL_SCALE, rowSpacing: 3.8 }
+    return size(0.9, { fov: 70, cameraZ: 9.5, radius: 4.6, rowSpacing: 3.2 })
   }
   if (w < 1024 && tall) {
-    return { fov: 65, cameraZ: 9, radius: 5.5, panelW: 1 * PANEL_SCALE, panelH: 1.4 * PANEL_SCALE, rowSpacing: 6.5 }
+    return size(0.95, { fov: 65, cameraZ: 9, radius: 5.5, rowSpacing: 4.2 })
   }
   if (w < 1024) {
-    return { fov: 60, cameraZ: 11, radius: 6.5, panelW: 1.2 * PANEL_SCALE, panelH: 1.6 * PANEL_SCALE, rowSpacing: 4 }
+    return size(1.05, { fov: 60, cameraZ: 11, radius: 6.5, rowSpacing: 3.6 })
   }
-  return { fov: 50, cameraZ: 13, radius: 7.8, panelW: 1.4 * PANEL_SCALE, panelH: 1.9 * PANEL_SCALE, rowSpacing: 7 }
+  return size(1.2, { fov: 50, cameraZ: 13, radius: 7.8, rowSpacing: 4.8 })
 }
 
 function loadTexture(url) {
