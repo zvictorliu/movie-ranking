@@ -16,12 +16,10 @@ export default defineConfig({
       '/api': {
         target: backendUrl,
         changeOrigin: true,
-        // pathRewrite: { '^/api': '' }, // 可选：重写路径
       },
       '/imgs': {
         target: backendUrl,
         changeOrigin: true,
-        // pathRewrite: { '.imgs': '/imgs' }, // 可选：重写路径
       },
     },
   },
