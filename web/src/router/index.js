@@ -18,7 +18,7 @@ const routes = [
     path: '/',
     name: 'HomePage',
     component: HomePage,
-    meta: { requiresAuth: false }, // 首页不需要认证
+    meta: { requiresAuth: true, hideChrome: true },
   },
   {
     path: '/dashboard',
@@ -85,6 +85,10 @@ const routes = [
     name: 'ImgbedPage',
     component: ImgbedPage, // 图床页面路由
     meta: { requiresAuth: true }, // 需要认证
+  },
+  {
+    path: '/demo/cylinder',
+    redirect: '/',
   },
 ]
 

@@ -1,620 +1,398 @@
 <template>
   <div class="home-page">
-    <!-- 主要内容 -->
-    <div class="content-wrapper">
-      <!-- Hero 区域 -->
-      <div class="hero-section">
-        <div class="hero-icon">
-          <span class="material-icons">movie</span>
-        </div>
-        <h1 class="hero-title">影片排行榜</h1>
-        <p class="hero-subtitle">铭记美丽的瞬间</p>
-      </div>
+    <ThreeCylinderScene
+      v-if="projects.length"
+      :projects="projects"
+      :spiral="isSpiral"
+      @open-project="onOpen"
+    />
 
-      <!-- 状态卡片 -->
-      <div class="status-card">
-        <div v-if="userStore.isLoggedIn" class="user-section">
-          <div class="user-avatar">
-            <span class="material-icons">account_circle</span>
-          </div>
-          <div class="user-details">
-            <h2 class="user-name">{{ userStore.username }}</h2>
-            <p class="user-role">
-              <span class="role-badge" :class="userStore.isAdmin ? 'admin' : 'user'">
-                {{ userStore.isAdmin ? '管理员' : '用户' }}
-              </span>
-            </p>
-          </div>
-          <button class="logout-btn" @click="handleLogout" title="退出登录">
-            <span class="material-icons">logout</span>
-          </button>
-        </div>
-
-        <div v-else class="guest-section">
-          <div class="guest-icon">
-            <span class="material-icons">lock</span>
-          </div>
-          <h2 class="guest-title">请先登录</h2>
-          <p class="guest-description">登录后即可访问影片排行、演员信息等精彩内容</p>
-          <button class="login-btn" @click="goToLogin">
-            <span class="material-icons">login</span>
-            立即登录
-          </button>
-        </div>
-      </div>
-
-      <!-- 快捷入口 -->
-      <div class="quick-access">
-        <h3 class="section-title">快捷入口</h3>
-        <div class="access-grid">
-          <div class="access-card" @click="goToMovies">
-            <div class="card-icon movies">
-              <span class="material-icons">movie</span>
-            </div>
-            <h4 class="card-title">影片排行</h4>
-            <p class="card-description">查看和管理影片评分</p>
-          </div>
-
-          <div class="access-card" @click="goToActors">
-            <div class="card-icon actors">
-              <span class="material-icons">people</span>
-            </div>
-            <h4 class="card-title">演员列表</h4>
-            <p class="card-description">浏览演员信息资料</p>
-          </div>
-
-          <div class="access-card" @click="goToTags">
-            <div class="card-icon tags">
-              <span class="material-icons">local_offer</span>
-            </div>
-            <h4 class="card-title">标签分类</h4>
-            <p class="card-description">按标签筛选影片</p>
-          </div>
-
-          <div class="access-card" @click="goToPosts">
-            <div class="card-icon posts">
-              <span class="material-icons">article</span>
-            </div>
-            <h4 class="card-title">博客文章</h4>
-            <p class="card-description">阅读影评和随笔</p>
-          </div>
-        </div>
-      </div>
+    <div v-else class="home-page__loading">
+      <p>{{ error || '正在加载影片封面…' }}</p>
     </div>
+
+    <header class="home-page__chrome">
+      <div class="chrome-brand">
+        <span class="material-icons chrome-brand__icon">movie</span>
+        <span class="chrome-brand__text">影片排行榜</span>
+      </div>
+
+      <div class="layout-switch" :class="{ 'is-spiral': isSpiral }">
+        <span class="layout-switch__pill" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="layout-switch__btn"
+          :class="{ 'is-active': !isSpiral }"
+          @click="isSpiral = false"
+        >
+          Rings
+        </button>
+        <button
+          type="button"
+          class="layout-switch__btn"
+          :class="{ 'is-active': isSpiral }"
+          @click="isSpiral = true"
+        >
+          Spiral
+        </button>
+      </div>
+
+      <div class="chrome-actions">
+        <button type="button" class="chrome-btn" @click="goToMovies" title="影片排行">
+          <span class="material-icons">movie</span>
+        </button>
+        <button type="button" class="chrome-btn" @click="handleLogout" title="退出登录">
+          <span class="material-icons">logout</span>
+        </button>
+      </div>
+    </header>
+
+    <footer class="home-footer">
+      <span class="home-footer__item home-footer__left">
+        <span class="home-footer__line">铭记美丽的瞬间</span>
+      </span>
+      <span class="home-footer__item home-footer__center">
+        <span class="home-footer__line">
+          <button type="button" class="home-footer__link" @click="goToMovies">
+            影片 {{ movieCount }}
+          </button>
+          <span class="home-footer__sep">/</span>
+          <button type="button" class="home-footer__link" @click="goToActors">
+            演员 {{ actorCount }}
+          </button>
+        </span>
+      </span>
+      <span class="home-footer__item home-footer__right">
+        <span class="home-footer__line">© {{ currentYear }}</span>
+      </span>
+    </footer>
   </div>
 </template>
 
-<script>
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
 import { useUserStore } from '../store/user.js'
+import ThreeCylinderScene from '../components/three/ThreeCylinderScene.vue'
 
-export default {
-  name: 'HomePage',
-  setup() {
-    const userStore = useUserStore()
-    return { userStore }
-  },
-  mounted() {
-    this.userStore.restoreLoginState()
-  },
-  methods: {
-    handleLogout() {
-      this.userStore.logout()
-      this.$message.success('已退出登录')
-    },
-    goToLogin() {
-      this.$router.push('/login')
-    },
-    goToMovies() {
-      this.$router.push('/movies')
-    },
-    goToActors() {
-      this.$router.push('/actors')
-    },
-    goToTags() {
-      this.$router.push('/tags')
-    },
-    goToPosts() {
-      this.$router.push('/posts')
-    },
-  },
+const GALLERY_SIZE = 10
+
+function pickRandomMovies(movies, count) {
+  const pool = [...movies]
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  return pool.slice(0, Math.min(count, pool.length))
 }
+
+const router = useRouter()
+const userStore = useUserStore()
+const projects = ref([])
+const isSpiral = ref(false)
+const error = ref('')
+const movieCount = ref(0)
+const actorCount = ref(0)
+const currentYear = new Date().getFullYear()
+
+function goToMovies() {
+  router.push({ name: 'MoviesPage' })
+}
+
+function goToActors() {
+  router.push({ name: 'ActorsPage' })
+}
+
+function handleLogout() {
+  userStore.logout()
+  ElMessage.success('已退出登录')
+  router.push({ path: '/login', query: { redirect: '/' } })
+}
+
+function onOpen(project) {
+  const id = project?.id
+  if (!id || typeof id !== 'string') return
+  router.push({ name: 'MovieDetail', params: { id } })
+}
+
+onMounted(async () => {
+  userStore.restoreLoginState()
+
+  const moviesReq = axios.get('/api/movies').catch((err) => {
+    console.error('[HomePage] Failed to load movies', err)
+    return null
+  })
+  const actorsReq = axios.get('/api/actors').catch((err) => {
+    console.error('[HomePage] Failed to load actors', err)
+    return null
+  })
+
+  const [moviesRes, actorsRes] = await Promise.all([moviesReq, actorsReq])
+
+  actorCount.value = Array.isArray(actorsRes?.data) ? actorsRes.data.length : 0
+
+  if (!moviesRes) {
+    error.value = '无法加载影片列表，请确认后端服务已启动'
+    projects.value = []
+    return
+  }
+
+  const list = (moviesRes.data || [])
+    .filter((m) => m.cover)
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      cover: m.cover,
+      rating: m.rating,
+    }))
+
+  movieCount.value = list.length
+
+  if (!list.length) {
+    error.value = '暂无可用影片封面'
+    projects.value = []
+    return
+  }
+
+  projects.value = pickRandomMovies(list, GALLERY_SIZE)
+})
 </script>
 
 <style scoped>
 .home-page {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow-x: hidden;
-  background: var(--bg-primary);
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: #f3f5fa;
 }
 
-/* 内容区域 */
-.content-wrapper {
+.home-page__loading {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: #5a647c;
+  font-size: 15px;
+}
+
+.home-page__chrome {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  pointer-events: none;
+}
+
+.chrome-brand,
+.layout-switch,
+.layout-switch__btn,
+.chrome-actions,
+.chrome-btn {
+  pointer-events: auto;
+}
+
+.chrome-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #1a1f36;
+}
+
+.chrome-brand__icon {
+  font-size: 28px;
+  opacity: 0.9;
+  color: #1500e1;
+}
+
+.chrome-brand__text {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.layout-switch {
+  position: relative;
+  justify-self: center;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  width: 180px;
+  height: 36px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(26, 31, 54, 0.06);
+  border: 1px solid rgba(26, 31, 54, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.layout-switch__pill {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: 999px;
+  background: #1500e1;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.layout-switch.is-spiral .layout-switch__pill {
+  transform: translateX(100%);
+}
+
+.layout-switch__btn {
   position: relative;
   z-index: 1;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px;
-}
-
-/* Hero 区域 */
-.hero-section {
-  text-align: center;
-  margin-bottom: 40px;
-  animation: fadeInDown 0.8s ease-out;
-}
-
-.hero-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  background: var(--primary-gradient);
-  border-radius: 20px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-md);
-}
-
-.hero-icon .material-icons {
-  font-size: 48px;
-  color: white;
-}
-
-.hero-title {
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
-.hero-subtitle {
-  font-size: 20px;
-  color: var(--text-secondary);
-  font-weight: 300;
-}
-
-/* 状态卡片 */
-.status-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 40px;
-  box-shadow: var(--shadow-md);
-  animation: fadeInUp 0.8s ease-out 0.2s both;
-}
-
-/* 用户区域 */
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.user-avatar {
-  width: 60px;
-  height: 60px;
-  background: var(--primary-gradient);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.user-avatar .material-icons {
-  font-size: 36px;
-  color: white;
-}
-
-.user-details {
-  flex: 1;
-}
-
-.user-name {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 5px;
-}
-
-.user-role {
-  margin: 0;
-}
-
-.role-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.role-badge.admin {
-  background: var(--primary-gradient);
-  color: white;
-}
-
-.role-badge.user {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-light);
-}
-
-.logout-btn {
-  width: 44px;
-  height: 44px;
-  background: #ff6b6b;
-  border: none;
-  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  color: rgba(26, 31, 54, 0.55);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  display: flex;
+}
+
+.layout-switch__btn.is-active {
+  color: #fff;
+}
+
+.chrome-actions {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chrome-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.logout-btn .material-icons {
-  font-size: 20px;
-  color: white;
-}
-
-.logout-btn:hover {
-  background: #ff5252;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-}
-
-/* 访客区域 */
-.guest-section {
-  text-align: center;
-}
-
-.guest-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--primary-gradient);
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(26, 31, 54, 0.08);
   border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.guest-icon .material-icons {
-  font-size: 32px;
-  color: white;
-}
-
-.guest-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
-.guest-description {
-  font-size: 16px;
-  color: var(--text-tertiary);
-  margin-bottom: 20px;
-}
-
-.login-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 32px;
-  background: var(--primary-gradient);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 500;
+  background: rgba(26, 31, 54, 0.06);
+  color: #1a1f36;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
 }
 
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+.chrome-btn:hover {
+  background: rgba(26, 31, 54, 0.1);
 }
 
-.login-btn .material-icons {
-  font-size: 20px;
-}
-
-/* 快捷入口 */
-.quick-access {
-  animation: fadeInUp 0.8s ease-out 0.4s both;
-}
-
-.section-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.access-grid {
+.home-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 28px 26px;
+  pointer-events: none;
 }
 
-.access-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
-  text-align: center;
-}
-
-.access-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-.card-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+.home-footer__item {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+}
+
+.home-footer__left {
+  justify-content: flex-start;
+}
+
+.home-footer__center {
   justify-content: center;
-  margin-bottom: 15px;
-  transition: all 0.3s ease;
 }
 
-.card-icon .material-icons {
-  font-size: 32px;
-  color: white;
+.home-footer__right {
+  justify-content: flex-end;
 }
 
-.card-icon.movies,
-.card-icon.actors,
-.card-icon.tags,
-.card-icon.posts {
-  background: var(--primary-gradient);
+.home-footer__line {
+  color: rgba(26, 31, 54, 0.55);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
-.access-card:hover .card-icon {
-  transform: scale(1.1) rotate(5deg);
+.home-footer__sep {
+  margin: 0 10px;
+  color: rgba(26, 31, 54, 0.28);
 }
 
-.card-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+.home-footer__link {
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(26, 31, 54, 0.7);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
 }
 
-.card-description {
-  font-size: 14px;
-  color: var(--text-tertiary);
-  line-height: 1.5;
+.home-footer__link:hover {
+  color: #1500e1;
 }
 
-/* 动画 */
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .content-wrapper {
-    padding: 30px 15px;
+@media (max-width: 720px) {
+  .home-page__chrome {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'brand actions'
+      'switch switch';
+    row-gap: 12px;
   }
 
-  .hero-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    margin-bottom: 15px;
+  .chrome-brand {
+    grid-area: brand;
   }
 
-  .hero-icon .material-icons {
-    font-size: 36px;
+  .chrome-actions {
+    grid-area: actions;
   }
 
-  .hero-title {
-    font-size: 32px;
-    margin-bottom: 8px;
+  .layout-switch {
+    grid-area: switch;
   }
 
-  .hero-subtitle {
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .hero-section {
-    margin-bottom: 30px;
-  }
-
-  .status-card {
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 30px;
-  }
-
-  .user-section {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
-  }
-
-  .user-avatar {
-    width: 56px;
-    height: 56px;
-  }
-
-  .user-avatar .material-icons {
-    font-size: 32px;
-  }
-
-  .user-name {
-    font-size: 20px;
-  }
-
-  .logout-btn {
-    width: 100%;
-    height: 40px;
-    border-radius: 10px;
-  }
-
-  .guest-icon {
-    width: 56px;
-    height: 56px;
-    margin-bottom: 12px;
-  }
-
-  .guest-icon .material-icons {
-    font-size: 28px;
-  }
-
-  .guest-title {
-    font-size: 20px;
-  }
-
-  .guest-description {
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .login-btn {
-    width: 100%;
-    padding: 12px 24px;
-    border-radius: 10px;
-  }
-
-  .section-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-
-  .access-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 30px;
-  }
-
-  .access-card {
-    padding: 20px 15px;
-    border-radius: 12px;
-  }
-
-  .access-card:hover {
-    transform: translateY(-4px);
-  }
-
-  .card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-  }
-
-  .card-icon .material-icons {
-    font-size: 24px;
-  }
-
-  .card-title {
-    font-size: 16px;
-    margin-bottom: 5px;
-  }
-
-  .card-description {
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
-  .footer {
-    margin-top: 20px;
-  }
-
-  .footer-text {
-    font-size: 14px;
-  }
-
-  .footer-text .material-icons {
+  .chrome-brand__text {
     font-size: 16px;
   }
-}
 
-/* 小屏幕手机优化 */
-@media (max-width: 480px) {
-  .content-wrapper {
-    padding: 20px 12px;
-  }
-
-  .hero-title {
-    font-size: 28px;
-  }
-
-  .hero-subtitle {
-    font-size: 13px;
-  }
-
-  .access-grid {
+  .home-footer {
     grid-template-columns: 1fr;
-    gap: 10px;
+    justify-items: center;
+    gap: 8px;
+    padding: 16px 20px 20px;
+    text-align: center;
   }
 
-  .access-card {
-    padding: 20px;
+  .home-footer__left,
+  .home-footer__center,
+  .home-footer__right {
+    justify-content: center;
   }
 
-  .card-icon {
-    width: 52px;
-    height: 52px;
+  .home-footer__left {
+    order: 2;
   }
 
-  .card-icon .material-icons {
-    font-size: 28px;
+  .home-footer__center {
+    order: 1;
   }
 
-  .card-title {
-    font-size: 17px;
-  }
-
-  .card-description {
-    font-size: 13px;
+  .home-footer__right {
+    order: 3;
   }
 }
-
 </style>
