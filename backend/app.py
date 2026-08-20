@@ -1,9 +1,13 @@
 from flask import Flask, jsonify, send_from_directory, request  # 导入 Flask 和 jsonify [[1]]
 from flask_cors import CORS  # 导入 CORS [[2]]
 import os
+import mimetypes
 import frontmatter
 from pypinyin import lazy_pinyin
 import hashlib
+from cover_thumbs import cover_variant_urls, save_movie_cover, DEFAULT_COVER_URL
+
+mimetypes.add_type('image/webp', '.webp')
 
 app = Flask(__name__)
 CORS(app)  # 启用 CORS 支持 [[2]]
@@ -27,6 +31,15 @@ ACTOR_COVER_FOLDER = os.path.join(COVER_FOLDER, 'actor-cover')
 POST_COVER_FOLDER = os.path.join(COVER_FOLDER, 'post-cover')
 IMGBED_FOLDER = os.path.join(CONTENT_FOLDER, 'imgbed')
 
+
+def movie_cover_payload(cover_filename):
+    if cover_filename:
+        original = f"/imgs/{MOVIE_COVER_FOLDER}/{cover_filename}"
+    else:
+        original = DEFAULT_COVER_URL
+    return original, cover_variant_urls(original)
+
+
 def parse_movie_files():
     """
     解析 content 文件夹中的所有 Markdown 文件，并返回解析后的数据列表。
@@ -37,13 +50,15 @@ def parse_movie_files():
             file_path = os.path.join(MOVIES_FOLDER, filename)
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)  # 使用 frontmatter 解析 Markdown 文件 [[3]]
+                cover_url, covers = movie_cover_payload(post.get('cover'))
                 movie_data = {
                     "id": filename,
                     "title": post.get('title', '未知标题'),
                     "actors": post.get('actors', '未知演员'),
                     "tags": post.get('tags', []),
                     "description": post.get('description', '暂无描述'),
-                    "cover": f"/imgs/{MOVIE_COVER_FOLDER}/{post.get('cover')}",
+                    "cover": cover_url,
+                    "covers": covers,
                     "order": post.get('order', float('inf')),
                     "rating": post.get('rating', 0),
                     "body": post.content,  # 只返回原始正文内容
@@ -334,11 +349,8 @@ def create_movie():
                 file_extension = os.path.splitext(file.filename)[1].lower()
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
-                # 保存图片文件
                 save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
-                os.makedirs(save_folder, exist_ok=True)
-                image_path = os.path.join(save_folder, cover_filename)
-                file.save(image_path)
+                image_path = save_movie_cover(file, save_folder, cover_filename)
                 print(f"影片封面图片保存成功: {image_path}")
 
         # 构建 Markdown 文件内容
@@ -494,23 +506,27 @@ def get_movie_by_name(movie_name):
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
                 if post.get('title') == movie_name:  # 匹配电影标题 [[3]]
+                    cover_url, covers = movie_cover_payload(post.get('cover'))
                     return jsonify({
                         "id": filename,
                         "title": post.get('title'),
                         "actors": post.get('actors', ''),
                         "tags": post.get('tags', []),
                         "description": post.get('description', ''),
-                        "cover": f"/imgs/{MOVIE_COVER_FOLDER}/{post.get('cover')}",
+                        "cover": cover_url,
+                        "covers": covers,
                         "rating": post.get('rating', 0),
                         "body": post.content,  # 只返回原始正文内容
                     })
+    default_covers = cover_variant_urls(DEFAULT_COVER_URL)
     return jsonify({
         "id": None,
         "title": movie_name,
         "actors": '',
         "tags": [],
         "description": '待观看',
-        "cover": '/imgs/default_cover.jpg',
+        "cover": DEFAULT_COVER_URL,
+        "covers": default_covers,
         "rating": 0,
         "body": '',
     })
@@ -567,11 +583,8 @@ def update_movie(id):
                 file_extension = os.path.splitext(file.filename)[1].lower()
                 cover_filename = f"{title.replace(' ', '_')}{file_extension}"
                 
-                # 保存图片文件
                 save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
-                os.makedirs(save_folder, exist_ok=True)
-                image_path = os.path.join(save_folder, cover_filename)
-                file.save(image_path)
+                image_path = save_movie_cover(file, save_folder, cover_filename)
                 print(f"影片封面图片更新成功: {image_path}")
 
         with open(file_path, 'r+', encoding='utf-8') as f:
@@ -921,6 +934,7 @@ def upload_image():
             filename = name + file_extension
 
         # 根据类型确定保存路径
+        covers = None
         if image_type == 'actor':
             save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
         elif image_type == 'post':
@@ -930,12 +944,12 @@ def upload_image():
         else:  # movie
             save_folder = os.path.join(CONTENT_FOLDER, MOVIE_COVER_FOLDER)
 
-        # 确保文件夹存在
-        os.makedirs(save_folder, exist_ok=True)
-
-        # 保存文件（如果存在同名文件则覆盖）
-        file_path = os.path.join(save_folder, filename)
-        file.save(file_path)
+        if image_type == 'movie':
+            file_path = save_movie_cover(file, save_folder, filename)
+        else:
+            os.makedirs(save_folder, exist_ok=True)
+            file_path = os.path.join(save_folder, filename)
+            file.save(file_path)
 
         print(f"图片上传成功: {file_path}")
 
@@ -948,13 +962,17 @@ def upload_image():
             return_path = f"/imgs/imgbed/{filename}"
         else:  # movie
             return_path = f"/imgs/{MOVIE_COVER_FOLDER}/{filename}"
+            covers = cover_variant_urls(return_path)
 
-        return jsonify({
+        payload = {
             "success": True,
             "message": "图片上传成功",
             "filename": filename,
             "path": return_path
-        }), 200
+        }
+        if covers:
+            payload["covers"] = covers
+        return jsonify(payload), 200
 
     except Exception as e:
         print(f"图片上传错误: {str(e)}")

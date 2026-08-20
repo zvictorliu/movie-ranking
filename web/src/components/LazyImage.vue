@@ -23,6 +23,10 @@ export default {
       type: String,
       default: '',
     },
+    srcFallback: {
+      type: String,
+      default: '',
+    },
     alt: {
       type: String,
       default: '',
@@ -43,24 +47,32 @@ export default {
   data() {
     return {
       isVisible: false,
-      hasError: false,
+      errorStage: 0,
       observer: null,
     }
   },
   computed: {
     currentSrc() {
-      if (this.hasError) {
+      if (this.errorStage >= 2) {
         return this.fallback
       }
       if (!this.isVisible) {
         return PLACEHOLDER
+      }
+      if (this.errorStage === 1 && this.srcFallback) {
+        return this.srcFallback
       }
       return this.src || this.fallback
     },
   },
   watch: {
     src() {
-      this.hasError = false
+      this.errorStage = 0
+    },
+    srcFallback() {
+      if (this.errorStage > 0) {
+        this.errorStage = 0
+      }
     },
   },
   mounted() {
@@ -98,8 +110,12 @@ export default {
       }
     },
     onError() {
-      if (this.hasError) return
-      this.hasError = true
+      if (this.errorStage === 0 && this.srcFallback && this.srcFallback !== this.src) {
+        this.errorStage = 1
+        return
+      }
+      if (this.errorStage >= 2) return
+      this.errorStage = 2
     },
     onLoad() {
       // no-op; kept for potential future fade-in hooks

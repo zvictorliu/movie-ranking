@@ -3,7 +3,12 @@
     <div class="movie-item">
       <!-- 封面 -->
       <div class="cover-wrapper" @click="goToDetail(movie.id)">
-        <LazyImage :src="movie.cover" alt="封面" img-class="movie-cover" />
+        <LazyImage
+          :src="coverSrc"
+          :src-fallback="coverOriginal"
+          alt="封面"
+          img-class="movie-cover"
+        />
       </div>
       <!-- 详细信息 -->
       <div class="details">
@@ -83,6 +88,7 @@
 <script>
 import axios from 'axios'
 import LazyImage from '@/components/LazyImage.vue'
+import { movieCover } from '@/utils/cover'
 
 export default {
   name: 'MoviePreview',
@@ -113,6 +119,14 @@ export default {
       hoverRating: 0, // 鼠标悬停时的评分
       ratingUpdating: false, // 评分更新状态
     }
+  },
+  computed: {
+    coverSrc() {
+      return movieCover(this.movie, 'medium')
+    },
+    coverOriginal() {
+      return movieCover(this.movie, 'original')
+    },
   },
   watch: {
     movieData: {

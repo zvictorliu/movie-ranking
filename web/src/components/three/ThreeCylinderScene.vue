@@ -193,10 +193,21 @@ function layoutParams() {
   return size(1.2, { fov: 50, cameraZ: 13, radius: 7.8, rowSpacing: 4.8 })
 }
 
-function loadTexture(url) {
+function loadTexture(url, fallbackUrl) {
   if (!url) return null
   if (textureCache.has(url)) return textureCache.get(url)
-  const tex = textureLoader.load(url)
+  const tex = textureLoader.load(
+    url,
+    undefined,
+    undefined,
+    () => {
+      if (!fallbackUrl || fallbackUrl === url) return
+      textureLoader.load(fallbackUrl, (loaded) => {
+        tex.image = loaded.image
+        tex.needsUpdate = true
+      })
+    },
+  )
   tex.colorSpace = THREE.SRGBColorSpace
   tex.minFilter = THREE.LinearMipmapLinearFilter
   tex.magFilter = THREE.LinearFilter
@@ -342,9 +353,10 @@ function rebuildPanels() {
     for (let col = 0; col < COLS; col += 1) {
       const project = shuffled[col % shuffled.length]
       const cover = project.cover || project.image
+      const fallback = project.image && project.image !== cover ? project.image : ''
       const material = new THREE.ShaderMaterial({
         uniforms: {
-          uTexture: { value: loadTexture(cover) },
+          uTexture: { value: loadTexture(cover, fallback) },
           uBendH: { value: 0 },
           uBendV: { value: 0 },
           uTime: { value: 0 },

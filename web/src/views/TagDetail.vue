@@ -5,7 +5,12 @@
       <div v-for="movie in movies" :key="movie.id" class="movie-item">
         <!-- 封面 -->
         <div class="cover-wrapper" @click="goToDetail(movie.id)">
-          <LazyImage :src="movie.cover" alt="封面" img-class="movie-cover" />
+          <LazyImage
+            :src="coverSrc(movie)"
+            :src-fallback="coverOriginal(movie)"
+            alt="封面"
+            img-class="movie-cover"
+          />
         </div>
 
         <!-- 详细信息 -->
@@ -34,6 +39,7 @@
 <script>
 import axios from 'axios'
 import LazyImage from '@/components/LazyImage.vue'
+import { movieCover } from '@/utils/cover'
 
 export default {
   components: {
@@ -74,6 +80,12 @@ export default {
         console.error('电影记录不存在:', error)
         alert('不存在对应的电影记录')
       }
+    },
+    coverSrc(movie) {
+      return movieCover(movie, 'medium')
+    },
+    coverOriginal(movie) {
+      return movieCover(movie, 'original')
     },
   },
 }

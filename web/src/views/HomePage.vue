@@ -76,6 +76,7 @@ import { ElMessage } from 'element-plus'
 import axios from 'axios'
 import { useUserStore } from '../store/user.js'
 import ThreeCylinderScene from '../components/three/ThreeCylinderScene.vue'
+import { movieCover } from '../utils/cover.js'
 
 const GALLERY_SIZE = 10
 
@@ -144,7 +145,8 @@ onMounted(async () => {
     .map((m) => ({
       id: m.id,
       title: m.title,
-      cover: m.cover,
+      cover: movieCover(m, 'small'),
+      image: movieCover(m, 'original'),
       rating: m.rating,
     }))
 
