@@ -17,18 +17,26 @@ export function deriveThumbUrl(originalUrl, size) {
   return `${dir}/thumbs/${size}/${stem}.webp`
 }
 
-export function movieCover(movie, size = 'original') {
-  if (!movie) {
+function pickCover(item, size) {
+  if (!item) {
     return DEFAULT_COVER
   }
-  if (movie.covers?.[size]) {
-    return movie.covers[size]
+  if (item.covers?.[size]) {
+    return item.covers[size]
   }
   if (size === 'original') {
-    return movie.cover || DEFAULT_COVER
+    return item.cover || DEFAULT_COVER
   }
-  if (movie.cover) {
-    return deriveThumbUrl(movie.cover, size)
+  if (item.cover) {
+    return deriveThumbUrl(item.cover, size)
   }
   return DEFAULT_COVER
+}
+
+export function movieCover(movie, size = 'original') {
+  return pickCover(movie, size)
+}
+
+export function actorCover(actor, size = 'small') {
+  return pickCover(actor, size)
 }

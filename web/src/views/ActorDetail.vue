@@ -22,11 +22,11 @@
       <aside v-if="actor.cover || hasMetaSection" class="infobox">
         <div class="infobox-header">{{ actor.name }}</div>
         <div class="infobox-photo">
-          <img
-            :src="actor.cover"
+          <LazyImage
+            :src="coverSrc"
+            :src-fallback="coverOriginal"
             :alt="actor.name ? `${actor.name} 的照片` : '演员封面'"
-            class="cover"
-            @error="setDefaultCover($event)"
+            img-class="cover"
           />
         </div>
         <table v-if="hasMetaSection" class="infobox-table">
@@ -124,6 +124,8 @@ import { Document, Setting } from '@element-plus/icons-vue'
 import LiveEditor from '@/components/LiveEditor.vue'
 import MetaEditor from '@/components/MetaEditor.vue'
 import MarkdownRender from '@/components/MarkdownRender.vue'
+import LazyImage from '@/components/LazyImage.vue'
+import { actorCover } from '@/utils/cover'
 
 export default {
   name: 'ActorDetailPage',
@@ -133,6 +135,7 @@ export default {
     LiveEditor,
     MetaEditor,
     MarkdownRender,
+    LazyImage,
   },
   data() {
     return {
@@ -142,6 +145,12 @@ export default {
     }
   },
   computed: {
+    coverSrc() {
+      return actorCover(this.actor, 'small')
+    },
+    coverOriginal() {
+      return actorCover(this.actor, 'original')
+    },
     socialLinks() {
       const links = []
       const mappings = [
@@ -271,9 +280,6 @@ export default {
       }
       return stringValue
     },
-    setDefaultCover(event) {
-      event.target.src = '/imgs/default_cover.jpg'
-    },
     goBack() {
       this.$router.go(-1) // 返回上一页 [[7]]
     },
@@ -394,7 +400,7 @@ export default {
   text-align: center;
 }
 
-.cover {
+:deep(.cover) {
   display: block;
   max-width: 100%;
   height: auto;

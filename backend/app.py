@@ -5,7 +5,13 @@ import mimetypes
 import frontmatter
 from pypinyin import lazy_pinyin
 import hashlib
-from cover_thumbs import cover_variant_urls, save_movie_cover, DEFAULT_COVER_URL
+from cover_thumbs import (
+    ACTOR_THUMB_SIZES,
+    cover_variant_urls,
+    save_actor_cover,
+    save_movie_cover,
+    DEFAULT_COVER_URL,
+)
 
 mimetypes.add_type('image/webp', '.webp')
 
@@ -38,6 +44,14 @@ def movie_cover_payload(cover_filename):
     else:
         original = DEFAULT_COVER_URL
     return original, cover_variant_urls(original)
+
+
+def actor_cover_payload(cover_filename):
+    if cover_filename:
+        original = f"/imgs/{ACTOR_COVER_FOLDER}/{cover_filename}"
+    else:
+        original = DEFAULT_COVER_URL
+    return original, cover_variant_urls(original, sizes=ACTOR_THUMB_SIZES)
 
 
 def parse_movie_files():
@@ -78,12 +92,14 @@ def parse_actor_files():
             file_path = os.path.join(ACTORS_FOLDER, filename)
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
+                cover_url, covers = actor_cover_payload(post.get('cover'))
                 actor_data = {
                     "name": post.get('name', '未知演员'),
                     "birth": post.get('birth', '未知出生日期'),
                     "debut": post.get('debut', '未知出道日期'),
                     "favorite": post.get('favorite', 1),  # 默认喜爱度为1
-                    "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
+                    "cover": cover_url,
+                    "covers": covers,
                     "x": post.get('x', ''),
                     "instagram": post.get('instagram', ''),
                     "wiki": post.get('wiki', ''),
@@ -275,12 +291,14 @@ def get_actor(actor_name):
 
     with open(file_path, 'r', encoding='utf-8') as f:
         post = frontmatter.load(f)
+        cover_url, covers = actor_cover_payload(post.get('cover'))
         actor_data = {
             "name": post.get('name'),
             "birth": post.get('birth'),
             "debut": post.get('debut'),
             "favorite": post.get('favorite', 1),  # 默认喜爱度为1
-            "cover": f"/imgs/{ACTOR_COVER_FOLDER}/{post.get('cover')}",
+            "cover": cover_url,
+            "covers": covers,
             "body": post.content,  # 只返回原始正文内容
             "x": post.get('x', ''),
             "instagram": post.get('instagram', ''),
@@ -417,11 +435,8 @@ def create_actor():
                 file_extension = os.path.splitext(file.filename)[1].lower()
                 cover_filename = f"{name.replace(' ', '_')}{file_extension}"
                 
-                # 保存图片文件
                 save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
-                os.makedirs(save_folder, exist_ok=True)
-                image_path = os.path.join(save_folder, cover_filename)
-                file.save(image_path)
+                image_path = save_actor_cover(file, save_folder, cover_filename)
                 print(f"演员头像图片保存成功: {image_path}")
 
         # 构建 Markdown 文件内容
@@ -737,11 +752,8 @@ def update_actor(actor_name):
                 file_extension = os.path.splitext(file.filename)[1].lower()
                 cover_filename = f"{name.replace(' ', '_')}{file_extension}"
                 
-                # 保存图片文件
                 save_folder = os.path.join(CONTENT_FOLDER, ACTOR_COVER_FOLDER)
-                os.makedirs(save_folder, exist_ok=True)
-                image_path = os.path.join(save_folder, cover_filename)
-                file.save(image_path)
+                image_path = save_actor_cover(file, save_folder, cover_filename)
                 print(f"演员封面图片更新成功: {image_path}")
 
         with open(file_path, 'r+', encoding='utf-8') as f:
@@ -946,6 +958,8 @@ def upload_image():
 
         if image_type == 'movie':
             file_path = save_movie_cover(file, save_folder, filename)
+        elif image_type == 'actor':
+            file_path = save_actor_cover(file, save_folder, filename)
         else:
             os.makedirs(save_folder, exist_ok=True)
             file_path = os.path.join(save_folder, filename)
@@ -956,6 +970,7 @@ def upload_image():
         # 确定返回的路径
         if image_type == 'actor':
             return_path = f"/imgs/{ACTOR_COVER_FOLDER}/{filename}"
+            covers = cover_variant_urls(return_path, sizes=ACTOR_THUMB_SIZES)
         elif image_type == 'post':
             return_path = f"/imgs/{POST_COVER_FOLDER}/{filename}"
         elif image_type == 'imgbed':

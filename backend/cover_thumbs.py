@@ -1,4 +1,4 @@
-"""Movie-cover thumbnail generation (small / medium WebP)."""
+"""Cover thumbnail generation (WebP)."""
 
 import os
 
@@ -10,10 +10,14 @@ THUMB_EXT = '.webp'
 THUMB_FORMAT = 'WEBP'
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
 
-THUMB_SIZES = {
+MOVIE_THUMB_SIZES = {
     'small': {'max_edge': 480, 'quality': 75},
     'medium': {'max_edge': 960, 'quality': 82},
 }
+ACTOR_THUMB_SIZES = {
+    'small': {'max_edge': 480, 'quality': 75},
+}
+THUMB_SIZES = MOVIE_THUMB_SIZES
 
 
 def thumb_filename(original_filename):
@@ -40,15 +44,18 @@ def thumb_url(original_url, size):
     return f'{dirname}/{THUMBS_DIRNAME}/{size}/{thumb_filename(filename)}'
 
 
-def cover_variant_urls(original_url):
+def cover_variant_urls(original_url, sizes=None):
+    sizes = sizes or MOVIE_THUMB_SIZES
     if is_default_cover(original_url):
         url = original_url or DEFAULT_COVER_URL
-        return {'original': url, 'small': url, 'medium': url}
-    return {
-        'original': original_url,
-        'small': thumb_url(original_url, 'small'),
-        'medium': thumb_url(original_url, 'medium'),
-    }
+        variants = {'original': url}
+        for size in sizes:
+            variants[size] = url
+        return variants
+    variants = {'original': original_url}
+    for size in sizes:
+        variants[size] = thumb_url(original_url, size)
+    return variants
 
 
 def _to_rgb(img):
@@ -70,14 +77,15 @@ def _load_still(path):
         return _to_rgb(img).copy()
 
 
-def generate_thumbs(original_path, force=False, dry_run=False):
-    """Create small/medium WebP thumbs beside an original cover.
+def generate_thumbs(original_path, force=False, dry_run=False, sizes=None):
+    """Create WebP thumbs beside an original cover.
 
     Returns a dict of {size: dest_path} for written or already-present files.
     """
+    sizes = sizes or MOVIE_THUMB_SIZES
     results = {}
     img = None
-    for size, spec in THUMB_SIZES.items():
+    for size, spec in sizes.items():
         dest = thumb_path(original_path, size)
         if not force and os.path.exists(dest):
             results[size] = dest
@@ -100,13 +108,21 @@ def generate_thumbs(original_path, force=False, dry_run=False):
     return results
 
 
-def save_movie_cover(file_storage, dest_dir, filename):
-    """Persist the original cover, then generate both thumbnail grades."""
+def save_cover(file_storage, dest_dir, filename, sizes=None):
+    """Persist the original cover, then generate the requested thumbnail grades."""
     os.makedirs(dest_dir, exist_ok=True)
     original_path = os.path.join(dest_dir, filename)
     file_storage.save(original_path)
-    generate_thumbs(original_path, force=True)
+    generate_thumbs(original_path, force=True, sizes=sizes)
     return original_path
+
+
+def save_movie_cover(file_storage, dest_dir, filename):
+    return save_cover(file_storage, dest_dir, filename, sizes=MOVIE_THUMB_SIZES)
+
+
+def save_actor_cover(file_storage, dest_dir, filename):
+    return save_cover(file_storage, dest_dir, filename, sizes=ACTOR_THUMB_SIZES)
 
 
 def iter_original_covers(cover_dir):

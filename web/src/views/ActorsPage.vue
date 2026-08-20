@@ -55,7 +55,8 @@
         <div v-else class="actor-grid">
           <div v-for="actor in filteredActors" :key="actor.name" class="actor-item">
             <LazyImage
-              :src="actor.cover"
+              :src="coverSrc(actor)"
+              :src-fallback="coverOriginal(actor)"
               alt="演员封面"
               img-class="actor-cover"
               @click="goToActor(actor.name)"
@@ -109,7 +110,8 @@
           <div class="level-actors" v-show="!collapsedLevels.includes(level)">
             <div v-for="actor in actorsByFavorite[level]" :key="actor.name" class="actor-item">
               <LazyImage
-                :src="actor.cover"
+                :src="coverSrc(actor)"
+                :src-fallback="coverOriginal(actor)"
                 alt="演员封面"
                 img-class="actor-cover"
                 @click="goToActor(actor.name)"
@@ -144,6 +146,7 @@
 <script>
 import axios from 'axios'
 import LazyImage from '@/components/LazyImage.vue'
+import { actorCover } from '@/utils/cover'
 
 export default {
   name: 'ActorsPage',
@@ -202,6 +205,12 @@ export default {
   methods: {
     goToActor(name) {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
+    },
+    coverSrc(actor) {
+      return actorCover(actor, 'small')
+    },
+    coverOriginal(actor) {
+      return actorCover(actor, 'original')
     },
     async fetchActors() {
       try {
