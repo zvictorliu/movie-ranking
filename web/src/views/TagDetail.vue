@@ -5,7 +5,7 @@
       <div v-for="movie in movies" :key="movie.id" class="movie-item">
         <!-- 封面 -->
         <div class="cover-wrapper" @click="goToDetail(movie.id)">
-          <img :src="movie.cover" alt="封面" class="movie-cover" @error="setDefaultCover($event)" />
+          <LazyImage :src="movie.cover" alt="封面" img-class="movie-cover" />
         </div>
 
         <!-- 详细信息 -->
@@ -33,8 +33,12 @@
 
 <script>
 import axios from 'axios'
+import LazyImage from '@/components/LazyImage.vue'
 
 export default {
+  components: {
+    LazyImage,
+  },
   data() {
     return {
       tagName: '', // 当前标签名称
@@ -70,9 +74,6 @@ export default {
         console.error('电影记录不存在:', error)
         alert('不存在对应的电影记录')
       }
-    },
-    setDefaultCover(event) {
-      event.target.src = '/imgs/default.jpg' // 设置默认封面
     },
   },
 }
@@ -154,7 +155,7 @@ export default {
   transform: scale(1.02);
 }
 
-.movie-cover {
+:deep(.movie-cover) {
   border-radius: 8px;
   border: 2px solid var(--border-light);
   box-shadow: var(--shadow-sm);
@@ -184,7 +185,7 @@ export default {
   .movie-item {
     flex-direction: row;
   }
-  .movie-cover {
+  :deep(.movie-cover) {
     max-width: 350px;
     object-fit: cover;
     aspect-ratio: 16 / 9;
@@ -202,7 +203,7 @@ export default {
     flex-direction: column;
     align-items: flex-start;
   }
-  .movie-cover {
+  :deep(.movie-cover) {
     max-width: 100%;
     margin-right: 0;
     margin-bottom: 15px;
