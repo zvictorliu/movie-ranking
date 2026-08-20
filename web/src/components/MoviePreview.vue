@@ -3,7 +3,7 @@
     <div class="movie-item">
       <!-- 封面 -->
       <div class="cover-wrapper" @click="goToDetail(movie.id)">
-        <img :src="movie.cover" alt="封面" class="movie-cover" @error="setDefaultCover($event)" />
+        <LazyImage :src="movie.cover" alt="封面" img-class="movie-cover" />
       </div>
       <!-- 详细信息 -->
       <div class="details">
@@ -82,13 +82,22 @@
 
 <script>
 import axios from 'axios'
+import LazyImage from '@/components/LazyImage.vue'
 
 export default {
   name: 'MoviePreview',
+  components: {
+    LazyImage,
+  },
   props: {
     title: {
       type: String,
       required: true,
+    },
+    // 列表页传入完整影片对象时跳过逐条详情请求
+    movieData: {
+      type: Object,
+      default: null,
     },
     // 新增：是否允许点击评分
     allowRating: {
@@ -105,13 +114,23 @@ export default {
       ratingUpdating: false, // 评分更新状态
     }
   },
-  async created() {
-    await this.fetchMovie(this.title)
-  },
   watch: {
+    movieData: {
+      handler(val) {
+        if (val) {
+          this.movie = { ...val }
+          this.loading = false
+          this.error = null
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
     title: {
-      handler() {
-        this.fetchMovie(this.title)
+      handler(val) {
+        if (!this.movieData) {
+          this.fetchMovie(val)
+        }
       },
       immediate: true,
     },
@@ -119,7 +138,9 @@ export default {
   mounted() {
     // 监听影片创建事件，因为可能会影响当前影片信息
     this.$eventBus.on('movie-created', () => {
-      this.fetchMovie(this.title)
+      if (!this.movieData) {
+        this.fetchMovie(this.title)
+      }
     })
   },
   beforeUnmount() {
@@ -142,9 +163,6 @@ export default {
       } finally {
         this.loading = false
       }
-    },
-    setDefaultCover(event) {
-      event.target.src = '/imgs/default_cover.jpg'
     },
     goToDetail(id) {
       if (id) {
@@ -304,7 +322,7 @@ export default {
   .movie-item {
     flex-direction: row;
   }
-  .movie-cover {
+  :deep(.movie-cover) {
     max-width: 350px;
     object-fit: cover;
     aspect-ratio: 16 / 9;
@@ -325,7 +343,7 @@ export default {
     align-items: center;
     justify-content: flex-start; /* 内容从顶部开始 */
   }
-  .movie-cover {
+  :deep(.movie-cover) {
     max-width: 100%;
     margin-right: 0;
     margin-bottom: 15px;

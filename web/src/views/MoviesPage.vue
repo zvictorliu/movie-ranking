@@ -38,7 +38,7 @@
             :key="movie.id || `slide-${index}`"
             class="slideshow-slide"
             :class="{ active: index === currentSlideIndex }"
-            :style="{ backgroundImage: `url(${movie.cover || defaultCover})` }"
+            :style="getSlideshowSlideStyle(movie, index)"
             role="button"
             tabindex="0"
             :aria-label="movie.title ? `查看${movie.title}详情` : '查看影片详情'"
@@ -176,6 +176,7 @@
         v-for="(movie, index) in filteredMovies"
         :key="movie.id"
         :title="movie.title"
+        :movie-data="movie"
         :allow-rating="true"
       >
         <template #controls>
@@ -462,6 +463,23 @@ export default {
         return
       }
       this.$router.push({ name: 'MovieDetail', params: { id: movie.id } })
+    },
+    shouldLoadSlideshowCover(index) {
+      const total = this.slideshowMovies.length
+      if (total <= 1) {
+        return index === this.currentSlideIndex
+      }
+      const current = this.currentSlideIndex
+      const prev = (current - 1 + total) % total
+      const next = (current + 1) % total
+      return index === current || index === prev || index === next
+    },
+    getSlideshowSlideStyle(movie, index) {
+      if (!this.shouldLoadSlideshowCover(index)) {
+        return { backgroundColor: '#111' }
+      }
+      const cover = movie.cover || this.defaultCover
+      return { backgroundImage: `url(${cover})` }
     },
     onSlideshowTouchStart(event) {
       if (!event.touches || event.touches.length !== 1) {
