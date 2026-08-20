@@ -54,12 +54,11 @@
         <!-- 演员网格 -->
         <div v-else class="actor-grid">
           <div v-for="actor in filteredActors" :key="actor.name" class="actor-item">
-            <img
+            <LazyImage
               :src="actor.cover"
               alt="演员封面"
-              class="actor-cover"
+              img-class="actor-cover"
               @click="goToActor(actor.name)"
-              @error="setDefaultCover($event)"
             />
             <span class="actor-name">{{ actor.name }}</span>
           </div>
@@ -109,12 +108,11 @@
           </div>
           <div class="level-actors" v-show="!collapsedLevels.includes(level)">
             <div v-for="actor in actorsByFavorite[level]" :key="actor.name" class="actor-item">
-              <img
+              <LazyImage
                 :src="actor.cover"
                 alt="演员封面"
-                class="actor-cover"
+                img-class="actor-cover"
                 @click="goToActor(actor.name)"
-                @error="setDefaultCover($event)"
               />
               <div class="actor-name-container">
                 <span class="actor-name">{{ actor.name }}</span>
@@ -145,15 +143,19 @@
 
 <script>
 import axios from 'axios'
+import LazyImage from '@/components/LazyImage.vue'
+
 export default {
   name: 'ActorsPage',
+  components: {
+    LazyImage,
+  },
   data() {
     return {
       actors: [],
       searchQuery: '', // 搜索查询
       currentView: 'favorite', // 当前视图模式：grid 或 favorite
       collapsedLevels: [], // 存储折叠的喜爱度等级
-      defaultCover: '/imgs/default_cover.jpg', // 默认封面图片路径
     }
   },
   computed: {
@@ -200,9 +202,6 @@ export default {
   methods: {
     goToActor(name) {
       this.$router.push({ name: 'ActorDetail', params: { name } }) // 跳转到演员详情页
-    },
-    setDefaultCover(event) {
-      event.target.src = this.defaultCover // 设置默认封面图片
     },
     async fetchActors() {
       try {
@@ -398,7 +397,7 @@ export default {
   transform: translateY(-2px);
 }
 
-.actor-cover {
+:deep(.actor-cover) {
   max-width: 200px;
   object-fit: cover;
   margin-right: 10px;
@@ -407,7 +406,7 @@ export default {
   transition: transform 0.2s ease;
 }
 
-.actor-cover:hover {
+:deep(.actor-cover:hover) {
   transform: scale(1.05);
 }
 
