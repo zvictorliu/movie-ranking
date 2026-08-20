@@ -17,63 +17,72 @@
         </el-tooltip>
       </div>
     </div>
-    <img :src="actor.cover" alt="演员封面" class="cover" @error="setDefaultCover($event)" />
-    <div v-if="hasMetaSection" class="meta-section">
-      <div
-        v-for="item in metaInfoItems"
-        :key="item.label"
-        class="meta-item"
-      >
-        <span class="meta-label">{{ item.label }}：</span>
-        <span class="meta-value">{{ item.value }}</span>
-      </div>
-      <div v-if="shouldShowFavorite" class="meta-item meta-item--favorite">
-        <span class="meta-label">喜爱度：</span>
-        <span class="meta-value">
-          <span class="favorite-hearts">
-            <span
-              v-for="i in 5"
-              :key="i"
-              class="heart"
-              :class="{ filled: i <= actor.favorite, empty: i > actor.favorite }"
-              @click="updateFavorite(i)"
-            >
-              <span class="material-icons">
-                {{ i <= actor.favorite ? 'favorite' : 'favorite_border' }}
-              </span>
-            </span>
-          </span>
-        </span>
-      </div>
-      <div v-if="socialLinks.length" class="meta-item meta-item--social">
-        <span class="meta-label">社媒链接：</span>
-        <span class="meta-value">
-          <span class="social-links-list">
-            <a
-              v-for="link in socialLinks"
-              :key="link.type"
-              class="social-link"
-              :href="link.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              :title="link.title"
-              :aria-label="link.ariaLabel"
-            >
-              <i
-                :class="['social-icon', `social-icon--${link.type}`, 'fa-brands', link.iconClass]"
-                aria-hidden="true"
-              ></i>
-            </a>
-          </span>
-        </span>
-      </div>
-    </div>
 
-    <div class="section-divider" aria-hidden="true"></div>
+    <div class="article-body">
+      <aside v-if="actor.cover || hasMetaSection" class="infobox">
+        <div class="infobox-header">{{ actor.name }}</div>
+        <div class="infobox-photo">
+          <img
+            :src="actor.cover"
+            :alt="actor.name ? `${actor.name} 的照片` : '演员封面'"
+            class="cover"
+            @error="setDefaultCover($event)"
+          />
+        </div>
+        <table v-if="hasMetaSection" class="infobox-table">
+          <tbody>
+            <tr v-for="item in metaInfoItems" :key="item.label">
+              <th scope="row">{{ item.label }}</th>
+              <td>{{ item.value }}</td>
+            </tr>
+            <tr v-if="shouldShowFavorite">
+              <th scope="row">喜爱度</th>
+              <td>
+                <span class="favorite-hearts">
+                  <span
+                    v-for="i in 5"
+                    :key="i"
+                    class="heart"
+                    :class="{ filled: i <= actor.favorite, empty: i > actor.favorite }"
+                    @click="updateFavorite(i)"
+                  >
+                    <span class="material-icons">
+                      {{ i <= actor.favorite ? 'favorite' : 'favorite_border' }}
+                    </span>
+                  </span>
+                </span>
+              </td>
+            </tr>
+            <tr v-if="socialLinks.length">
+              <th scope="row">社媒链接</th>
+              <td>
+                <span class="social-links-list">
+                  <a
+                    v-for="link in socialLinks"
+                    :key="link.type"
+                    class="social-link"
+                    :href="link.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :title="link.title"
+                    :aria-label="link.ariaLabel"
+                  >
+                    <i
+                      :class="['social-icon', `social-icon--${link.type}`, 'fa-brands', link.iconClass]"
+                      aria-hidden="true"
+                    ></i>
+                  </a>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </aside>
 
-    <!-- 渲染正文内容 -->
-    <div class="content" v-if="!editBodyDialogVisible">
-      <MarkdownRender :content="actor.body" />
+      <!-- 渲染正文内容 -->
+      <div class="content" v-if="!editBodyDialogVisible">
+        <MarkdownRender :content="actor.body" />
+      </div>
     </div>
 
     <!-- 编辑正文对话框 -->
@@ -95,7 +104,7 @@
     </el-dialog>
 
     <!-- 返回按钮 -->
-    <button @click="goBack">返回</button>
+    <button class="back-button" @click="goBack">返回</button>
 
     <!-- 编辑元信息对话框 -->
     <MetaEditor
@@ -316,19 +325,26 @@ export default {
 <style scoped>
 .actor-detail {
   text-align: left;
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 30px;
-  background: var(--bg-gradient-light);
+  background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 12px;
   box-shadow: var(--card-shadow);
 }
 
+.actor-detail :deep(.title-container) {
+  border-bottom: 1px solid var(--border-medium);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
 .actor-detail h1 {
   color: var(--primary-color);
   font-size: 2rem;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -337,7 +353,7 @@ export default {
 
 .actor-detail p {
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.7;
   margin-bottom: 15px;
 }
 
@@ -346,69 +362,90 @@ export default {
   font-weight: 600;
 }
 
-/* title-container 样式已移至 article-title.scss */
+.article-body::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.infobox {
+  float: right;
+  width: 260px;
+  margin: 0 0 1.25rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.infobox-header {
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+  padding: 10px 8px;
+  background: var(--bg-gradient-medium);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+.infobox-photo {
+  padding: 8px 8px 4px;
+  text-align: center;
+}
 
 .cover {
+  display: block;
   max-width: 100%;
   height: auto;
-  margin-top: 20px;
-  border-radius: 12px;
-  border: 2px solid var(--border-light);
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
+  margin: 0 auto;
+  border: 1px solid var(--border-light);
 }
 
-.cover:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+.infobox-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
 }
 
-.meta-section {
-  margin-top: 24px;
-  padding: 20px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.infobox-table th,
+.infobox-table td {
+  padding: 7px 10px;
+  border-top: 1px solid var(--border-light);
+  vertical-align: top;
 }
 
-.meta-item {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  align-items: center;
-  gap: 12px;
-}
-
-.meta-label {
+.infobox-table th {
+  width: 36%;
   font-weight: 600;
-  color: var(--primary-color);
+  text-align: left;
+  color: var(--text-secondary);
+  background: var(--bg-gradient-light);
+  white-space: nowrap;
 }
 
-.meta-value {
+.infobox-table td {
   color: var(--text-secondary);
 }
 
-.meta-item--favorite {
-  align-items: flex-start;
-}
-
-.meta-item--favorite .meta-value {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
 .content {
-  margin-top: 30px;
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
-.section-divider {
-  height: 1px;
-  background: var(--border-light);
-  margin: 24px 0;
-  width: 100%;
+.content :deep(.markdown-render) {
+  min-width: 0;
 }
 
-button {
+.content :deep(.markdown-content) > *:first-child {
+  margin-top: 0;
+}
+
+.content :deep(.movie-preview),
+.content :deep(.markdown-inline-image) {
+  clear: right;
+}
+
+.back-button {
   padding: 12px 24px;
   cursor: pointer;
   position: relative;
@@ -422,16 +459,15 @@ button {
   margin-top: 20px;
 }
 
-button:hover {
+.back-button:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
 }
 
-/* 编辑按钮样式已移至 article-title.scss */
-
 .favorite-hearts {
   display: flex;
-  gap: 5px;
+  gap: 2px;
+  flex-wrap: wrap;
 }
 
 .heart {
@@ -440,12 +476,11 @@ button:hover {
 }
 
 .heart .material-icons {
-  font-size: 28px;
+  font-size: 20px;
 }
 
 .heart.filled .material-icons {
   color: #e91e63;
-  text-shadow: 0 2px 4px rgba(233, 30, 99, 0.3);
 }
 
 .heart.empty .material-icons {
@@ -453,21 +488,16 @@ button:hover {
 }
 
 .heart:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
 .heart:hover .material-icons {
   color: #e91e63;
 }
 
-.meta-item--social .meta-value {
-  display: flex;
-  align-items: center;
-}
-
 .social-links-list {
   display: inline-flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -486,14 +516,14 @@ button:hover {
 }
 
 .social-icon {
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1;
   transition: transform 0.2s ease;
 }
 
 .social-link:hover .social-icon,
 .social-link:focus-visible .social-icon {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .social-icon--x {
@@ -525,7 +555,6 @@ button:hover {
   color: #1f4d99;
 }
 
-/* 编辑正文对话框样式 */
 :deep(.body-editor-dialog .el-dialog) {
   height: 90vh;
 }
@@ -535,4 +564,25 @@ button:hover {
   padding: 0;
 }
 
+@media (max-width: 768px) {
+  .infobox {
+    float: none;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .actor-detail {
+    padding: 20px 16px;
+  }
+}
+
+body.dark-mode .social-icon--x {
+  color: #fff;
+}
+
+body.dark-mode .social-link:hover .social-icon--x,
+body.dark-mode .social-link:focus-visible .social-icon--x {
+  color: #ddd;
+}
 </style>
