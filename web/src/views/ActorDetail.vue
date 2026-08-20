@@ -362,16 +362,17 @@ export default {
   font-weight: 600;
 }
 
-.article-body::after {
-  content: '';
-  display: block;
-  clear: both;
+.article-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
 }
 
 .infobox {
-  float: right;
+  order: 2;
+  flex: 0 0 260px;
   width: 260px;
-  margin: 0 0 1.25rem 1.5rem;
+  margin: 0;
   background: var(--bg-secondary);
   border: 1px solid var(--border-medium);
   font-size: 0.875rem;
@@ -428,6 +429,8 @@ export default {
 }
 
 .content {
+  flex: 1 1 auto;
+  min-width: 0;
   color: var(--text-secondary);
   line-height: 1.7;
 }
@@ -440,9 +443,11 @@ export default {
   margin-top: 0;
 }
 
-.content :deep(.movie-preview),
-.content :deep(.markdown-inline-image) {
-  clear: right;
+.content :deep(.markdown-inline-image),
+.content :deep(.markdown-content img) {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
 }
 
 .back-button {
@@ -565,11 +570,17 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .article-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .infobox {
-    float: none;
+    order: 0;
+    flex: none;
     width: 100%;
     max-width: 280px;
-    margin: 0 auto 1.5rem;
+    align-self: center;
   }
 
   .actor-detail {
